@@ -191,14 +191,16 @@ TextMiningGUI <- function() {
     }
 
     # Transformation
-    Transformation <- function() {             
+    Transformation <- function() {    
+        languages <- c("spanish")         
         names <- colnames(DATA)
-        group <- tclVar(" ")
-        text <- tclVar(" ")
+        group <- tclVar("")
+        text <- tclVar("")
+        lang <- tclVar("")
 
-        window <- tktoplevel(width = 300, height = 150)
-        tkwm.minsize(window, "300", "150")
-        tkwm.maxsize(window, "300", "150")
+        window <- tktoplevel(width = 300, height = 175)
+        tkwm.minsize(window, "300", "175")
+        tkwm.maxsize(window, "300", "175")
 
         tkwm.title(window, "Transformation")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -228,6 +230,14 @@ TextMiningGUI <- function() {
                         justify = "left")
         tkgrid(combo_box2, row = 2, column = 1, sticky = "ew", padx = 2)
 
+        put_label(label_frame, "Language: ", 3, 0)
+        combo_box3 <- ttkcombobox(label_frame, 
+                        values = languages, 
+                        textvariable = lang,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box3, row = 3, column = 1, sticky = "ew", padx = 2)
+
         button_frame <- ttkframe(frame)
         cancel_button <- ttkbutton(button_frame, text = "cancel",
             command = function() { 
@@ -235,8 +245,15 @@ TextMiningGUI <- function() {
             })
         ok_button <- ttkbutton(button_frame, text = "ok",
             command = function() { 
+                g <- tclvalue(group)
+                t <- tclvalue(text)
+                l <- tclvalue(lang)
+
+                TMP <- DATA %>% distinct() %>% select(g, t)
+
                 RefreshTableFrame()
-                dataFrameTable(tableFrame, DATA)
+                TM <<- DataTM(TMP, l)
+                dataFrameTable(tableFrame, TM)
                 tkdestroy(window) 
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
@@ -263,6 +280,13 @@ TextMiningGUI <- function() {
 
     # Table
     dataFrameTable <- function(frame, DF) {
+        ID <- rownames(DF)
+        COL <- colnames(DF)
+        count <- nrow(DF)
+
+        DF <- cbind(ID, DF)
+        colnames(DF) <- c("-", COL)
+
         console_chunk("dim(DATA)")
         console_chunk("str(DATA)")
 
@@ -315,7 +339,7 @@ TextMiningGUI <- function() {
         # count
         frame_2 <- ttkframe(frame)
         tkpack(frame_2, fill = "x")
-        count <- paste0(" | Total rows: ", nrow(DATA))
+        count <- paste0(" | Total rows: ", count)
         label_count <- ttklabel(frame_0, text = count)
         tkpack(label_count, side = "left")
 
@@ -572,12 +596,13 @@ TextMiningGUI <- function() {
 
     tkadd(data_menu, "separator")
     
-    tkadd(data_menu, "command", label = "View text",
+    tkadd(data_menu, "command", label = "View words",
         command = function() {
-            
+            RefreshTableFrame()
+            dataFrameTable(tableFrame, TM)
         })
 
-    tkadd(data_menu, "command", label = "View raw data", 
+    tkadd(data_menu, "command", label = "View text", 
         command = function() {
             RefreshTableFrame()
             dataFrameTable(tableFrame, DATA)
