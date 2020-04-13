@@ -84,6 +84,35 @@ TextMiningGUI <- function() {
         }
     }
 
+    # About
+    About <- function() {             
+        window <- tktoplevel(width = 600, height = 400)
+        tkwm.minsize(window, "600", "400")
+        tkwm.maxsize(window, "600", "400")
+        tkwm.title(window, "About")
+
+        frame <- tkframe(window, bg = "white")
+        tkpack(frame, expand = TRUE, fill = "both")
+
+        tcl("image", "create", "photo", "imageID1", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))
+        img1 <- ttklabel(frame, image = "imageID1", compound = "image")
+        tkconfigure(img1, background = "white")
+        tkpack(img1)
+
+        text1 <- ttklabel(frame, text = "Version: 0.1")
+        tkconfigure(text1, background = "white")
+        text2 <- ttklabel(frame, text = "License: GPL")
+        tkconfigure(text2, background = "white")
+        text3 <- ttklabel(frame, text = "Developer: Conrado Reyes\n\n")
+        tkconfigure(text3, background = "white")
+        tkpack(text1, text2, text3)
+
+        tcl("image", "create", "photo", "imageID2", file = system.file("logos/usal.png", package = "TextMiningGUI"))
+        img2 <- ttklabel(frame, image = "imageID2", compound = "image")
+        tkconfigure(img2, background = "white")
+        tkpack(img2)
+    }
+
     # Converter
     Converter <- function() {             
         vars <- colnames(DATA)
@@ -560,4 +589,7 @@ TextMiningGUI <- function() {
         command = function() {
             console()
         })
+
+    # Help
+    tkadd(help_menu, "command", label = "About", command = About)
 }
