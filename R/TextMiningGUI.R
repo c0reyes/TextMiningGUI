@@ -249,7 +249,8 @@ TextMiningGUI <- function() {
                 t <- tclvalue(text)
                 l <- tclvalue(lang)
 
-                TMP <- DATA %>% distinct() %>% select(g, t)
+                TMP <- DATA %>% distinct() %>% select(g, t) 
+                colnames(TMP) <- c("GROUP","TEXT")
 
                 RefreshTableFrame()
                 TM <<- DataTM(TMP, l)
@@ -434,7 +435,7 @@ TextMiningGUI <- function() {
         encoding <- "UTF-8"
         header <- tclVar(TRUE) 
         sep <- tclVar(",")  
-        comment.char <- tclVar("#")
+        comment.char <- tclVar("")
         other.char <- tclVar("")
 
         window <- tktoplevel(width = 350, height = 200)
@@ -596,13 +597,13 @@ TextMiningGUI <- function() {
 
     tkadd(data_menu, "separator")
     
-    tkadd(data_menu, "command", label = "View words",
+    tkadd(data_menu, "command", label = "View Words",
         command = function() {
             RefreshTableFrame()
             dataFrameTable(tableFrame, TM)
         })
 
-    tkadd(data_menu, "command", label = "View text", 
+    tkadd(data_menu, "command", label = "View Raw Text", 
         command = function() {
             RefreshTableFrame()
             dataFrameTable(tableFrame, DATA)
