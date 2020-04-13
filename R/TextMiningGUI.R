@@ -531,16 +531,16 @@ TextMiningGUI <- function() {
     menu_bar <- tkmenu(window)
 
     tkconfigure(window, menu = menu_bar)
-    file_menu <- tkmenu(menu_bar)
+    file_menu <- tkmenu(menu_bar, tearoff = "0")
     tkadd(menu_bar, "cascade", label = "File", menu = file_menu)
 
-    data_menu <- tkmenu(menu_bar)
+    data_menu <- tkmenu(menu_bar, tearoff = "0")
     tkadd(menu_bar, "cascade", label = "Data", menu = data_menu)
 
-    analysis_menu <- tkmenu(menu_bar)
+    analysis_menu <- tkmenu(menu_bar, tearoff = "0")
     tkadd(menu_bar, "cascade", label = "Analysis", menu = analysis_menu)
 
-    help_menu <- tkmenu(menu_bar)
+    help_menu <- tkmenu(menu_bar, tearoff = "0")
     tkadd(menu_bar, "cascade", label = "Help", menu = help_menu)
 
     # File
