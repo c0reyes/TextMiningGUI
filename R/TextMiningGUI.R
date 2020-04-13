@@ -1,0 +1,563 @@
+TextMiningGUI <- function() {
+    # Scrollbars
+    addScrollbars <- function(parent, widget) {
+        xscr <- ttkscrollbar(parent, orient = "horizontal",
+                           command = function(...) tkxview(widget, ...))
+        yscr <- ttkscrollbar(parent, orient = "vertical",
+                           command = function(...) tkyview(widget, ...))
+
+        tkconfigure(widget,
+                  xscrollcommand = function(...) tkset(xscr,...),
+                  yscrollcommand = function(...) tkset(yscr,...))
+
+        tkgrid(widget, row = 0, column = 0, sticky = "news")
+        tkgrid(yscr, row = 0, column = 1, sticky = "ns")
+        tkgrid(xscr, row = 1, column = 0, sticky = "ew")
+        tkgrid.columnconfigure(parent, 0, weight = 1)
+        tkgrid.rowconfigure(parent, 0, weight = 1)
+    }
+
+    # Labels
+    put_label <- function(parent, text, row, column) {
+        label <- ttklabel(parent, text = text)
+        tkgrid(label, row = row, column = column, sticky = "e")
+    }
+
+    # Console
+    console <- function() {
+        if(!exists("windowc") || is.null(windowc)) {
+            windowc <<- tktoplevel()
+            tkwm.minsize(windowc, "600", "200")
+            tkwm.title(windowc, "Console")
+            tkwm.protocol(windowc, "WM_DELETE_WINDOW", function() {
+                    tkdestroy(windowc)
+                    windowc <<- NULL
+                    txt <<- NULL
+                })
+            frame <- ttkframe(windowc, padding = c(3,3,12,12))
+            frame_2 <- ttkframe(windowc)
+            tkpack(frame, expand = TRUE, fill = "both")
+            tkpack(frame_2, expand = TRUE, fill = "both")
+
+            txt <<- tktext(frame, width = 80, height =24)
+            addScrollbars(frame, txt)
+
+            tktag.configure(txt, "commandTag", foreground = "blue", font = "courier 12 italic")
+            tktag.configure(txt, "outputTag", font = "courier 12")
+            tktag.configure(txt, "errorTag", foreground = "red", font = "courier 12 bold")
+
+            button_frame <- ttkframe(frame_2)
+            close_button <- ttkbutton(button_frame, text = "close",
+                command = function() { 
+                    tkdestroy(windowc) 
+                    windowc <<- NULL
+                    txt <<- NULL
+                })
+            tkpack(button_frame, fill = "x", padx = 5, pady = 5)             
+            tkpack(close_button, side = "right", padx = 0)             
+        }
+    }
+
+    console_chunk <- function(cmds) {
+        if(exists("txt") && !is.null(txt)) {
+            tkinsert(txt, "end", "\n")
+            tkinsert(txt, "end", "\n")
+
+            cmd_chunks <- try(parse(text = cmds), silent = TRUE)
+
+            for(cmd in cmd_chunks) {
+                cutoff <- 0.75 * getOption("width")
+                dcmd <- deparse(cmd, width.cutoff = cutoff)
+                command <- paste(getOption("prompt"),
+                            paste(dcmd, collapse = paste("\n", 
+                            getOption("continue"), sep = "")),
+                            sep = "", collapse = "")
+                tkinsert(txt, "end", command, "commandTag")
+                tkinsert(txt, "end","\n")
+                
+                output <- capture.output(eval(cmd, envir = .GlobalEnv))
+                output <- iconv(output, to = "ASCII//TRANSLIT")
+                output <- paste(output, collapse = "\n")
+                tkinsert(txt, "end", output, "outputTag")
+                tkinsert(txt, "end","\n")
+            }
+        }
+    }
+
+    # Converter
+    Converter <- function() {             
+        vars <- colnames(DATA)
+        types <- c("factor", "date")
+
+        var <- tclVar("")
+        type <- tclVar("")
+        value <- tclVar("")
+
+        window <- tktoplevel(width = 300, height = 175)
+        tkwm.minsize(window, "300", "175")
+        tkwm.maxsize(window, "300", "175")
+
+        tkwm.title(window, "Converter")
+        frame <- ttkframe(window, padding = c(3,3,12,12))
+        tkpack(frame, expand = TRUE, fill = "both")
+
+        label_frame <- ttklabelframe(frame, text = "Options", padding = 10)
+        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
+
+        tkgrid.columnconfigure(label_frame, 0, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+        tkgrid.columnconfigure(label_frame, 2, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+
+        put_label(label_frame, "Variable: ", 1, 0)
+        combo_box1 <- ttkcombobox(label_frame, 
+                        values = vars, 
+                        textvariable = var,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box1, row = 1, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "Type: ", 2, 0)
+        combo_box2 <- ttkcombobox(label_frame, 
+                        values = types, 
+                        textvariable = type,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box2, row = 2, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "Values or format: ", 3, 0)
+        options <- ttkentry(label_frame, width = 15, textvariable = value)
+        tkgrid(options, row = 3, column = 1, sticky = "ew", padx = 2)
+
+        button_frame <- ttkframe(frame)
+        cancel_button <- ttkbutton(button_frame, text = "cancel",
+            command = function() { 
+                tkdestroy(window) 
+            })
+        ok_button <- ttkbutton(button_frame, text = "ok",
+            command = function() { 
+                v <- tclvalue(var)
+                t <- tclvalue(type)
+                vv <- tclvalue(value)
+
+                if(v != "" && t == "factor") {
+                    if(vv != "") {
+                        labels <- unlist(strsplit(vv, ","))
+                        DATA[[v]] <<- factor(DATA[[v]], labels = labels)
+                    }else{
+                        DATA[[v]] <<- factor(DATA[[v]])
+                    }
+                }else if(v != "" && t == "date" && vv != "") {
+                    DATA[[v]] <<- as.Date(DATA[[v]], vv)
+                }
+
+                RefreshTableFrame()
+                dataFrameTable(tableFrame, DATA)
+                tkdestroy(window)
+            })
+        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
+        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
+           fill = "y", side = "left")               
+        sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+    }
+
+    # Transformation
+    Transformation <- function() {             
+        names <- colnames(DATA)
+        group <- tclVar(" ")
+        text <- tclVar(" ")
+
+        window <- tktoplevel(width = 300, height = 150)
+        tkwm.minsize(window, "300", "150")
+        tkwm.maxsize(window, "300", "150")
+
+        tkwm.title(window, "Transformation")
+        frame <- ttkframe(window, padding = c(3,3,12,12))
+        tkpack(frame, expand = TRUE, fill = "both")
+
+        label_frame <- ttklabelframe(frame, text = "Options", padding = 10)
+        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
+
+        tkgrid.columnconfigure(label_frame, 0, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+        tkgrid.columnconfigure(label_frame, 2, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+
+        put_label(label_frame, "Group: ", 1, 0)
+        combo_box1 <- ttkcombobox(label_frame, 
+                        values = names, 
+                        textvariable = group,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box1, row = 1, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "Text: ", 2, 0)
+        combo_box2 <- ttkcombobox(label_frame, 
+                        values = names, 
+                        textvariable = text,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box2, row = 2, column = 1, sticky = "ew", padx = 2)
+
+        button_frame <- ttkframe(frame)
+        cancel_button <- ttkbutton(button_frame, text = "cancel",
+            command = function() { 
+                tkdestroy(window) 
+            })
+        ok_button <- ttkbutton(button_frame, text = "ok",
+            command = function() { 
+                RefreshTableFrame()
+                dataFrameTable(tableFrame, DATA)
+                tkdestroy(window) 
+            })
+        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
+        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
+           fill = "y", side = "left")               
+        sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+    }
+
+    # Fill Table
+    fillTable <- function(treeview, DF) {
+        children <- as.character(tcl(treeview, "children", ""))
+        for(i in children) 
+            tcl(treeview, "delete", i)                 
+        shade <- c("none", "gray")
+        strs <- unlist(lapply(DF, is.character)) 
+        for(i in seq_len(nrow(DF))) {
+            DF[i,] <- lapply(DF[i,], iconv, to = "ASCII//TRANSLIT")
+            tcl(treeview, "insert", "", "end", tag = shade[i %% 2], 
+                text = "",  
+                values = unlist(DF[i,]))               
+        }
+        tktag.configure(treeview, "gray", background = "gray95")
+    }
+
+    # Table
+    dataFrameTable <- function(frame, DF) {
+        console_chunk("dim(DATA)")
+        console_chunk("str(DATA)")
+
+        l <- if(nrow(DF) > 100) 100 else nrow(DF)
+        DF <- DF[1:l,]
+
+        .toCharacter <- function(x,width,...) UseMethod(".toCharacter")
+        .toCharacter.default <- function(x,width,...) as.character(x)
+        .toCharacter.integer <- function(x,width,...) {
+            if(missing(width)) width <- max(nchar(as.character(x))) + 2  
+            format(x, justify = "right", width = width)
+        }
+        .toCharacter.numeric <- function(x,width,...) {
+            if(missing(width)) width <- max(nchar(as.character(x))) + 2
+            format(x,trim = FALSE, width = width, justify = "right")
+        }
+        .toCharacter.factor <- function(x,width,...) {
+            if(missing(width)) width <- max(nchar(as.character(x))) + 2
+            .toCharacter(as.character(x),width,...)
+        }
+        .toCharacter.logical <- function(x,width,...) {
+            if(missing(width)) width <- 7
+            format(as.character(x), justify = "centre", width = width)
+        }
+        .toCharacter.data.frame <- function(x,width =  10, ...) {
+            nms <- dimnames(x)
+            DF <- as.data.frame(lapply(x,function(i) .toCharacter(i, width = width)),
+                          stringsAsFactors = FALSE)
+            dimnames(DF) <- nms
+            return(DF)
+        }
+
+        # filter
+        frame_0 <- ttkframe(frame)
+        tkpack(frame_0, fill = "x")
+        label <- ttklabel(frame_0, text = "Filter: ")
+        tkpack(label, side = "left")
+        filter_var <- tclVar("")
+        filter_entry <- ttkentry(frame_0, textvariable = filter_var)
+        tkpack(filter_entry, side = "left")
+
+        # make tree
+        frame_1 <- ttkframe(frame)
+        tkpack(frame_1, expand = TRUE, fill = "both")
+        treeview <- ttktreeview(frame_1, columns = 1:ncol(DF), 
+                      displaycolumns = 1:(ncol(DF)), 
+                      show = "headings",     
+                      selectmode = "browse") 
+
+        # count
+        frame_2 <- ttkframe(frame)
+        tkpack(frame_2, fill = "x")
+        count <- paste0(" | Total rows: ", nrow(DATA))
+        label_count <- ttklabel(frame_0, text = count)
+        tkpack(label_count, side = "left")
+
+        # scrollbars tree
+        addScrollbars(frame_1, treeview)
+
+        # configure
+        nms <- names(DF)
+        for(i in 1:ncol(DF)) {
+            tcl(treeview, "heading", i, text = nms[i])
+            tcl(treeview, "column", i, width = 10, stretch = TRUE, anchor = "w")
+        }
+
+        # fill
+        DF <- data.frame(lapply(DF, as.character), stringsAsFactors = FALSE)
+        fillTable(treeview, DF)
+
+        # filter bind
+        cur_ind <- 1:nrow(DF)
+        tkbind(filter_entry, "<KeyRelease>", function(W, K) {
+            val <- tclvalue(tkget(W))
+            poss_vals <- apply(DF, 1, function(...) 
+                        paste(..., collapse = " "))
+            ind <- grep(val, poss_vals)
+            if(length(ind) == 0) ind <- 1:nrow(DF)
+                fillTable(treeview, DF[ind,])
+        })
+    }
+
+    # Read Data
+    ReadData <- function(file_name) {                                                                                                                                                                                                                         
+        load(file_name)
+        df_names <- ls(pattern = "[^file_name]")
+        var <- tclVar(" ")
+
+        window <- tktoplevel(width = 300, height = 150)
+        tkwm.minsize(window, "300", "150")
+        tkwm.maxsize(window, "300", "150")
+
+        tkwm.title(window, "Data Options")
+        frame <- ttkframe(window, padding = c(3,3,12,12))
+        tkpack(frame, expand = TRUE, fill = "both")
+
+        label_frame <- ttklabelframe(frame, text = "Options", padding = 10)
+        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
+
+        tkgrid.columnconfigure(label_frame, 0, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+        tkgrid.columnconfigure(label_frame, 2, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+
+        put_label(label_frame, "Data: ", 1, 0)
+        combo_box <- ttkcombobox(label_frame, 
+                        values = df_names, 
+                        textvariable = var,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box, row = 1, column = 1, sticky = "ew", padx = 2)
+
+        tkbind(combo_box, "<<ComboboxSelected>>", function() {
+            if(is.matrix(get(tclvalue(var)))) {
+                DATA <<- as.data.frame(get(tclvalue(var)))
+            }else{
+                DATA <<- get(tclvalue(var))
+            }
+        })
+
+        button_frame <- ttkframe(frame)
+        cancel_button <- ttkbutton(button_frame, text = "cancel",
+            command = function() { 
+                tkdestroy(window) 
+            })
+        ok_button <- ttkbutton(button_frame, text = "ok",
+            command = function() { 
+                dataFrameTable(tableFrame, DATA)
+                tkdestroy(window) 
+            })
+        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
+        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
+           fill = "y", side = "left")               
+        sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+    }
+
+    # Read Excel
+    ReadExcel <- function(file_name) {                                                                                                                                                                                                                              
+        DATA <<- read_excel(file_name)                                                                                                                                                                                            
+        dataFrameTable(tableFrame, DATA)
+    }
+
+    # Read Table
+    ReadTable <- function(file_name) {
+        encoding <- "UTF-8"
+        header <- tclVar(TRUE) 
+        sep <- tclVar(",")  
+        comment.char <- tclVar("#")
+        other.char <- tclVar("")
+
+        window <- tktoplevel(width = 350, height = 200)
+        tkwm.minsize(window, "350", "200")
+        tkwm.maxsize(window, "350", "200")
+
+        tkwm.title(window, "Table Options")
+        frame <- ttkframe(window, padding = c(3,3,12,12))
+        tkpack(frame, expand = TRUE, fill = "both")
+
+        label_frame <- ttklabelframe(frame, text = "Options", padding = 10)
+        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
+
+        tkgrid.columnconfigure(label_frame, 0, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+        tkgrid.columnconfigure(label_frame, 2, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+
+        put_label(label_frame, "Header: ", 1, 0)
+        header_check <- ttkcheckbutton(label_frame, variable = header)
+        tkgrid(header_check, row = 1, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "Spacer: ", 2, 0)
+        rb_frame <- ttkframe(label_frame)
+        sapply(c(",","|","other:"), function(i) {
+            radio_button <- ttkradiobutton(rb_frame, variable = sep, text = i, value = i)
+            tkpack(radio_button, side = "left")
+        })
+        tkgrid(rb_frame, row = 2, column = 1, sticky = "ew", padx = 2)
+
+        other <- ttkentry(label_frame, width = 15, textvariable = other.char)
+        tkgrid(other, row = 2, column = 2, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "Comments: ", 3, 0)
+        entry <- ttkentry(label_frame, textvariable = comment.char)
+        tkgrid(entry, row = 3, column = 1, sticky = "ew", padx = 2)
+
+        button_frame <- ttkframe(frame)
+        cancel_button <- ttkbutton(button_frame, text = "cancel",
+            command = function() { 
+                tkdestroy(window) 
+            })
+        ok_button <- ttkbutton(button_frame, text = "ok",
+            command = function() { 
+                h <- if( tclvalue(header) == "1" ) TRUE else FALSE
+                s <- if( tclvalue(sep) == "other:") tclvalue(other.char) else tclvalue(sep)
+                DATA <<- read.table(file_name, 
+                    encoding = encoding, 
+                    header = h, 
+                    sep = s, 
+                    fill = TRUE, 
+                    quote = "", 
+                    stringsAsFactors = FALSE, 
+                    comment.char = tclvalue(comment.char))
+
+                dataFrameTable(tableFrame, DATA)
+                tkdestroy(window) 
+            })
+        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
+        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
+           fill = "y", side = "left")               
+        sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+    }
+
+    RefreshTableFrame <- function() {
+        if(exists("tableFrame")) {        
+            tkdestroy(tableFrame)
+        }
+        tableFrame <<- ttkframe(frame, padding = c(3,3,3,12))
+        tkpack(tableFrame, expand = TRUE, fill = "both")
+    }
+
+    done <- 1
+    window <- tktoplevel(width = 600, height = 400)
+    tkwm.minsize(window, "600", "400")
+    tkwm.title(window, "TextMiningGUI")
+    tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
+            tkdestroy(window)
+            tclvalue(done) <- 1
+        })
+    
+    # Table
+    frame <- ttkframe(window, padding = c(3,3,3,12))
+    tkpack(frame, expand = TRUE, fill = "both")
+    
+    # Image
+    tcl("image", "create", "photo", "imageID", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))
+    tableFrame <<- ttkframe(frame, padding = c(3,3,3,12))
+    tkpack(tableFrame, expand = TRUE, fill = "both")
+    img <- ttklabel(tableFrame, image = "imageID", compound = "image")
+    tkpack(img)
+
+    # Menu
+    menu_bar <- tkmenu(window)
+
+    tkconfigure(window, menu = menu_bar)
+    file_menu <- tkmenu(menu_bar)
+    tkadd(menu_bar, "cascade", label = "File", menu = file_menu)
+
+    data_menu <- tkmenu(menu_bar)
+    tkadd(menu_bar, "cascade", label = "Data", menu = data_menu)
+
+    analysis_menu <- tkmenu(menu_bar)
+    tkadd(menu_bar, "cascade", label = "Analysis", menu = analysis_menu)
+
+    help_menu <- tkmenu(menu_bar)
+    tkadd(menu_bar, "cascade", label = "Help", menu = help_menu)
+
+    # File
+    tkadd(file_menu,"command", label = "Text file...",
+        command =  function() {
+            file_name <- tkgetOpenFile(filetypes=
+                        "{{Text files} {.txt}} {{CSV files} {.csv}} {{All files} *}")
+            if(file.exists(file_name <- as.character(file_name))) {
+                RefreshTableFrame()
+                ReadTable(file_name)
+            }
+        })
+
+    tkadd(file_menu,"command", label = "Excel file...",
+        command =  function() {
+            file_name <- tkgetOpenFile(filetypes=
+                        "{{Excel files} {.xls}} {{Excel files} {.xlsx}} {{All files} *}")
+            if(file.exists(file_name <- as.character(file_name))) {
+                RefreshTableFrame()
+                ReadExcel(file_name)
+            }
+        })
+
+    tkadd(file_menu,"command", label = "Data file...",
+        command =  function() {
+            file_name <- tkgetOpenFile(filetypes=
+                        "{{Rdata files} {.Rdata}} {{Rdata files} {.RData}} {{Rdata files} {.rda}} {{All files} *}")
+            if(file.exists(file_name <- as.character(file_name))) {
+                RefreshTableFrame()
+                ReadData(file_name)
+            }
+        })
+
+    tkadd(file_menu, "command", label = "Set working directory...",
+        command = function() {
+            dir_name <- tkchooseDirectory()
+            if(nchar(dir_name <- as.character(dir_name)))
+                setwd(dir_name)
+        })
+
+    tkadd(file_menu, "separator")
+
+    tkadd(file_menu, "command", label = "Quit",
+        command = function() {
+            tkdestroy(window)
+            tclvalue(done) <- 1
+        })
+
+    # Data
+    tkadd(data_menu, "command", label = "Converter", command = Converter)
+
+    tkadd(data_menu, "command", label = "Transformation", command = Transformation)
+
+    tkadd(data_menu, "separator")
+    
+    tkadd(data_menu, "command", label = "View text",
+        command = function() {
+            
+        })
+
+    tkadd(data_menu, "command", label = "View raw data", 
+        command = function() {
+            RefreshTableFrame()
+            dataFrameTable(tableFrame, DATA)
+        })
+
+    tkadd(data_menu, "separator")
+
+    tkadd(data_menu, "command", label = "Console",
+        command = function() {
+            console()
+        })
+}
