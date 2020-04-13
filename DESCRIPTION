@@ -1,0 +1,9 @@
+Package: TextMiningGUI
+Version: 0.1
+Date: 2020-04-12
+Title: Text Mining GUI interface
+Author: Conrado Reyes, with...
+Maintainer: Conrado Reyes <coreyes@gmail.com>
+Depends: R(>= 3.6.3), tcltk, readxl
+Description: A simple GUI to analysis text.
+License: GPL (>= 2)
