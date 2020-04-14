@@ -527,7 +527,13 @@ TextMiningGUI <- function() {
             tkdestroy(window)
             tclvalue(done) <- 1
         })
-    
+
+    if(as.character(tcl("tk", "windowingsystem")) == "win32") {
+        tkwm.iconbitmap(window, system.file("icons/textmining.ico", package = "TextMiningGUI"))
+    }else{
+        tcl('wm', 'iconphoto', window, tcl('image', 'create', 'photo', '-file', system.file("icons/textmining.png", package = "TextMiningGUI")))
+    }
+
     # Table
     frame <- ttkframe(window, padding = c(3,3,3,12))
     tkpack(frame, expand = TRUE, fill = "both")
