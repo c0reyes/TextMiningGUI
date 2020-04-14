@@ -256,6 +256,8 @@ TextMiningGUI <- function() {
                 TM <<- DataTM(TMP, l)
                 dataFrameTable(tableFrame, TM)
                 tkdestroy(window) 
+                tkentryconfigure(menu_bar, 3, state = "normal")
+                tkentryconfigure(data_menu, 4, state = "normal")
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
@@ -417,6 +419,9 @@ TextMiningGUI <- function() {
             command = function() { 
                 dataFrameTable(tableFrame, DATA)
                 tkdestroy(window) 
+                tkentryconfigure(menu_bar, 2, state = "normal")
+                tkentryconfigure(menu_bar, 3, state = "disabled")
+                tkentryconfigure(data_menu, 4, state = "disabled")
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
@@ -428,6 +433,9 @@ TextMiningGUI <- function() {
     ReadExcel <- function(file_name) {                                                                                                                                                                                                                              
         DATA <<- read_excel(file_name)                                                                                                                                                                                            
         dataFrameTable(tableFrame, DATA)
+        tkentryconfigure(menu_bar, 2, state = "normal")
+        tkentryconfigure(menu_bar, 3, state = "disabled")
+        tkentryconfigure(data_menu, 4, state = "disabled")
     }
 
     # Read Table
@@ -492,7 +500,10 @@ TextMiningGUI <- function() {
                     comment.char = tclvalue(comment.char))
 
                 dataFrameTable(tableFrame, DATA)
-                tkdestroy(window) 
+                tkdestroy(window)
+                tkentryconfigure(menu_bar, 2, state = "normal")
+                tkentryconfigure(menu_bar, 3, state = "disabled")
+                tkentryconfigure(data_menu, 4, state = "disabled")
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
@@ -536,10 +547,10 @@ TextMiningGUI <- function() {
     tkadd(menu_bar, "cascade", label = "File", menu = file_menu)
 
     data_menu <- tkmenu(menu_bar, tearoff = "0")
-    tkadd(menu_bar, "cascade", label = "Data", menu = data_menu)
+    tkadd(menu_bar, "cascade", label = "Data", menu = data_menu, state = "disabled")
 
     analysis_menu <- tkmenu(menu_bar, tearoff = "0")
-    tkadd(menu_bar, "cascade", label = "Analysis", menu = analysis_menu)
+    tkadd(menu_bar, "cascade", label = "Analysis", menu = analysis_menu, state = "disabled")
 
     help_menu <- tkmenu(menu_bar, tearoff = "0")
     tkadd(menu_bar, "cascade", label = "Help", menu = help_menu)
@@ -596,17 +607,17 @@ TextMiningGUI <- function() {
     tkadd(data_menu, "command", label = "Transformation", command = Transformation)
 
     tkadd(data_menu, "separator")
-    
-    tkadd(data_menu, "command", label = "View Words",
-        command = function() {
-            RefreshTableFrame()
-            dataFrameTable(tableFrame, TM)
-        })
 
     tkadd(data_menu, "command", label = "View Raw Text", 
         command = function() {
             RefreshTableFrame()
             dataFrameTable(tableFrame, DATA)
+        })
+
+    tkadd(data_menu, "command", label = "View Words", state = "disabled",
+        command = function() {
+            RefreshTableFrame()
+            dataFrameTable(tableFrame, TM)
         })
 
     tkadd(data_menu, "separator")
