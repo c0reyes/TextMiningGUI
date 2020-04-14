@@ -585,7 +585,7 @@ TextMiningGUI <- function() {
     tkadd(file_menu,"command", label = "Data file...",
         command =  function() {
             file_name <- tkgetOpenFile(filetypes=
-                        "{{Rdata files} {.Rdata}} {{Rdata files} {.RData}} {{Rdata files} {.rda}} {{All files} *}")
+                        "{{Rdata files} {.RData}} {{Rdata files} {.Rdata}} {{Rdata files} {.rdata}} {{Rdata files} {.Rda}} {{Rdata files} {.rda}} {{All files} *}")
             if(file.exists(file_name <- as.character(file_name))) {
                 RefreshTableFrame()
                 ReadData(file_name)
