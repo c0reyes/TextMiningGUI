@@ -519,31 +519,49 @@ TextMiningGUI <- function() {
         tkpack(tableFrame, expand = TRUE, fill = "both")
     }
 
-    done <- 1
+    Page <- function(parent, name) {
+        iconx <- tclVar()
+        icons <- tclVar()
+        tcl("image", "create", "photo", iconx, file = system.file("icons/x.png", package = "TextMiningGUI"))
+        tcl("image", "create", "photo", icons, file = system.file("icons/save.png", package = "TextMiningGUI"))
+
+        frame <- ttkframe(parent, padding = c(3,3,3,12))
+        tkadd(parent, frame, sticky = "nswe", text = name, compound = "right")
+        
+        tool_bar <- ttkframe(frame, padding = 0)
+        content <- ttkframe(frame, padding = 4)
+        
+        tkgrid(tool_bar, row = 0, column = 0, sticky = "we")
+        tkgrid(content, row = 1, column = 0, sticky  =  "news")
+        tkgrid.rowconfigure(frame, 0, weight = 0)
+        tkgrid.rowconfigure(frame, 1, weight = 1)
+        tkgrid.columnconfigure(frame, 0, weight = 1)
+
+        txt <- "Lorem ipsum dolor sit amet..."
+        tkpack(ttklabel(content, text = txt))
+        
+        tcl("ttk::style", "configure", "Toolbar.TButton", font = "helvetica 12", padding = 0, borderwidth = 0)
+
+        img1 <- ttklabel(tool_bar, image = icons)
+        img2 <- ttklabel(tool_bar, image = iconx)
+        tkpack(img2, img1, side = "right")
+
+        tkbind(img2, "<ButtonRelease-1>", function() { tcl(parent, "forget", frame)})
+    }
+
+    # Main Window
     window <- tktoplevel(width = 600, height = 400)
     tkwm.minsize(window, "600", "400")
     tkwm.title(window, "TextMiningGUI")
     tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
             tkdestroy(window)
-            tclvalue(done) <- 1
         })
 
-    if(as.character(tcl("tk", "windowingsystem")) == "win32") {
+    if(as.character(tcl("tk", "windowingsystem")) == "win32" || Sys.info()["sysname"] == "Windows") {
         tkwm.iconbitmap(window, system.file("icons/textmining.ico", package = "TextMiningGUI"))
     }else{
         tcl('wm', 'iconphoto', window, tcl('image', 'create', 'photo', '-file', system.file("icons/textmining.png", package = "TextMiningGUI")))
     }
-
-    # Table
-    frame <- ttkframe(window, padding = c(3,3,3,12))
-    tkpack(frame, expand = TRUE, fill = "both")
-    
-    # Image
-    tcl("image", "create", "photo", "imageID", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))
-    tableFrame <<- ttkframe(frame, padding = c(3,3,3,12))
-    tkpack(tableFrame, expand = TRUE, fill = "both")
-    img <- ttklabel(tableFrame, image = "imageID", compound = "image")
-    tkpack(img)
 
     # Menu
     menu_bar <- tkmenu(window)
@@ -604,7 +622,6 @@ TextMiningGUI <- function() {
     tkadd(file_menu, "command", label = "Quit",
         command = function() {
             tkdestroy(window)
-            tclvalue(done) <- 1
         })
 
     # Data
@@ -635,4 +652,28 @@ TextMiningGUI <- function() {
 
     # Help
     tkadd(help_menu, "command", label = "About", command = About)
+
+    # Notebook
+    notebook <- ttknotebook(window)
+    tkpack(notebook, expand = TRUE, fill = "both")
+
+    # Table
+    frame <- ttkframe(notebook, padding = c(3,3,3,12))
+    tkadd(notebook, frame, sticky = "nswe", text = "Data", compound = "right")
+    
+    Page(notebook, "test1")
+    Page(notebook, "test2")
+    Page(notebook, "test3")
+
+    ## Notebook
+    #tcl(notebook, "index", "current")    
+    #tcl(notebook, "select", 0)           
+    #tcl("ttk::notebook::enableTraversal", notebook)
+
+    # Image
+    tcl("image", "create", "photo", "imageID", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))
+    tableFrame <<- ttkframe(frame, padding = c(3,3,3,12))
+    tkpack(tableFrame, expand = TRUE, fill = "both")
+    img <- ttklabel(tableFrame, image = "imageID", compound = "image")
+    tkpack(img)
 }
