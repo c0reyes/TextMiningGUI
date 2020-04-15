@@ -37,9 +37,9 @@ TextMiningGUI <- function() {
             frame <- ttkframe(windowc, padding = c(3,3,12,12))
             frame_2 <- ttkframe(windowc)
             tkpack(frame, expand = TRUE, fill = "both")
-            tkpack(frame_2, expand = TRUE, fill = "both")
+            tkpack(frame_2, side = "right")
 
-            txt <<- tktext(frame, width = 80, height =24)
+            txt <<- tktext(frame, width = 80, height = 24, wrap = "none", font = "courier")
             addScrollbars(frame, txt)
 
             tktag.configure(txt, "commandTag", foreground = "blue", font = "courier 12 italic")
@@ -253,8 +253,8 @@ TextMiningGUI <- function() {
                 colnames(TMP) <- c("GROUP","TEXT")
 
                 RefreshTableFrame()
-                TM <<- DataTM(TMP, l)
-                dataFrameTable(tableFrame, TM)
+                tm <<- DataTM(TMP, l)
+                dataFrameTable(tableFrame, tm$data)
                 tkdestroy(window) 
                 tkentryconfigure(menu_bar, 3, state = "normal")
                 tkentryconfigure(data_menu, 4, state = "normal")
@@ -537,16 +537,31 @@ TextMiningGUI <- function() {
         tkgrid.rowconfigure(frame, 1, weight = 1)
         tkgrid.columnconfigure(frame, 0, weight = 1)
 
-        txt <- "Lorem ipsum dolor sit amet..."
-        tkpack(ttklabel(content, text = txt))
-        
-        tcl("ttk::style", "configure", "Toolbar.TButton", font = "helvetica 12", padding = 0, borderwidth = 0)
-
         img1 <- ttklabel(tool_bar, image = icons)
         img2 <- ttklabel(tool_bar, image = iconx)
         tkpack(img2, img1, side = "right")
 
         tkbind(img2, "<ButtonRelease-1>", function() { tcl(parent, "forget", frame)})
+
+        return(content)
+    }
+
+    ## Analysis
+    Explorer <- function() {
+        console_chunk("tm")
+        content <- Page(notebook, "Explorer")
+        
+        eplot <- tkrplot(content, fun = function() {
+                p <- tm$token %>% ggplot(aes(x = GROUP)) + geom_bar() + labs(title = "Words by groups")
+                p <- p + theme(text = element_text(size = 12))
+                plot(p)
+            }, hscale = 1.5, vscale = 1.5)
+        tkpack(eplot)
+
+        # tm$token %>% ggplot(aes(x = GROUP)) + geom_bar() + labs(title = "Distinct words by groups")
+
+        l <- length(as.character(tcl(notebook,"tabs")))
+        tcl(notebook, "select", l-1)
     }
 
     # Main Window
@@ -640,7 +655,7 @@ TextMiningGUI <- function() {
     tkadd(data_menu, "command", label = "View Words", state = "disabled",
         command = function() {
             RefreshTableFrame()
-            dataFrameTable(tableFrame, TM)
+            dataFrameTable(tableFrame, tm$data)
         })
 
     tkadd(data_menu, "separator")
@@ -650,25 +665,21 @@ TextMiningGUI <- function() {
             console()
         })
 
+    # Analysis
+    tkadd(analysis_menu, "command", label = "Explorer", command = Explorer)
+
+    tkadd(analysis_menu, "separator")
+
     # Help
     tkadd(help_menu, "command", label = "About", command = About)
 
     # Notebook
-    notebook <- ttknotebook(window)
+    notebook <<- ttknotebook(window)
     tkpack(notebook, expand = TRUE, fill = "both")
 
     # Table
     frame <- ttkframe(notebook, padding = c(3,3,3,12))
     tkadd(notebook, frame, sticky = "nswe", text = "Data", compound = "right")
-    
-    Page(notebook, "test1")
-    Page(notebook, "test2")
-    Page(notebook, "test3")
-
-    ## Notebook
-    #tcl(notebook, "index", "current")    
-    #tcl(notebook, "select", 0)           
-    #tcl("ttk::notebook::enableTraversal", notebook)
 
     # Image
     tcl("image", "create", "photo", "imageID", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))

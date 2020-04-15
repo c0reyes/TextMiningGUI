@@ -1,1 +1,3 @@
 export(TextMiningGUI)
+
+S3method(print, DataTM)
