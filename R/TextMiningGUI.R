@@ -541,7 +541,12 @@ TextMiningGUI <- function() {
 
         tkbind(img2, "<ButtonRelease-1>", function() { tcl(parent, "forget", frame)})
 
-        return(content)
+        page <- list()
+        page$content <- content
+        page$save <- img1
+        class(page) <- "Page"
+
+        return(page)
     }
 
     # Main Window
@@ -649,6 +654,8 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Explorer", command = Explorer)
 
     tkadd(analysis_menu, "separator")
+
+    tkadd(analysis_menu, "command", label = "Worldcloud", command = Worldcloud)
 
     # Help
     tkadd(help_menu, "command", label = "About", command = About)

@@ -23,9 +23,8 @@ DataTM <- function(DF, language) {
 
     tm <- list()
     tm$data <- TM
-    tm$token <- df
-    tm$sum <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
-    tm$dist <- df %>% select(GROUP, word) %>% distinct() %>% group_by(GROUP) %>% summarise(distinct = n())
+    tm$freq <- df
+    tm$dist <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
     class(tm) <- "DataTM"
 
     return(tm)
