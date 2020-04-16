@@ -1,15 +1,13 @@
 TextMiningGUI <- function() {
     # Scrollbars
-    addScrollbars <- function(parent, widget) {
+    addScrollbars <<- function(parent, widget) {
         xscr <- ttkscrollbar(parent, orient = "horizontal",
                            command = function(...) tkxview(widget, ...))
         yscr <- ttkscrollbar(parent, orient = "vertical",
                            command = function(...) tkyview(widget, ...))
-
         tkconfigure(widget,
                   xscrollcommand = function(...) tkset(xscr,...),
                   yscrollcommand = function(...) tkset(yscr,...))
-
         tkgrid(widget, row = 0, column = 0, sticky = "news")
         tkgrid(yscr, row = 0, column = 1, sticky = "ns")
         tkgrid(xscr, row = 1, column = 0, sticky = "ew")
@@ -18,9 +16,9 @@ TextMiningGUI <- function() {
     }
 
     # Labels
-    put_label <- function(parent, text, row, column) {
+    put_label <<- function(parent, text, row, column, sticky = "e") {
         label <- ttklabel(parent, text = text)
-        tkgrid(label, row = row, column = column, sticky = "e")
+        tkgrid(label, row = row, column = column, sticky = sticky)
     }
 
     # Console
@@ -58,7 +56,7 @@ TextMiningGUI <- function() {
         }
     }
 
-    console_chunk <- function(cmds) {
+    console_chunk <<- function(cmds) {
         if(exists("txt") && !is.null(txt)) {
             tkinsert(txt, "end", "\n")
             tkinsert(txt, "end", "\n")
@@ -519,7 +517,7 @@ TextMiningGUI <- function() {
         tkpack(tableFrame, expand = TRUE, fill = "both")
     }
 
-    Page <- function(parent, name) {
+    Page <<- function(parent, name) {
         iconx <- tclVar()
         icons <- tclVar()
         tcl("image", "create", "photo", iconx, file = system.file("icons/x.png", package = "TextMiningGUI"))
@@ -544,24 +542,6 @@ TextMiningGUI <- function() {
         tkbind(img2, "<ButtonRelease-1>", function() { tcl(parent, "forget", frame)})
 
         return(content)
-    }
-
-    ## Analysis
-    Explorer <- function() {
-        console_chunk("tm")
-        content <- Page(notebook, "Explorer")
-        
-        eplot <- tkrplot(content, fun = function() {
-                p <- tm$token %>% ggplot(aes(x = GROUP)) + geom_bar() + labs(title = "Words by groups")
-                p <- p + theme(text = element_text(size = 12))
-                plot(p)
-            }, hscale = 1.5, vscale = 1.5)
-        tkpack(eplot)
-
-        # tm$token %>% ggplot(aes(x = GROUP)) + geom_bar() + labs(title = "Distinct words by groups")
-
-        l <- length(as.character(tcl(notebook,"tabs")))
-        tcl(notebook, "select", l-1)
     }
 
     # Main Window
@@ -685,6 +665,10 @@ TextMiningGUI <- function() {
     tcl("image", "create", "photo", "imageID", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))
     tableFrame <<- ttkframe(frame, padding = c(3,3,3,12))
     tkpack(tableFrame, expand = TRUE, fill = "both")
-    img <- ttklabel(tableFrame, image = "imageID", compound = "image")
+    img <- ttklabel(tableFrame, image = "imageID", compound = "image", anchor = "center")
     tkpack(img)
 }
+
+#scrollable-frame
+#example-padding
+#validation
