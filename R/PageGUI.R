@@ -1,4 +1,6 @@
-PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = "", title = "", xlab = "", ylab = "", flip = FALSE, palette = "") {
+PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = "", title = "", 
+                    xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "",
+                    background = "", text_color = "", vector_color = "", point_color = "") {
     themes <- c("theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
     palettes <- c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Paired", "Dark2", "Accent")
 
@@ -9,6 +11,28 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
     .ylab <- ylab
     .flip <- flip
     .palette <- palette
+    .subtitle <- subtitle
+    .caption <- caption
+    .background <- background
+    .tcolor <- text_color
+    .vcolor <- vector_color
+    .pcolor <- point_color
+
+    graph <- list()
+    graph$color <- .color
+    graph$theme <- .theme
+    graph$title <- .title
+    graph$xlab <- .xlab
+    graph$ylab <- .ylab
+    graph$flip <- .flip
+    graph$palette <- .palette
+    graph$subtitle <- .subtitle
+    graph$caption <- .caption
+    graph$background <- .background
+    graph$tcolor <- .tcolor
+    graph$vcolor <- .vcolor
+    graph$pcolor <- .pcolor
+    class(graph) <- "graph"
 
     console_chunk("tm")
     page <- Page(notebook, name)
@@ -39,105 +63,232 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
     tkgrid.rowconfigure(sidebar, 11, weight = 0)
     tkgrid.rowconfigure(sidebar, 12, weight = 0)
     tkgrid.rowconfigure(sidebar, 13, weight = 0)
+    tkgrid.rowconfigure(sidebar, 14, weight = 0)
+    tkgrid.rowconfigure(sidebar, 15, weight = 0)
+    tkgrid.rowconfigure(sidebar, 16, weight = 0)
+    tkgrid.rowconfigure(sidebar, 17, weight = 0)
+    tkgrid.rowconfigure(sidebar, 18, weight = 0)
+    tkgrid.rowconfigure(sidebar, 19, weight = 0)
+    tkgrid.rowconfigure(sidebar, 20, weight = 0)
+    tkgrid.rowconfigure(sidebar, 21, weight = 0)
+    tkgrid.rowconfigure(sidebar, 22, weight = 0)
+    tkgrid.rowconfigure(sidebar, 23, weight = 0)
+    tkgrid.rowconfigure(sidebar, 24, weight = 0)
+    tkgrid.rowconfigure(sidebar, 25, weight = 0)
 
     title <- tclVar()
     put_label(sidebar, "Title: ", 1, 1, sticky = "nw")
-    entry1 <- ttkentry(sidebar, textvariable = title)
+    entry1 <- ttkentry(sidebar, textvariable = title, state = "disabled")
     tkgrid(entry1, row = 2, column = 1, sticky = "nw", padx = 2)
 
+    subtitle <- tclVar()
+    put_label(sidebar, "Subtitle: ", 3, 1, sticky = "nw")
+    subentry <- ttkentry(sidebar, textvariable = subtitle, state = "disabled")
+    tkgrid(subentry, row = 4, column = 1, sticky = "nw", padx = 2)
+
+    caption <- tclVar()
+    put_label(sidebar, "Caption: ", 5, 1, sticky = "nw")
+    capentry <- ttkentry(sidebar, textvariable = caption, state = "disabled")
+    tkgrid(capentry, row = 6, column = 1, sticky = "nw", padx = 2)
+    
     xlab <- tclVar()
-    put_label(sidebar, "xlab: ", 3, 1, sticky = "nw")
-    entry2 <- ttkentry(sidebar, textvariable = xlab)
-    tkgrid(entry2, row = 4, column = 1, sticky = "nw", padx = 2)
+    put_label(sidebar, "xlab: ", 7, 1, sticky = "nw")
+    entry2 <- ttkentry(sidebar, textvariable = xlab, state = "disabled")
+    tkgrid(entry2, row = 8, column = 1, sticky = "nw", padx = 2)
 
     ylab <- tclVar()
-    put_label(sidebar, "ylab: ", 5, 1, sticky = "nw")
-    entry3 <- ttkentry(sidebar, textvariable = ylab)
-    tkgrid(entry3, row = 6, column = 1, sticky = "nw", padx = 2)
+    put_label(sidebar, "ylab: ", 9, 1, sticky = "nw")
+    entry3 <- ttkentry(sidebar, textvariable = ylab, state = "disabled")
+    tkgrid(entry3, row = 10, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Theme: ", 7, 1, sticky = "nw")
+    put_label(sidebar, "Theme: ", 11, 1, sticky = "nw")
     themex <- tclVar()
     theme_box <- ttkcombobox(sidebar, 
                         values = themes, 
                         textvariable = themex,
                         state = "normal",
-                        justify = "left")
-    tkgrid(theme_box, row = 8, column = 1, sticky = "nw", padx = 2)
+                        justify = "left", state = "disabled")
+    tkgrid(theme_box, row = 12, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Palette: ", 9, 1, sticky = "nw")
+    put_label(sidebar, "Palette: ", 13, 1, sticky = "nw")
     palette <- tclVar()
     palette_box <- ttkcombobox(sidebar, 
                         values = palettes, 
                         textvariable = palette,
                         state = "normal",
-                        justify = "left")
-    tkgrid(palette_box, row = 10, column = 1, sticky = "nw", padx = 2)
+                        justify = "left", state = "disabled")
+    tkgrid(palette_box, row = 14, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Barcolor: ", 11, 1, sticky = "nw")
+    put_label(sidebar, "Bar: ", 15, 1, sticky = "nw")
     color <- tkcanvas(sidebar, width = 40, height = 16, 
         background = "#000000",
         highlightbackground = "#ababab")
-    tkgrid(color, row = 12, column = 1, sticky = "nw", padx = 2)
+    tkgrid(color, row = 16, column = 1, sticky = "nw", padx = 2)
+
+    put_label(sidebar, "Background: ", 17, 1, sticky = "nw")
+    bcolor <- tkcanvas(sidebar, width = 40, height = 16, 
+        background = "#000000",
+        highlightbackground = "#ababab")
+    tkgrid(bcolor, row = 18, column = 1, sticky = "nw", padx = 2)
+
+    put_label(sidebar, "Text: ", 19, 1, sticky = "nw")
+    tcolor <- tkcanvas(sidebar, width = 40, height = 16, 
+        background = "#000000",
+        highlightbackground = "#ababab")
+    tkgrid(tcolor, row = 20, column = 1, sticky = "nw", padx = 2)
+
+    put_label(sidebar, "Vector: ", 21, 1, sticky = "nw")
+    vcolor <- tkcanvas(sidebar, width = 40, height = 16, 
+        background = "#000000",
+        highlightbackground = "#ababab")
+    tkgrid(vcolor, row = 22, column = 1, sticky = "nw", padx = 2)
+
+    put_label(sidebar, "Point: ", 23, 1, sticky = "nw")
+    pcolor <- tkcanvas(sidebar, width = 40, height = 16, 
+        background = "#000000",
+        highlightbackground = "#ababab")
+    tkgrid(pcolor, row = 24, column = 1, sticky = "nw", padx = 2)
 
     flip <- tclVar(FALSE)
     label_var <- tclVar("Flip graph")
-    check_button <- ttkcheckbutton(sidebar, variable = flip, textvariable = label_var, command = function() {
+    check_button <- ttkcheckbutton(sidebar, variable = flip, textvariable = label_var, state = "disabled", command = function() {
             .flip <<- if( tclvalue(flip) == "1" ) TRUE else FALSE
+            graph$flip <<- .flip
             tkrreplot(eplot, fun = function() {
-                plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+                plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
-    tkgrid(check_button, row = 13, column = 1, sticky = "nw", padx = 2)
+    tkgrid(check_button, row = 25, column = 1, sticky = "nw", padx = 2)
 
     tkbind(color, "<Button-1>", function(W) {
-            color <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-            .color <<- tclvalue(color)
-            if(nchar(.color)) {
-                tkconfigure(W, background = .color) 
-                tkrreplot(eplot, fun = function() {
-                        plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
-                    }, hscale = hscale, vscale = vscale)
+            if(.color != "") {
+                color <- tcl("tk_chooseColor", parent = W, title = "Set box color")
+                .color <<- tclvalue(color)
+                graph$color <<- .color
+                if(nchar(.color)) {
+                    tkconfigure(W, background = .color) 
+                    tkrreplot(eplot, fun = function() {
+                            plot(Plot(graph))
+                        }, hscale = hscale, vscale = vscale)
+                }
+            }
+        })
+
+    tkbind(bcolor, "<Button-1>", function(W) {
+            if(.background != "") {
+                bcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
+                .background <<- tclvalue(bcolor)
+                graph$background <<- .background
+                if(nchar(.background)) {
+                    tkconfigure(W, background = .background) 
+                    tkrreplot(eplot, fun = function() {
+                            plot(Plot(graph))
+                        }, hscale = hscale, vscale = vscale)
+                }
+            }
+        })
+
+    tkbind(tcolor, "<Button-1>", function(W) {
+            if(.tcolor != "") {
+                tcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
+                .tcolor <<- tclvalue(tcolor)
+                graph$tcolor <<- .tcolor
+                if(nchar(.tcolor)) {
+                    tkconfigure(W, background = .tcolor) 
+                    tkrreplot(eplot, fun = function() {
+                            plot(Plot(graph))
+                        }, hscale = hscale, vscale = vscale)
+                }
+            }
+        })
+
+    tkbind(vcolor, "<Button-1>", function(W) {
+            if(.vcolor != "") {
+                vcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
+                .vcolor <<- tclvalue(vcolor)
+                graph$vcolor <<- .vcolor
+                if(nchar(.vcolor)) {
+                    tkconfigure(W, background = .vcolor) 
+                    tkrreplot(eplot, fun = function() {
+                            plot(Plot(graph))
+                        }, hscale = hscale, vscale = vscale)
+                }
+            }
+        })
+
+    tkbind(pcolor, "<Button-1>", function(W) {
+            if(.pcolor != "") {
+                pcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
+                .pcolor <<- tclvalue(pcolor)
+                graph$pcolor <<- .pcolor
+                if(nchar(.pcolor)) {
+                    tkconfigure(W, background = .pcolor) 
+                    tkrreplot(eplot, fun = function() {
+                            plot(Plot(graph))
+                        }, hscale = hscale, vscale = vscale)
+                }
             }
         })
 
     tkbind(theme_box, "<<ComboboxSelected>>", function() {
             .theme <<- tclvalue(themex)
+            graph$theme <<- .theme
             tkrreplot(eplot, fun = function() {
-                plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+                plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(palette_box, "<<ComboboxSelected>>", function() {
             .palette <<- tclvalue(palette)
+            graph$palette <<- .palette
             tkrreplot(eplot, fun = function() {
-                plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+                plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(entry1, "<Return>", function() {
             .title <<- tclvalue(title)
+            graph$title <<- .title
             tkrreplot(eplot, fun = function() {
-                plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+                plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(entry2, "<Return>", function() {
             .xlab <<- tclvalue(xlab)
+            graph$xlab <<- .xlab
             tkrreplot(eplot, fun = function() {
-                plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+                plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(entry3, "<Return>", function() {
             .ylab <<- tclvalue(ylab)
+            graph$ylab <<- .ylab
             tkrreplot(eplot, fun = function() {
-                plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+                plot(Plot(graph))
+            }, hscale = hscale, vscale = vscale)
+        })
+
+    tkbind(subentry, "<Return>", function() {
+            .subtitle <<- tclvalue(subtitle)
+            graph$subtitle <<- .subtitle
+            tkrreplot(eplot, fun = function() {
+                plot(Plot(graph))
+            }, hscale = hscale, vscale = vscale)
+        })
+
+    tkbind(capentry, "<Return>", function() {
+            .caption <<- tclvalue(caption)
+            graph$caption <<- .caption
+            tkrreplot(eplot, fun = function() {
+                plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     # Graph
     eplot <- tkrplot(frame, fun = function() {
-            plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+            plot(Plot(graph))
         }, hscale = hscale, vscale = vscale)
     tkpack(eplot)
 
@@ -146,12 +297,21 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
 
     # Save
     tkbind(page$save, "<ButtonRelease-1>", function() {
-            ggsave(paste0(name, ".png"), plot = Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+            ggsave(paste0(name, ".png"), plot = Plot(graph))
             tkmessageBox(title = "Save", message = "Plot", detail = "The graph was saved.", type = "ok")
         })
 
     # Zoom
     tkbind(page$zoom, "<ButtonRelease-1>", function() {
-            plot(Plot(color = .color, theme = .theme, title = .title, xlab = .xlab, ylab = .ylab, flip = .flip, palette = .palette))
+            plot(Plot(graph))
         })
+
+    if(.title != "") tcl(entry1, "config", "-state", "normal")
+    if(.xlab != "") tcl(entry2, "config", "-state", "normal")
+    if(.ylab != "") tcl(entry3, "config", "-state", "normal")
+    if(.theme != "") tcl(theme_box, "config", "-state", "normal")
+    if(.palette != "") tcl(palette_box, "config", "-state", "normal")
+    if(.flip != "") tcl(check_button, "config", "-state", "normal")
+    if(.subtitle != "") tcl(subentry, "config", "-state", "normal")
+    if(.caption != "") tcl(capentry, "config", "-state", "normal")
 }

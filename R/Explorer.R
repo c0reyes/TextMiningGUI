@@ -1,12 +1,16 @@
 Explorer <- function() {
-    Plot <- function(color, theme, title, xlab, ylab, flip = FALSE, ...) {
-        t <- match.fun(theme)
-        pe <- tm$freq %>% ggplot(aes(x = GROUP)) + geom_bar(fill = color) + labs(title = title) + xlab(xlab) + ylab(ylab)
+    Plot <- function(graph) {
+        t <- match.fun(graph$theme)
+        pe <- tm$freq %>% ggplot(aes(x = GROUP)) + geom_bar(fill = graph$color) + 
+            labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + 
+            xlab(graph$xlab) + 
+            ylab(graph$ylab)
         pe <- pe + theme(text = element_text(size = 12)) + t()
-        if(flip == TRUE)
+        if(graph$flip == TRUE)
             pe <- pe + coord_flip()
         return(pe)
     }
 
-    PageGUI("Distinct words by groups", Plot, color = "#000000", theme = "theme_classic", title = "Distinct words by groups", xlab = "Groups", ylab = "Counts", flip = FALSE)
+    PageGUI("Distinct words by groups", Plot, color = "#000000", theme = "theme_classic", title = "Distinct words by groups", 
+            xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ")
 }
