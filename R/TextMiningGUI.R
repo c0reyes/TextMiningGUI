@@ -370,6 +370,62 @@ TextMiningGUI <- function() {
         })
     }
 
+    # Examples
+    ReadExample <- function() {                                                                                                                                                                                                                         
+        df_names <- c("chistes")
+        var <- tclVar(" ")
+
+        window <- tktoplevel(width = 300, height = 150)
+        tkwm.minsize(window, "300", "150")
+        tkwm.maxsize(window, "300", "150")
+
+        tkwm.title(window, "Data Options")
+        frame <- ttkframe(window, padding = c(3,3,12,12))
+        tkpack(frame, expand = TRUE, fill = "both")
+
+        label_frame <- ttklabelframe(frame, text = "Options", padding = 10)
+        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
+
+        tkgrid.columnconfigure(label_frame, 0, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+        tkgrid.columnconfigure(label_frame, 2, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+
+        put_label(label_frame, "Data: ", 1, 0)
+        combo_box <- ttkcombobox(label_frame, 
+                        values = df_names, 
+                        textvariable = var,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box, row = 1, column = 1, sticky = "ew", padx = 2)
+
+        tkbind(combo_box, "<<ComboboxSelected>>", function() {
+            if(is.matrix(get(tclvalue(var)))) {
+                DATA <<- as.data.frame(get(tclvalue(var)))
+            }else{
+                DATA <<- get(tclvalue(var))
+            }
+        })
+
+        button_frame <- ttkframe(frame)
+        cancel_button <- ttkbutton(button_frame, text = "cancel",
+            command = function() { 
+                tkdestroy(window) 
+            })
+        ok_button <- ttkbutton(button_frame, text = "ok",
+            command = function() { 
+                dataFrameTable(tableFrame, DATA)
+                tkdestroy(window) 
+                tkentryconfigure(menu_bar, 2, state = "normal")
+                tkentryconfigure(menu_bar, 3, state = "disabled")
+                tkentryconfigure(data_menu, 4, state = "disabled")
+            })
+        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
+        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
+           fill = "y", side = "left")               
+        sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+    }
+
     # Read Data
     ReadData <- function(file_name) {                                                                                                                                                                                                                         
         load(file_name)
@@ -520,14 +576,16 @@ TextMiningGUI <- function() {
     Page <<- function(parent, name) {
         iconx <- tclVar()
         icons <- tclVar()
+        iconl <- tclVar()
         tcl("image", "create", "photo", iconx, file = system.file("icons/x.png", package = "TextMiningGUI"))
         tcl("image", "create", "photo", icons, file = system.file("icons/save.png", package = "TextMiningGUI"))
+        tcl("image", "create", "photo", iconl, file = system.file("icons/lupa.png", package = "TextMiningGUI"))
 
         frame <- ttkframe(parent, padding = c(3,3,3,12))
         tkadd(parent, frame, sticky = "nswe", text = name, compound = "right")
         
-        tool_bar <- ttkframe(frame, padding = 0)
-        content <- ttkframe(frame, padding = 4)
+        tool_bar <- ttkframe(frame, padding = 2)
+        content <- ttkframe(frame, padding = 2)
         
         tkgrid(tool_bar, row = 0, column = 0, sticky = "we")
         tkgrid(content, row = 1, column = 0, sticky  =  "news")
@@ -535,15 +593,17 @@ TextMiningGUI <- function() {
         tkgrid.rowconfigure(frame, 1, weight = 1)
         tkgrid.columnconfigure(frame, 0, weight = 1)
 
+        img3 <- ttklabel(tool_bar, image = iconl)
         img1 <- ttklabel(tool_bar, image = icons)
         img2 <- ttklabel(tool_bar, image = iconx)
-        tkpack(img2, img1, side = "right")
+        tkpack(img2, img1, img3, side = "right")
 
         tkbind(img2, "<ButtonRelease-1>", function() { tcl(parent, "forget", frame)})
 
         page <- list()
         page$content <- content
         page$save <- img1
+        page$zoom <- img3
         class(page) <- "Page"
 
         return(page)
@@ -610,6 +670,12 @@ TextMiningGUI <- function() {
             }
         })
 
+    tkadd(file_menu,"command", label = "Data Examples...",
+        command =  function() {
+            RefreshTableFrame()
+            ReadExample()
+        })
+
     tkadd(file_menu, "command", label = "Set working directory...",
         command = function() {
             dir_name <- tkchooseDirectory()
@@ -655,7 +721,7 @@ TextMiningGUI <- function() {
 
     tkadd(analysis_menu, "separator")
 
-    tkadd(analysis_menu, "command", label = "Worldcloud", command = Worldcloud)
+    tkadd(analysis_menu, "command", label = "World Cloud", command = WorldCloud)
 
     # Help
     tkadd(help_menu, "command", label = "About", command = About)
