@@ -18,5 +18,5 @@ WorldCloud <- function() {
         return(pw)
     }
 
-    PageGUI("World Cloud", Plot, 1.5, 1.5, theme = "theme_void", palette = "Dark2", background = "#ffffff")
+    PageGUI("World Cloud", Plot, theme = "theme_void", palette = "Dark2", background = "#ffffff")
 }

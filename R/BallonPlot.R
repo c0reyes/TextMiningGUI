@@ -7,9 +7,9 @@ BallonPlot <- function() {
         pb <- ggballoonplot(w, fill = "value") +
                 scale_fill_gradientn(colors = colors) +
                 guides(size = FALSE)
-                
+
         return(pb)
     }
 
-    PageGUI("Ballon Plot", Plot, 1.5, 1.5)
+    PageGUI("Ballon Plot", Plot)
 }

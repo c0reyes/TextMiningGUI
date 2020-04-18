@@ -11,8 +11,9 @@ CaTM <- function() {
     tkmessageBox(title = "CA", message = "Chisq test", detail = paste("P.Value", as.character(chisq$p.value)), type = "ok")
 
     tm.ca <<- FactoMineR::CA(w, graph = FALSE)
+    console_chunk("summary(tm.ca)")
 
-    PageGUI("CA - Scree plot", Plot, 1.5, 1.5, title = "CA - Scree plot")
+    PageGUI("CA - Scree plot", Plot, title = "CA - Scree plot")
 }
 
 CaBiplot <- function() {
@@ -23,7 +24,7 @@ CaBiplot <- function() {
                 labs(title = graph$title)
     }
 
-    PageGUI("CA - Biplot", Plot, 1.5, 1.5, title = "CA - Biplot", vector_color = "red", point_color = "blue", repel = FALSE)
+    PageGUI("CA - Biplot", Plot, title = "CA - Biplot", vector_color = "red", point_color = "blue", repel = FALSE)
 }
 
 QualityRow <- function() {
@@ -35,5 +36,5 @@ QualityRow <- function() {
         return(qr)
     }
 
-    PageGUI("CA - Row points", Plot, 1.5, 1.5, title = "CA - Row points", repel = FALSE)
+    PageGUI("CA - Row points", Plot, title = "CA - Row points", repel = FALSE)
 }

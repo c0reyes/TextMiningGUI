@@ -1,4 +1,4 @@
-PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = "", title = "", 
+PageGUI <- function(name, Plot, color = "", theme = "", title = "", 
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "",
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "") {
     themes <- c("theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")

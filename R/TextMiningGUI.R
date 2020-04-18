@@ -82,6 +82,48 @@ TextMiningGUI <- function() {
         }
     }
 
+    # Configure
+    Configure <- function() {             
+        window <- tktoplevel(width = 350, height = 200)
+        tkwm.minsize(window, "350", "200")
+        tkwm.maxsize(window, "350", "200")
+        tkwm.title(window, "Configure")
+
+        frame <- ttkframe(window, padding = c(3,3,12,12))
+        tkpack(frame, expand = TRUE, fill = "both")
+
+        label_frame <- ttklabelframe(frame, text = "Configure", padding = 10)
+        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
+
+        tkgrid.columnconfigure(label_frame, 0, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+        tkgrid.columnconfigure(label_frame, 2, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+
+        put_label(label_frame, "hscale: ", 1, 0)
+        thscale <- tclVar(init = hscale)
+        hscalef <- tkscale(label_frame, from = 1, to = 3, variable = thscale, showvalue = TRUE, resolution = 0.05, orient = "horiz")
+        tkgrid(hscalef, row = 1, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "vscale:  ", 2, 0)
+        tvscale <- tclVar(init = vscale)
+        vscalef <- tkscale(label_frame, from = 1, to = 3, variable = tvscale, showvalue = TRUE, resolution = 0.05, orient = "horiz")
+        tkgrid(vscalef, row = 2, column = 1, sticky = "ew", padx = 2)
+        
+        button_frame <- ttkframe(frame)
+        
+        ok_button <- ttkbutton(button_frame, text = "ok",
+            command = function() { 
+                hscale <<- as.numeric(tclvalue(thscale))
+                vscale <<- as.numeric(tclvalue(tvscale))
+                tkdestroy(window)
+            })
+        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
+        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
+           fill = "y", side = "left")               
+        sapply(list(ok_button), tkpack, side = "left", padx = 6)
+    }
+
     # About
     About <- function() {             
         window <- tktoplevel(width = 600, height = 400)
@@ -609,6 +651,10 @@ TextMiningGUI <- function() {
         return(page)
     }
 
+    # Scale
+    hscale <<- 1.5
+    vscale <<- 1.5
+
     # Main Window
     window <- tktoplevel(width = 600, height = 400)
     tkwm.minsize(window, "600", "400")
@@ -733,6 +779,8 @@ TextMiningGUI <- function() {
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow)
 
     # Help
+    tkadd(help_menu, "command", label = "Configure", command = Configure)
+
     tkadd(help_menu, "command", label = "About", command = About)
 
     # Notebook
