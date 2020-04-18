@@ -771,6 +771,9 @@ TextMiningGUI <- function() {
 
     tkadd(analysis_menu, "separator")
 
+    tkadd(analysis_menu, "command", label = "Correlation", command = Correlation)
+    tkadd(analysis_menu, "command", label = "Correlation between groups", command = CorBetweenGroups)
+
     ca_menu <- tkmenu(analysis_menu, tearoff = "0")
     tkadd(analysis_menu, "cascade", label = "Correspondence Analysis", menu = ca_menu)
 
