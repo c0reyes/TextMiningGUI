@@ -3,7 +3,7 @@ WorldCloud <- function() {
         t <- match.fun(graph$theme)
 
         set.seed(0)
-        w <- tm$freq[1:100,]
+        w <- tm$freq[1:graph$limit,]
         pw <- w %>% ggplot(aes(label = word, size = freq, color = freq)) +
             geom_text_wordcloud(aes(angle = 45 * sample(-2:2, nrow(w),
                                     replace = TRUE,
@@ -18,5 +18,5 @@ WorldCloud <- function() {
         return(pw)
     }
 
-    PageGUI("World Cloud", Plot, theme = "theme_void", palette = "Dark2", background = "#ffffff")
+    PageGUI("World Cloud", Plot, theme = "theme_void", palette = "Dark2", background = "#ffffff", limit = 100)
 }

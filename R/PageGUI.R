@@ -1,6 +1,6 @@
 PageGUI <- function(name, Plot, color = "", theme = "", title = "", 
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "",
-                    background = "", text_color = "", vector_color = "", point_color = "", repel = "") {
+                    background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0) {
     themes <- c("theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
     palettes <- c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Paired", "Dark2", "Accent")
 
@@ -18,6 +18,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     .vcolor <- vector_color
     .pcolor <- point_color
     .repel <- repel
+    .limit <- limit
 
     graph <- list()
     graph$color <- .color
@@ -34,6 +35,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     graph$vcolor <- .vcolor
     graph$pcolor <- .pcolor
     graph$repel <- .repel
+    graph$limit <- .limit
     class(graph) <- "graph"
 
     console_chunk("tm")
@@ -78,79 +80,87 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     tkgrid.rowconfigure(sidebar, 24, weight = 0)
     tkgrid.rowconfigure(sidebar, 25, weight = 0)
     tkgrid.rowconfigure(sidebar, 26, weight = 0)
+    tkgrid.rowconfigure(sidebar, 27, weight = 0)
+    tkgrid.rowconfigure(sidebar, 28, weight = 0)
+
+    limit <- tclVar(init = .limit)
+    put_label(sidebar, "Limit: ", 1, 1, sticky = "nw")
+    limitbar <- tkscale(sidebar, from = 1, to = nrow(tm$data), variable = limit, 
+        showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
+    tkgrid(limitbar, row = 2, column = 1, sticky = "ew", padx = 2)
 
     title <- tclVar()
-    put_label(sidebar, "Title: ", 1, 1, sticky = "nw")
+    put_label(sidebar, "Title: ", 3, 1, sticky = "nw")
     entry1 <- ttkentry(sidebar, textvariable = title, state = "disabled")
-    tkgrid(entry1, row = 2, column = 1, sticky = "nw", padx = 2)
+    tkgrid(entry1, row = 4, column = 1, sticky = "nw", padx = 2)
 
     subtitle <- tclVar()
-    put_label(sidebar, "Subtitle: ", 3, 1, sticky = "nw")
+    put_label(sidebar, "Subtitle: ", 5, 1, sticky = "nw")
     subentry <- ttkentry(sidebar, textvariable = subtitle, state = "disabled")
-    tkgrid(subentry, row = 4, column = 1, sticky = "nw", padx = 2)
+    tkgrid(subentry, row = 6, column = 1, sticky = "nw", padx = 2)
 
     caption <- tclVar()
-    put_label(sidebar, "Caption: ", 5, 1, sticky = "nw")
+    put_label(sidebar, "Caption: ", 7, 1, sticky = "nw")
     capentry <- ttkentry(sidebar, textvariable = caption, state = "disabled")
-    tkgrid(capentry, row = 6, column = 1, sticky = "nw", padx = 2)
+    tkgrid(capentry, row = 8, column = 1, sticky = "nw", padx = 2)
     
     xlab <- tclVar()
-    put_label(sidebar, "xlab: ", 7, 1, sticky = "nw")
+    put_label(sidebar, "xlab: ", 9, 1, sticky = "nw")
     entry2 <- ttkentry(sidebar, textvariable = xlab, state = "disabled")
-    tkgrid(entry2, row = 8, column = 1, sticky = "nw", padx = 2)
+    tkgrid(entry2, row = 10, column = 1, sticky = "nw", padx = 2)
 
     ylab <- tclVar()
-    put_label(sidebar, "ylab: ", 9, 1, sticky = "nw")
+    put_label(sidebar, "ylab: ", 11, 1, sticky = "nw")
     entry3 <- ttkentry(sidebar, textvariable = ylab, state = "disabled")
-    tkgrid(entry3, row = 10, column = 1, sticky = "nw", padx = 2)
+    tkgrid(entry3, row = 12, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Theme: ", 11, 1, sticky = "nw")
+    put_label(sidebar, "Theme: ", 13, 1, sticky = "nw")
     themex <- tclVar()
     theme_box <- ttkcombobox(sidebar, 
                         values = themes, 
                         textvariable = themex,
                         state = "normal",
                         justify = "left", state = "disabled")
-    tkgrid(theme_box, row = 12, column = 1, sticky = "nw", padx = 2)
+    tkgrid(theme_box, row = 14, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Palette: ", 13, 1, sticky = "nw")
+    put_label(sidebar, "Palette: ", 15, 1, sticky = "nw")
     palette <- tclVar()
     palette_box <- ttkcombobox(sidebar, 
                         values = palettes, 
                         textvariable = palette,
                         state = "normal",
                         justify = "left", state = "disabled")
-    tkgrid(palette_box, row = 14, column = 1, sticky = "nw", padx = 2)
+    tkgrid(palette_box, row = 16, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Bar: ", 15, 1, sticky = "nw")
+    put_label(sidebar, "Bar: ", 17, 1, sticky = "nw")
     color <- tkcanvas(sidebar, width = 40, height = 16, 
         background = "#000000",
         highlightbackground = "#ababab")
-    tkgrid(color, row = 16, column = 1, sticky = "nw", padx = 2)
+    tkgrid(color, row = 18, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Background: ", 17, 1, sticky = "nw")
+    put_label(sidebar, "Background: ", 19, 1, sticky = "nw")
     bcolor <- tkcanvas(sidebar, width = 40, height = 16, 
         background = "#000000",
         highlightbackground = "#ababab")
-    tkgrid(bcolor, row = 18, column = 1, sticky = "nw", padx = 2)
+    tkgrid(bcolor, row = 20, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Text: ", 19, 1, sticky = "nw")
+    put_label(sidebar, "Text: ", 21, 1, sticky = "nw")
     tcolor <- tkcanvas(sidebar, width = 40, height = 16, 
         background = "#000000",
         highlightbackground = "#ababab")
-    tkgrid(tcolor, row = 20, column = 1, sticky = "nw", padx = 2)
+    tkgrid(tcolor, row = 22, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Vector: ", 21, 1, sticky = "nw")
+    put_label(sidebar, "Vector: ", 23, 1, sticky = "nw")
     vcolor <- tkcanvas(sidebar, width = 40, height = 16, 
         background = "#000000",
         highlightbackground = "#ababab")
-    tkgrid(vcolor, row = 22, column = 1, sticky = "nw", padx = 2)
+    tkgrid(vcolor, row = 24, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Point: ", 23, 1, sticky = "nw")
+    put_label(sidebar, "Point: ", 25, 1, sticky = "nw")
     pcolor <- tkcanvas(sidebar, width = 40, height = 16, 
         background = "#000000",
         highlightbackground = "#ababab")
-    tkgrid(pcolor, row = 24, column = 1, sticky = "nw", padx = 2)
+    tkgrid(pcolor, row = 26, column = 1, sticky = "nw", padx = 2)
 
     flip <- tclVar(FALSE)
     label_var <- tclVar("Flip graph")
@@ -161,7 +171,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
-    tkgrid(check_button, row = 25, column = 1, sticky = "nw", padx = 2)
+    tkgrid(check_button, row = 27, column = 1, sticky = "nw", padx = 2)
 
     repel <- tclVar(FALSE)
     label_repel <- tclVar("Repel point text")
@@ -172,7 +182,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
-    tkgrid(repel_button, row = 26, column = 1, sticky = "nw", padx = 2)
+    tkgrid(repel_button, row = 28, column = 1, sticky = "nw", padx = 2)
 
     tkbind(color, "<Button-1>", function(W) {
             if(.color != "") {
@@ -300,6 +310,14 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
             }, hscale = hscale, vscale = vscale)
         })
 
+    tkbind(limitbar, "<ButtonRelease-1>", function() {
+            .limit <<- as.numeric(tclvalue(limit))
+            graph$limit <<- .limit
+            tkrreplot(eplot, fun = function() {
+                plot(Plot(graph))
+            }, hscale = hscale, vscale = vscale)
+        })
+
     # Graph
     eplot <- tkrplot(frame, fun = function() {
             plot(Plot(graph))
@@ -329,6 +347,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     if(.subtitle != "") tcl(subentry, "config", "-state", "normal")
     if(.caption != "") tcl(capentry, "config", "-state", "normal")
     if(.repel != "") tcl(repel_button, "config", "-state", "normal")
+    if(.limit > 0) tcl(limitbar, "config", "-state", "normal")
 
     if(.color != "") tkconfigure(color, background = .color)
     if(.background != "") tkconfigure(bcolor, background = .background)

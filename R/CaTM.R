@@ -1,19 +1,23 @@
 CaTM <- function() {
+    .CA <- function(limit) {
+        w <- tm$data[1:limit,]
+        chisq <- chisq.test(w)
+
+        tkmessageBox(title = "CA", message = "Chisq test", detail = paste("P.Value", as.character(chisq$p.value)), type = "ok")
+
+        tm.ca <<- FactoMineR::CA(w, graph = FALSE)
+        console_chunk("summary(tm.ca)")
+    }
+
     Plot <- function(graph) {
+        .CA(graph$limit)
+        
         bp <- fviz_screeplot(tm.ca, addlabels = TRUE) +
                 labs(title = graph$title)
         return(bp)
     }
 
-    w <- tm$data[1:100,]
-    chisq <- chisq.test(w)
-    
-    tkmessageBox(title = "CA", message = "Chisq test", detail = paste("P.Value", as.character(chisq$p.value)), type = "ok")
-
-    tm.ca <<- FactoMineR::CA(w, graph = FALSE)
-    console_chunk("summary(tm.ca)")
-
-    PageGUI("CA - Scree plot", Plot, title = "CA - Scree plot")
+    PageGUI("CA - Scree plot", Plot, title = "CA - Scree plot", limit = 100)
 }
 
 CaBiplot <- function() {

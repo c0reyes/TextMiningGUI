@@ -763,11 +763,11 @@ TextMiningGUI <- function() {
         })
 
     # Analysis
-    tkadd(analysis_menu, "command", label = "Ballon Plot", command = BallonPlot)
+    tkadd(analysis_menu, "command", label = "BallonPlot", command = BallonPlot)
 
-    tkadd(analysis_menu, "command", label = "World Count", command = Explorer)
+    tkadd(analysis_menu, "command", label = "WorldCounter", command = Explorer)
 
-    tkadd(analysis_menu, "command", label = "World Cloud", command = WorldCloud)
+    tkadd(analysis_menu, "command", label = "WorldCloud", command = WorldCloud)
 
     tkadd(analysis_menu, "separator")
 
