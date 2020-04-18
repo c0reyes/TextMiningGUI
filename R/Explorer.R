@@ -11,6 +11,6 @@ Explorer <- function() {
         return(pe)
     }
 
-    PageGUI("Distinct words by groups", Plot, color = "#000000", theme = "theme_classic", title = "Distinct words by groups", 
+    PageGUI("Distinct words by groups", Plot, color = "#323232", theme = "theme_gray", title = "Distinct words by groups", 
             xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ")
 }

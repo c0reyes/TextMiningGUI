@@ -717,11 +717,20 @@ TextMiningGUI <- function() {
         })
 
     # Analysis
-    tkadd(analysis_menu, "command", label = "Explorer", command = Explorer)
+    tkadd(analysis_menu, "command", label = "Ballon Plot", command = BallonPlot)
+
+    tkadd(analysis_menu, "command", label = "World Count", command = Explorer)
+
+    tkadd(analysis_menu, "command", label = "World Cloud", command = WorldCloud)
 
     tkadd(analysis_menu, "separator")
 
-    tkadd(analysis_menu, "command", label = "World Cloud", command = WorldCloud)
+    ca_menu <- tkmenu(analysis_menu, tearoff = "0")
+    tkadd(analysis_menu, "cascade", label = "Correspondence Analysis", menu = ca_menu)
+
+    tkadd(ca_menu, "command", label = "CA & Scree plot", command = CaTM)
+    tkadd(ca_menu, "command", label = "CA - Biplot", command = CaBiplot)
+    tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow)
 
     # Help
     tkadd(help_menu, "command", label = "About", command = About)

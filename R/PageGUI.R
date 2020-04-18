@@ -1,6 +1,6 @@
 PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = "", title = "", 
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "",
-                    background = "", text_color = "", vector_color = "", point_color = "") {
+                    background = "", text_color = "", vector_color = "", point_color = "", repel = "") {
     themes <- c("theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
     palettes <- c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Paired", "Dark2", "Accent")
 
@@ -17,6 +17,7 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
     .tcolor <- text_color
     .vcolor <- vector_color
     .pcolor <- point_color
+    .repel <- repel
 
     graph <- list()
     graph$color <- .color
@@ -32,6 +33,7 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
     graph$tcolor <- .tcolor
     graph$vcolor <- .vcolor
     graph$pcolor <- .pcolor
+    graph$repel <- .repel
     class(graph) <- "graph"
 
     console_chunk("tm")
@@ -75,6 +77,7 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
     tkgrid.rowconfigure(sidebar, 23, weight = 0)
     tkgrid.rowconfigure(sidebar, 24, weight = 0)
     tkgrid.rowconfigure(sidebar, 25, weight = 0)
+    tkgrid.rowconfigure(sidebar, 26, weight = 0)
 
     title <- tclVar()
     put_label(sidebar, "Title: ", 1, 1, sticky = "nw")
@@ -159,6 +162,17 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
             }, hscale = hscale, vscale = vscale)
         })
     tkgrid(check_button, row = 25, column = 1, sticky = "nw", padx = 2)
+
+    repel <- tclVar(FALSE)
+    label_repel <- tclVar("Repel point text")
+    repel_button <- ttkcheckbutton(sidebar, variable = repel, textvariable = label_repel, state = "disabled", command = function() {
+            .repel <<- if( tclvalue(repel) == "1" ) TRUE else FALSE
+            graph$repel <<- .repel
+            tkrreplot(eplot, fun = function() {
+                plot(Plot(graph))
+            }, hscale = hscale, vscale = vscale)
+        })
+    tkgrid(repel_button, row = 26, column = 1, sticky = "nw", padx = 2)
 
     tkbind(color, "<Button-1>", function(W) {
             if(.color != "") {
@@ -314,4 +328,11 @@ PageGUI <- function(name, Plot, hscale = 1.5, vscale = 1.5, color = "", theme = 
     if(.flip != "") tcl(check_button, "config", "-state", "normal")
     if(.subtitle != "") tcl(subentry, "config", "-state", "normal")
     if(.caption != "") tcl(capentry, "config", "-state", "normal")
+    if(.repel != "") tcl(repel_button, "config", "-state", "normal")
+
+    if(.color != "") tkconfigure(color, background = .color)
+    if(.background != "") tkconfigure(bcolor, background = .background)
+    if(.tcolor != "") tkconfigure(tcolor, background = .tcolor)
+    if(.vcolor != "") tkconfigure(vcolor, background = .vcolor)
+    if(.pcolor != "") tkconfigure(pcolor, background = .pcolor)
 }
