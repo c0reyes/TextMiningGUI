@@ -777,6 +777,7 @@ TextMiningGUI <- function() {
     tkadd(ca_menu, "command", label = "CA & Scree plot", command = CaTM)
     tkadd(ca_menu, "command", label = "CA - Biplot", command = CaBiplot)
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow)
+    tkadd(ca_menu, "command", label = "CA - Quality of representarion of cols", command = QualityCol)
 
     # Help
     tkadd(help_menu, "command", label = "Configure", command = Configure)

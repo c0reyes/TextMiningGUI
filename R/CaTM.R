@@ -42,3 +42,15 @@ QualityRow <- function() {
 
     PageGUI("CA - Row points", Plot, title = "CA - Row points", repel = FALSE)
 }
+
+QualityCol <- function() {
+    Plot <- function(graph) {
+        qr <- fviz_ca_col(tm.ca, col.col = "cos2", 
+                gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+                repel = graph$repel) + 
+                labs(title = graph$title)
+        return(qr)
+    }
+
+    PageGUI("CA - Quality and contribution", Plot, title = "CA - Column points", repel = FALSE)
+}
