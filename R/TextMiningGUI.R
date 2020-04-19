@@ -656,8 +656,8 @@ TextMiningGUI <- function() {
     vscale <<- 1.5
 
     # Main Window
-    window <- tktoplevel(width = 600, height = 400)
-    tkwm.minsize(window, "600", "400")
+    window <- tktoplevel(width = 800, height = 800)
+    tkwm.minsize(window, "640", "480")
     tkwm.title(window, "TextMiningGUI")
     tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
             tkdestroy(window)
@@ -665,8 +665,9 @@ TextMiningGUI <- function() {
 
     if(as.character(tcl("tk", "windowingsystem")) == "win32" || Sys.info()["sysname"] == "Windows") {
         tkwm.iconbitmap(window, system.file("icons/textmining.ico", package = "TextMiningGUI"))
+        tkwm.state(window, "zoomed")
     }else{
-        tcl('wm', 'iconphoto', window, tcl('image', 'create', 'photo', '-file', system.file("icons/textmining.png", package = "TextMiningGUI")))
+        tcl("wm", "iconphoto", window, tcl("image", "create", "photo", "-file", system.file("icons/textmining.png", package = "TextMiningGUI")))
     }
 
     # Menu

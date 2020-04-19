@@ -36,6 +36,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     graph$pcolor <- .pcolor
     graph$repel <- .repel
     graph$limit <- .limit
+    graph$alpha <- 1
     class(graph) <- "graph"
 
     console_chunk("tm")
@@ -83,9 +84,9 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     tkgrid.rowconfigure(sidebar, 27, weight = 0)
     tkgrid.rowconfigure(sidebar, 28, weight = 0)
 
-    limit <- tclVar(init = .limit)
+    llimit <- tclVar(init = .limit)
     put_label(sidebar, "Limit: ", 1, 1, sticky = "nw")
-    limitbar <- tkscale(sidebar, from = 1, to = nrow(tm$data), variable = limit, 
+    limitbar <- tkscale(sidebar, from = 1, to = nrow(tm$data), variable = llimit, 
         showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
     tkgrid(limitbar, row = 2, column = 1, sticky = "ew", padx = 2)
 
@@ -311,7 +312,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
         })
 
     tkbind(limitbar, "<ButtonRelease-1>", function() {
-            .limit <<- as.numeric(tclvalue(limit))
+            .limit <<- as.numeric(tclvalue(llimit))
             graph$limit <<- .limit
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
@@ -329,12 +330,14 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
 
     # Save
     tkbind(page$save, "<ButtonRelease-1>", function() {
+            graph$alpha <- 0.1
             ggsave(paste0(name, ".png"), plot = Plot(graph))
             tkmessageBox(title = "Save", message = "Plot", detail = "The graph was saved.", type = "ok")
         })
 
     # Zoom
     tkbind(page$zoom, "<ButtonRelease-1>", function() {
+            graph$alpha <- 0.1
             plot(Plot(graph))
         })
 

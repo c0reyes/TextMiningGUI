@@ -50,7 +50,7 @@ CorBetweenGroups <- function() {
                 Plot <- function(graph) {
                     w <- tm$data[1:graph$limit,]
                     corp <- ggplot(w, aes(w[[g1]], w[[g2]])) +
-                                geom_jitter(alpha = 0.1, size = 2.5, width = 0.25, height = 0.25) +
+                                geom_jitter(alpha = graph$alpha, size = 2.5, width = 0.25, height = 0.25) +
                                 geom_text(aes(label = rownames(w)), check_overlap = TRUE, vjust = 1.5) +
                                 geom_abline(color = "red") +
                                 theme_bw() +

@@ -6,7 +6,7 @@ BallonPlot <- function() {
         w <- tm$data[1:graph$limit,]
         pb <- ggballoonplot(w, fill = "value") +
                 scale_fill_gradientn(colors = colors) +
-                guides(size = FALSE)
+                guides(size = FALSE) 
 
         return(pb)
     }
