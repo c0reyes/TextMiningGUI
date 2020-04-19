@@ -234,7 +234,7 @@ TextMiningGUI <- function() {
 
     # Transformation
     Transformation <- function() {    
-        languages <- c("spanish","danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
+        languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(DATA)
         group <- tclVar("")
         text <- tclVar("")
@@ -460,9 +460,7 @@ TextMiningGUI <- function() {
             command = function() { 
                 dataFrameTable(tableFrame, DATA)
                 tkdestroy(window) 
-                tkentryconfigure(menu_bar, 2, state = "normal")
-                tkentryconfigure(menu_bar, 3, state = "disabled")
-                tkentryconfigure(data_menu, 4, state = "disabled")
+                disableMenu()
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
@@ -517,9 +515,7 @@ TextMiningGUI <- function() {
             command = function() { 
                 dataFrameTable(tableFrame, DATA)
                 tkdestroy(window) 
-                tkentryconfigure(menu_bar, 2, state = "normal")
-                tkentryconfigure(menu_bar, 3, state = "disabled")
-                tkentryconfigure(data_menu, 4, state = "disabled")
+                disableMenu()
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
@@ -531,9 +527,7 @@ TextMiningGUI <- function() {
     ReadExcel <- function(file_name) {                                                                                                                                                                                                                              
         DATA <<- read_excel(file_name)                                                                                                                                                                                            
         dataFrameTable(tableFrame, DATA)
-        tkentryconfigure(menu_bar, 2, state = "normal")
-        tkentryconfigure(menu_bar, 3, state = "disabled")
-        tkentryconfigure(data_menu, 4, state = "disabled")
+        disableMenu()
     }
 
     # Read Table
@@ -599,14 +593,21 @@ TextMiningGUI <- function() {
 
                 dataFrameTable(tableFrame, DATA)
                 tkdestroy(window)
-                tkentryconfigure(menu_bar, 2, state = "normal")
-                tkentryconfigure(menu_bar, 3, state = "disabled")
-                tkentryconfigure(data_menu, 4, state = "disabled")
+                disableMenu()
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
            fill = "y", side = "left")               
         sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+    }
+
+    disableMenu <- function() {
+        tkentryconfigure(menu_bar, 2, state = "normal")
+        tkentryconfigure(menu_bar, 3, state = "disabled")
+        tkentryconfigure(data_menu, 4, state = "disabled")
+        tkentryconfigure(ca_menu, 1, state = "disabled")
+        tkentryconfigure(ca_menu, 2, state = "disabled")
+        tkentryconfigure(ca_menu, 3, state = "disabled")
     }
 
     RefreshTableFrame <- function() {
@@ -766,24 +767,24 @@ TextMiningGUI <- function() {
         })
 
     # Analysis
-    tkadd(analysis_menu, "command", label = "Balloon Plot", command = BalloonPlot)
+    tkadd(analysis_menu, "command", label = "Words Most Used", command = BalloonPlot)
 
-    tkadd(analysis_menu, "command", label = "World Counter", command = Explorer)
+    tkadd(analysis_menu, "command", label = "Word Counter by Groups", command = Explorer)
 
-    tkadd(analysis_menu, "command", label = "World Cloud", command = WorldCloud)
+    tkadd(analysis_menu, "command", label = "Word Cloud", command = WordCloud)
 
     tkadd(analysis_menu, "separator")
 
     tkadd(analysis_menu, "command", label = "Correlation", command = Correlation)
     tkadd(analysis_menu, "command", label = "Correlation Between Groups", command = CorBetweenGroups)
 
-    ca_menu <- tkmenu(analysis_menu, tearoff = "0")
+    ca_menu <<- tkmenu(analysis_menu, tearoff = "0")
     tkadd(analysis_menu, "cascade", label = "Correspondence Analysis", menu = ca_menu)
 
-    tkadd(ca_menu, "command", label = "CA & Scree Plot", command = CaTM)
-    tkadd(ca_menu, "command", label = "CA - Biplot", command = CaBiplot)
-    tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow)
-    tkadd(ca_menu, "command", label = "CA - Quality of representarion of cols", command = QualityCol)
+    tkadd(ca_menu, "command", label = "Chisq test & Scree Plot", command = CaTM)
+    tkadd(ca_menu, "command", label = "CA - Biplot", command = CaBiplot, state = "disabled")
+    tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow, state = "disabled")
+    tkadd(ca_menu, "command", label = "CA - Quality of representarion of cols", command = QualityCol, state = "disabled")
 
     # Help
     tkadd(help_menu, "command", label = "Configure", command = Configure)

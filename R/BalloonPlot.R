@@ -13,5 +13,5 @@ BalloonPlot <- function() {
         return(pb)
     }
 
-    PageGUI("Balloon Plot", Plot, limit = 50)
+    PageGUI("Words Most Used", Plot, limit = 50)
 }

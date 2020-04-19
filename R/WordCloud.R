@@ -1,4 +1,4 @@
-WorldCloud <- function() {
+WordCloud <- function() {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
@@ -15,5 +15,5 @@ WorldCloud <- function() {
         return(pw)
     }
 
-    PageGUI("World Cloud", Plot, theme = "theme_void", palette = "Dark2", background = "#ffffff", limit = 100)
+    PageGUI("Word Cloud", Plot, theme = "theme_void", palette = "Dark2", background = "#ffffff", limit = 100)
 }

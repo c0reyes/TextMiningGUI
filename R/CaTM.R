@@ -19,6 +19,10 @@ CaTM <- function() {
         return(bp)
     }
 
+    tkentryconfigure(ca_menu, 1, state = "normal")
+    tkentryconfigure(ca_menu, 2, state = "normal")
+    tkentryconfigure(ca_menu, 3, state = "normal")
+    
     PageGUI("CA - Scree plot", Plot, title = "CA - Scree plot", limit = 100)
 }
 
