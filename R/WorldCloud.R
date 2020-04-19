@@ -8,12 +8,9 @@ WorldCloud <- function() {
             geom_text_wordcloud(aes(angle = 45 * sample(-2:2, nrow(w),
                                     replace = TRUE,
                                     prob = c(1, 1, 4, 1, 1)))) +
-            scale_size_area(max_size = 12) + t() + scale_color_fermenter(palette = graph$palette)
-
-        if(graph$background != "#ffffff") {
-            pw <- pw + theme(plot.background = element_rect(fill = graph$background),
-                             panel.background = element_rect(fill = graph$background))
-        }
+            scale_size_area(max_size = 12) + t() + scale_color_fermenter(palette = graph$palette) +
+                theme(plot.background = element_rect(fill = "#ffffff", size = 0),
+                      panel.background = element_rect(fill ="#ffffff", size = 0))
 
         return(pw)
     }

@@ -56,7 +56,9 @@ CorBetweenGroups <- function() {
                                 theme_bw() +
                                 labs(x = g1, y = g2) +
                                 theme(axis.text.x = element_blank(),
-                                axis.text.y = element_blank())
+                                      axis.text.y = element_blank(), 
+                                      plot.background = element_rect(fill = "#ffffff", size = 0),
+                                      panel.background = element_rect(fill ="#ffffff", size = 0))
                     return(corp)
                 }
 

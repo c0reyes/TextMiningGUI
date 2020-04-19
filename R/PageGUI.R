@@ -311,13 +311,14 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
             }, hscale = hscale, vscale = vscale)
         })
 
-    tkbind(limitbar, "<ButtonRelease-1>", function() {
-            .limit <<- as.numeric(tclvalue(llimit))
-            graph$limit <<- .limit
-            tkrreplot(eplot, fun = function() {
-                plot(Plot(graph))
-            }, hscale = hscale, vscale = vscale)
-        })
+    if(.limit > 0)
+        tkbind(limitbar, "<ButtonRelease-1>", function() {
+                .limit <<- as.numeric(tclvalue(llimit))
+                graph$limit <<- .limit
+                tkrreplot(eplot, fun = function() {
+                    plot(Plot(graph))
+                }, hscale = hscale, vscale = vscale)
+            })
 
     # Graph
     eplot <- tkrplot(frame, fun = function() {

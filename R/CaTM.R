@@ -13,7 +13,9 @@ CaTM <- function() {
         .CA(graph$limit)
         
         bp <- fviz_screeplot(tm.ca, addlabels = TRUE) +
-                labs(title = graph$title)
+                labs(title = graph$title) +
+                theme(plot.background = element_rect(fill = "#ffffff", size = 0),
+                      panel.background = element_rect(fill ="#ffffff", size = 0))
         return(bp)
     }
 
@@ -25,7 +27,9 @@ CaBiplot <- function() {
         cb <- fviz_ca_biplot(tm.ca, arrow = c(FALSE, TRUE), 
                 repel = graph$repel, map = "rowgreen", 
                 col.col = graph$vcolor, col.row = graph$pcolor) +
-                labs(title = graph$title)
+                labs(title = graph$title) +
+                theme(plot.background = element_rect(fill = "#ffffff", size = 0),
+                      panel.background = element_rect(fill ="#ffffff", size = 0))
     }
 
     PageGUI("CA - Biplot", Plot, title = "CA - Biplot", vector_color = "red", point_color = "blue", repel = FALSE)
@@ -36,7 +40,9 @@ QualityRow <- function() {
         qr <- fviz_ca_row(tm.ca, col.row = "cos2",
                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
                 repel = graph$repel) + 
-                labs(title = graph$title)
+                labs(title = graph$title) +
+                theme(plot.background = element_rect(fill = "#ffffff", size = 0),
+                      panel.background = element_rect(fill ="#ffffff", size = 0))
         return(qr)
     }
 
@@ -48,7 +54,9 @@ QualityCol <- function() {
         qr <- fviz_ca_col(tm.ca, col.col = "cos2", 
                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
                 repel = graph$repel) + 
-                labs(title = graph$title)
+                labs(title = graph$title) +
+                theme(plot.background = element_rect(fill = "#ffffff", size = 0),
+                      panel.background = element_rect(fill ="#ffffff", size = 0))
         return(qr)
     }
 

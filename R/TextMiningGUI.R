@@ -1,4 +1,6 @@
 TextMiningGUI <- function() {
+    theme_clean <<- theme(plot.background = element_rect(fill = "#ffffff", size = 0),
+                        panel.background = element_rect(fill ="#ffffff", size = 0))
     # Scrollbars
     addScrollbars <<- function(parent, widget) {
         xscr <- ttkscrollbar(parent, orient = "horizontal",
@@ -232,7 +234,7 @@ TextMiningGUI <- function() {
 
     # Transformation
     Transformation <- function() {    
-        languages <- c("spanish")         
+        languages <- c("spanish","danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(DATA)
         group <- tclVar("")
         text <- tclVar("")
@@ -764,21 +766,21 @@ TextMiningGUI <- function() {
         })
 
     # Analysis
-    tkadd(analysis_menu, "command", label = "BallonPlot", command = BallonPlot)
+    tkadd(analysis_menu, "command", label = "Balloon Plot", command = BalloonPlot)
 
-    tkadd(analysis_menu, "command", label = "WorldCounter", command = Explorer)
+    tkadd(analysis_menu, "command", label = "World Counter", command = Explorer)
 
-    tkadd(analysis_menu, "command", label = "WorldCloud", command = WorldCloud)
+    tkadd(analysis_menu, "command", label = "World Cloud", command = WorldCloud)
 
     tkadd(analysis_menu, "separator")
 
     tkadd(analysis_menu, "command", label = "Correlation", command = Correlation)
-    tkadd(analysis_menu, "command", label = "Correlation between groups", command = CorBetweenGroups)
+    tkadd(analysis_menu, "command", label = "Correlation Between Groups", command = CorBetweenGroups)
 
     ca_menu <- tkmenu(analysis_menu, tearoff = "0")
     tkadd(analysis_menu, "cascade", label = "Correspondence Analysis", menu = ca_menu)
 
-    tkadd(ca_menu, "command", label = "CA & Scree plot", command = CaTM)
+    tkadd(ca_menu, "command", label = "CA & Scree Plot", command = CaTM)
     tkadd(ca_menu, "command", label = "CA - Biplot", command = CaBiplot)
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow)
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of cols", command = QualityCol)
