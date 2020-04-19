@@ -416,7 +416,7 @@ TextMiningGUI <- function() {
 
     # Examples
     ReadExample <- function() {                                                                                                                                                                                                                         
-        df_names <- c("chistes")
+        df_names <- c("chistes", "jockes")
         var <- tclVar(" ")
 
         window <- tktoplevel(width = 300, height = 150)
