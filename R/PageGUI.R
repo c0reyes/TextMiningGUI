@@ -1,42 +1,28 @@
 PageGUI <- function(name, Plot, color = "", theme = "", title = "", 
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "",
-                    background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0) {
+                    background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "") {
     themes <- c("theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
     palettes <- c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Paired", "Dark2", "Accent")
 
-    .color <- color
-    .theme <- theme
-    .title <- title
-    .xlab <- xlab
-    .ylab <- ylab
-    .flip <- flip
-    .palette <- palette
-    .subtitle <- subtitle
-    .caption <- caption
-    .background <- background
-    .tcolor <- text_color
-    .vcolor <- vector_color
-    .pcolor <- point_color
-    .repel <- repel
-    .limit <- limit
-
     graph <- list()
-    graph$color <- .color
-    graph$theme <- .theme
-    graph$title <- .title
-    graph$xlab <- .xlab
-    graph$ylab <- .ylab
-    graph$flip <- .flip
-    graph$palette <- .palette
-    graph$subtitle <- .subtitle
-    graph$caption <- .caption
-    graph$background <- .background
-    graph$tcolor <- .tcolor
-    graph$vcolor <- .vcolor
-    graph$pcolor <- .pcolor
-    graph$repel <- .repel
-    graph$limit <- .limit
+    graph$color <- color
+    graph$theme <- theme
+    graph$title <- title
+    graph$xlab <- xlab
+    graph$ylab <- ylab
+    graph$flip <- flip
+    graph$palette <- palette
+    graph$subtitle <- subtitle
+    graph$caption <- caption
+    graph$background <- background
+    graph$tcolor <- text_color
+    graph$vcolor <- vector_color
+    graph$pcolor <- point_color
+    graph$repel <- repel
+    graph$limit <- limit
     graph$alpha <- 1
+    graph$vtext <- vector_text
+    graph$ptext <- point_text
     class(graph) <- "graph"
 
     console_chunk("tm")
@@ -83,8 +69,10 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     tkgrid.rowconfigure(sidebar, 26, weight = 0)
     tkgrid.rowconfigure(sidebar, 27, weight = 0)
     tkgrid.rowconfigure(sidebar, 28, weight = 0)
+    tkgrid.rowconfigure(sidebar, 29, weight = 0)
+    tkgrid.rowconfigure(sidebar, 30, weight = 0)
 
-    llimit <- tclVar(init = .limit)
+    llimit <- tclVar(init = limit)
     put_label(sidebar, "Limit: ", 1, 1, sticky = "nw")
     limitbar <- tkscale(sidebar, from = 1, to = nrow(tm$data), variable = llimit, 
         showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
@@ -135,39 +123,38 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
 
     put_label(sidebar, "Bar: ", 17, 1, sticky = "nw")
     color <- tkcanvas(sidebar, width = 40, height = 16, 
-        background = "#000000",
+        background = "#d3d3d3",
         highlightbackground = "#ababab")
     tkgrid(color, row = 18, column = 1, sticky = "nw", padx = 2)
 
     put_label(sidebar, "Background: ", 19, 1, sticky = "nw")
     bcolor <- tkcanvas(sidebar, width = 40, height = 16, 
-        background = "#000000",
+        background = "#d3d3d3",
         highlightbackground = "#ababab")
     tkgrid(bcolor, row = 20, column = 1, sticky = "nw", padx = 2)
 
     put_label(sidebar, "Text: ", 21, 1, sticky = "nw")
     tcolor <- tkcanvas(sidebar, width = 40, height = 16, 
-        background = "#000000",
+        background = "#d3d3d3",
         highlightbackground = "#ababab")
     tkgrid(tcolor, row = 22, column = 1, sticky = "nw", padx = 2)
 
     put_label(sidebar, "Vector: ", 23, 1, sticky = "nw")
     vcolor <- tkcanvas(sidebar, width = 40, height = 16, 
-        background = "#000000",
+        background = "#d3d3d3",
         highlightbackground = "#ababab")
     tkgrid(vcolor, row = 24, column = 1, sticky = "nw", padx = 2)
 
     put_label(sidebar, "Point: ", 25, 1, sticky = "nw")
     pcolor <- tkcanvas(sidebar, width = 40, height = 16, 
-        background = "#000000",
+        background = "#d3d3d3",
         highlightbackground = "#ababab")
     tkgrid(pcolor, row = 26, column = 1, sticky = "nw", padx = 2)
 
     flip <- tclVar(FALSE)
-    label_var <- tclVar("Flip graph")
-    check_button <- ttkcheckbutton(sidebar, variable = flip, textvariable = label_var, state = "disabled", command = function() {
-            .flip <<- if( tclvalue(flip) == "1" ) TRUE else FALSE
-            graph$flip <<- .flip
+    ft <- tclVar("Flip graph")
+    check_button <- ttkcheckbutton(sidebar, variable = flip, textvariable = ft, state = "disabled", command = function() {
+            graph$flip <<- if( tclvalue(flip) == "1" ) TRUE else FALSE
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
@@ -175,23 +162,41 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     tkgrid(check_button, row = 27, column = 1, sticky = "nw", padx = 2)
 
     repel <- tclVar(FALSE)
-    label_repel <- tclVar("Repel point text")
-    repel_button <- ttkcheckbutton(sidebar, variable = repel, textvariable = label_repel, state = "disabled", command = function() {
-            .repel <<- if( tclvalue(repel) == "1" ) TRUE else FALSE
-            graph$repel <<- .repel
+    rt <- tclVar("Repel point text")
+    repel_button <- ttkcheckbutton(sidebar, variable = repel, textvariable = rt, state = "disabled", command = function() {
+            graph$repel <<- if( tclvalue(repel) == "1" ) TRUE else FALSE
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
     tkgrid(repel_button, row = 28, column = 1, sticky = "nw", padx = 2)
 
+    vtext <- tclVar(FALSE)
+    tt <- tclVar("Show vector text")
+    text_button <- ttkcheckbutton(sidebar, variable = vtext, textvariable = tt, state = "disabled", command = function() {
+            graph$vtext <<- if( tclvalue(vtext) == "1" ) TRUE else FALSE
+            tkrreplot(eplot, fun = function() {
+                plot(Plot(graph))
+            }, hscale = hscale, vscale = vscale)
+        })
+    tkgrid(text_button, row = 29, column = 1, sticky = "nw", padx = 2)
+
+    ptext <- tclVar(FALSE)
+    vt <- tclVar("Show point text")
+    vector_button <- ttkcheckbutton(sidebar, variable = ptext, textvariable = vt, state = "disabled", command = function() {
+            graph$ptext <<- if( tclvalue(ptext) == "1" ) TRUE else FALSE
+            tkrreplot(eplot, fun = function() {
+                plot(Plot(graph))
+            }, hscale = hscale, vscale = vscale)
+        })
+    tkgrid(vector_button, row = 30, column = 1, sticky = "nw", padx = 2)
+
     tkbind(color, "<Button-1>", function(W) {
-            if(.color != "") {
+            if(graph$color != "") {
                 color <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                .color <<- tclvalue(color)
-                graph$color <<- .color
-                if(nchar(.color)) {
-                    tkconfigure(W, background = .color) 
+                graph$color <<- tclvalue(color)
+                if(nchar(tclvalue(color))) {
+                    tkconfigure(W, background = tclvalue(color)) 
                     tkrreplot(eplot, fun = function() {
                             plot(Plot(graph))
                         }, hscale = hscale, vscale = vscale)
@@ -200,12 +205,11 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
         })
 
     tkbind(bcolor, "<Button-1>", function(W) {
-            if(.background != "") {
+            if(graph$background != "") {
                 bcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                .background <<- tclvalue(bcolor)
-                graph$background <<- .background
-                if(nchar(.background)) {
-                    tkconfigure(W, background = .background) 
+                graph$background <<- tclvalue(bcolor)
+                if(nchar(tclvalue(bcolor))) {
+                    tkconfigure(W, background = tclvalue(bcolor)) 
                     tkrreplot(eplot, fun = function() {
                             plot(Plot(graph))
                         }, hscale = hscale, vscale = vscale)
@@ -214,12 +218,11 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
         })
 
     tkbind(tcolor, "<Button-1>", function(W) {
-            if(.tcolor != "") {
+            if(graph$tcolor != "") {
                 tcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                .tcolor <<- tclvalue(tcolor)
-                graph$tcolor <<- .tcolor
-                if(nchar(.tcolor)) {
-                    tkconfigure(W, background = .tcolor) 
+                graph$tcolor <<- tclvalue(tcolor)
+                if(nchar(tclvalue(tcolor))) {
+                    tkconfigure(W, background = tclvalue(tcolor)) 
                     tkrreplot(eplot, fun = function() {
                             plot(Plot(graph))
                         }, hscale = hscale, vscale = vscale)
@@ -228,12 +231,11 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
         })
 
     tkbind(vcolor, "<Button-1>", function(W) {
-            if(.vcolor != "") {
+            if(graph$vcolor != "") {
                 vcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                .vcolor <<- tclvalue(vcolor)
-                graph$vcolor <<- .vcolor
-                if(nchar(.vcolor)) {
-                    tkconfigure(W, background = .vcolor) 
+                graph$vcolor <<- tclvalue(vcolor)
+                if(nchar(tclvalue(vcolor))) {
+                    tkconfigure(W, background = tclvalue(vcolor)) 
                     tkrreplot(eplot, fun = function() {
                             plot(Plot(graph))
                         }, hscale = hscale, vscale = vscale)
@@ -242,12 +244,11 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
         })
 
     tkbind(pcolor, "<Button-1>", function(W) {
-            if(.pcolor != "") {
+            if(graph$pcolor != "") {
                 pcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                .pcolor <<- tclvalue(pcolor)
-                graph$pcolor <<- .pcolor
-                if(nchar(.pcolor)) {
-                    tkconfigure(W, background = .pcolor) 
+                graph$pcolor <<- tclvalue(pcolor)
+                if(nchar(tclvalue(pcolor))) {
+                    tkconfigure(W, background = tclvalue(pcolor)) 
                     tkrreplot(eplot, fun = function() {
                             plot(Plot(graph))
                         }, hscale = hscale, vscale = vscale)
@@ -256,65 +257,57 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
         })
 
     tkbind(theme_box, "<<ComboboxSelected>>", function() {
-            .theme <<- tclvalue(themex)
-            graph$theme <<- .theme
+            graph$theme <<- tclvalue(themex)
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(palette_box, "<<ComboboxSelected>>", function() {
-            .palette <<- tclvalue(palette)
-            graph$palette <<- .palette
+            graph$palette <<- tclvalue(palette)
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(entry1, "<Return>", function() {
-            .title <<- tclvalue(title)
-            graph$title <<- .title
+            graph$title <<- tclvalue(title)
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(entry2, "<Return>", function() {
-            .xlab <<- tclvalue(xlab)
-            graph$xlab <<- .xlab
+            graph$xlab <<- tclvalue(xlab)
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(entry3, "<Return>", function() {
-            .ylab <<- tclvalue(ylab)
-            graph$ylab <<- .ylab
+            graph$ylab <<- tclvalue(ylab)
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(subentry, "<Return>", function() {
-            .subtitle <<- tclvalue(subtitle)
-            graph$subtitle <<- .subtitle
+            graph$subtitle <<- tclvalue(subtitle)
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
     tkbind(capentry, "<Return>", function() {
-            .caption <<- tclvalue(caption)
-            graph$caption <<- .caption
+            graph$caption <<- tclvalue(caption)
             tkrreplot(eplot, fun = function() {
                 plot(Plot(graph))
             }, hscale = hscale, vscale = vscale)
         })
 
-    if(.limit > 0)
+    if(limit > 0)
         tkbind(limitbar, "<ButtonRelease-1>", function() {
-                .limit <<- as.numeric(tclvalue(llimit))
-                graph$limit <<- .limit
+                graph$limit <<- as.numeric(tclvalue(llimit))
                 tkrreplot(eplot, fun = function() {
                     plot(Plot(graph))
                 }, hscale = hscale, vscale = vscale)
@@ -342,20 +335,22 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
             plot(Plot(graph))
         })
 
-    if(.title != "") tcl(entry1, "config", "-state", "normal")
-    if(.xlab != "") tcl(entry2, "config", "-state", "normal")
-    if(.ylab != "") tcl(entry3, "config", "-state", "normal")
-    if(.theme != "") tcl(theme_box, "config", "-state", "normal")
-    if(.palette != "") tcl(palette_box, "config", "-state", "normal")
-    if(.flip != "") tcl(check_button, "config", "-state", "normal")
-    if(.subtitle != "") tcl(subentry, "config", "-state", "normal")
-    if(.caption != "") tcl(capentry, "config", "-state", "normal")
-    if(.repel != "") tcl(repel_button, "config", "-state", "normal")
-    if(.limit > 0) tcl(limitbar, "config", "-state", "normal")
+    if(graph$title != "") tcl(entry1, "config", "-state", "normal")
+    if(graph$xlab != "") tcl(entry2, "config", "-state", "normal")
+    if(graph$ylab != "") tcl(entry3, "config", "-state", "normal")
+    if(graph$theme != "") tcl(theme_box, "config", "-state", "normal")
+    if(graph$palette != "") tcl(palette_box, "config", "-state", "normal")
+    if(graph$flip != "") tcl(check_button, "config", "-state", "normal")
+    if(graph$subtitle != "") tcl(subentry, "config", "-state", "normal")
+    if(graph$caption != "") tcl(capentry, "config", "-state", "normal")
+    if(graph$repel != "") tcl(repel_button, "config", "-state", "normal")
+    if(graph$limit > 0) tcl(limitbar, "config", "-state", "normal")
+    if(graph$ptext != "") tcl(point_button, "config", "-state", "normal")
+    if(graph$vtext != "") tcl(vector_button, "config", "-state", "normal")
 
-    if(.color != "") tkconfigure(color, background = .color)
-    if(.background != "") tkconfigure(bcolor, background = .background)
-    if(.tcolor != "") tkconfigure(tcolor, background = .tcolor)
-    if(.vcolor != "") tkconfigure(vcolor, background = .vcolor)
-    if(.pcolor != "") tkconfigure(pcolor, background = .pcolor)
+    if(graph$color != "") tkconfigure(color, background = graph$color )
+    if(graph$background  != "") tkconfigure(bcolor, background = graph$background)
+    if(graph$tcolor != "") tkconfigure(tcolor, background = graph$tcolor)
+    if(graph$vcolor != "") tkconfigure(vcolor, background = graph$vcolor)
+    if(graph$pcolor != "") tkconfigure(pcolor, background = graph$pcolor)
 }
