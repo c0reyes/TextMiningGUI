@@ -12,7 +12,7 @@ CaTM <- function() {
     Plot <- function(graph) {
         .CA(graph$limit)
         
-        bp <- fviz_screeplot(tm.ca, addlabels = TRUE) +
+        bp <- fviz_screeplot(tm.ca, addlabels = TRUE, linecolor = "red") +
                 labs(title = graph$title) +
                 theme(plot.background = element_rect(fill = "#ffffff", size = 0),
                       panel.background = element_rect(fill ="#ffffff", size = 0))
@@ -22,15 +22,15 @@ CaTM <- function() {
     tkentryconfigure(ca_menu, 1, state = "normal")
     tkentryconfigure(ca_menu, 2, state = "normal")
     tkentryconfigure(ca_menu, 3, state = "normal")
-    
+
     PageGUI("CA - Scree plot", Plot, title = "CA - Scree plot", limit = 100)
 }
 
 CaBiplot <- function() {
     Plot <- function(graph) {
         cb <- fviz_ca_biplot(tm.ca, arrow = c(FALSE, TRUE), 
-                repel = graph$repel, map = "rowgreen", 
-                col.col = graph$vcolor, col.row = graph$pcolor) +
+                repel = graph$repel, 
+                col.col = graph$vcolor, col.row = graph$pcolor, map = "colgreen") +
                 labs(title = graph$title) +
                 theme(plot.background = element_rect(fill = "#ffffff", size = 0),
                       panel.background = element_rect(fill ="#ffffff", size = 0))

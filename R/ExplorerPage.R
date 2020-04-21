@@ -1,4 +1,4 @@
-Explorer <- function() {
+ExplorerPage <- function() {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
         pe <- tm$freq %>% ggplot(aes(x = GROUP)) + geom_bar(fill = graph$color) + 

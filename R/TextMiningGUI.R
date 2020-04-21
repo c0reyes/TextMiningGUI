@@ -767,16 +767,16 @@ TextMiningGUI <- function() {
         })
 
     # Analysis
-    tkadd(analysis_menu, "command", label = "Words Most Used", command = BalloonPlot)
+    tkadd(analysis_menu, "command", label = "Words Most Used", command = BalloonPlotPage)
 
-    tkadd(analysis_menu, "command", label = "Word Counter by Groups", command = Explorer)
+    tkadd(analysis_menu, "command", label = "Word Counter by Groups", command = ExplorerPage)
 
-    tkadd(analysis_menu, "command", label = "Word Cloud", command = WordCloud)
+    tkadd(analysis_menu, "command", label = "Word Cloud", command = WordCloudPage)
 
     tkadd(analysis_menu, "separator")
 
-    tkadd(analysis_menu, "command", label = "Correlation", command = Correlation)
-    tkadd(analysis_menu, "command", label = "Correlation Between Groups", command = CorBetweenGroups)
+    tkadd(analysis_menu, "command", label = "Correlation", command = CorrelationPage)
+    tkadd(analysis_menu, "command", label = "Correlation Between Groups", command = CorBetweenGroupsPage)
 
     ca_menu <<- tkmenu(analysis_menu, tearoff = "0")
     tkadd(analysis_menu, "cascade", label = "Correspondence Analysis", menu = ca_menu)
@@ -785,6 +785,8 @@ TextMiningGUI <- function() {
     tkadd(ca_menu, "command", label = "CA - Biplot", command = CaBiplot, state = "disabled")
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow, state = "disabled")
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of cols", command = QualityCol, state = "disabled")
+
+    tkadd(analysis_menu, "command", label = "HJ-Biplot", command = HJBiplotPage)
 
     # Help
     tkadd(help_menu, "command", label = "Configure", command = Configure)

@@ -1,4 +1,4 @@
-Correlation <- function() {
+CorrelationPage <- function() {
     window <- tktoplevel(width = 350, height = 150)
     tkwm.minsize(window, "350", "150")
     tkwm.maxsize(window, "350", "150")
@@ -29,8 +29,7 @@ Correlation <- function() {
         command = function() { 
             Plot <- function(graph) {
                 cor <- tm$data %>% correlate() %>% network_plot(min_cor = tclvalue(min_cor), repel = TRUE) 
-                cor <- cor + theme(plot.background = element_rect(fill = "#ffffff", size = 0),
-                                   panel.background = element_rect(fill ="#ffffff", size = 0))
+                cor <- cor + theme_void()
 
                 if(graph$alpha == 1) {
                     cor <- cor + scale_alpha_continuous(range = c(1,1))
