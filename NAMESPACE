@@ -1,3 +1,4 @@
 export(TextMiningGUI)
 
 S3method(print, DataTM)
+S3method(as.data.frame, HJBiplot)
