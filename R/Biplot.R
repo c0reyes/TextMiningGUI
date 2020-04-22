@@ -1,4 +1,10 @@
-HJBiplot <- function(X, dimension = 3, name = "HJBiplot", U = TRUE, V = TRUE) {
+HJBiplot <- function(X, ...) Biplot(X, name = "HJBiplot", A = TRUE, B = TRUE, scale = 2)
+
+JKBiplot <- function(X, ...) Biplot(X, name = "JKBiplot", A = TRUE, B = FALSE, scale = 1)
+
+GHBiplot <- function(X, ...) Biplot(X, name = "GHBiplot", A = FALSE, B = TRUE, scale = 1)
+
+Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale = 2) {
   if(is.data.frame(X)) 
     X <- as.matrix(X)
   
@@ -22,13 +28,13 @@ HJBiplot <- function(X, dimension = 3, name = "HJBiplot", U = TRUE, V = TRUE) {
   biplot$inertia <- round((EV/sum(EV)) * 100, digits = 3)
   biplot$cuminertia <- cumsum(biplot$inertia)
   
-  if(U)
-    biplot$RowCoordinates <-SD$u %*% diag(SD$d[1:dimension])
+  if(A)
+    biplot$RowCoordinates <- (SD$u %*% diag(SD$d[1:dimension])) * scale
   else
-    biplot$RowCoordinates <-SD$u
+    biplot$RowCoordinates <- SD$u
   
-  if(V)
-    biplot$ColCoordinates <- SD$v %*% diag(SD$d[1:dimension])
+  if(B)
+    biplot$ColCoordinates <- (SD$v %*% diag(SD$d[1:dimension])) / scale
   else
     biplot$ColCoordinates <- SD$v
   

@@ -1,4 +1,10 @@
-as.data.frame.HJBiplot <- function (X, row.lab = "Rows", col.lab = "Columns") {
+as.data.frame.HJBiplot <- function (X, ...) as.data.frame.Biplot(X, ...)
+
+as.data.frame.JKBiplot <- function (X, ...) as.data.frame.Biplot(X, ...)
+
+as.data.frame.GHBiplot <- function (X, ...) as.data.frame.Biplot(X, ...)
+
+as.data.frame.Biplot <- function (X, row.lab = "Rows", col.lab = "Columns") {
   df <- data.frame(
     Label = c(rownames(X$ColCoordinates), rownames(X$RowCoordinates)),
     Dim1 = c(X$ColCoordinates[,1], X$RowCoordinates[,1]),

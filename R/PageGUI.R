@@ -25,7 +25,6 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     graph$ptext <- point_text
     class(graph) <- "graph"
 
-    console_chunk("tm")
     page <- Page(notebook, name)
     content <- page$content
 
@@ -345,7 +344,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     if(graph$caption != "") tcl(capentry, "config", "-state", "normal")
     if(graph$repel != "") tcl(repel_button, "config", "-state", "normal")
     if(graph$limit > 0) tcl(limitbar, "config", "-state", "normal")
-    if(graph$ptext != "") tcl(point_button, "config", "-state", "normal")
+    if(graph$ptext != "") tcl(text_button, "config", "-state", "normal")
     if(graph$vtext != "") tcl(vector_button, "config", "-state", "normal")
 
     if(graph$color != "") tkconfigure(color, background = graph$color )

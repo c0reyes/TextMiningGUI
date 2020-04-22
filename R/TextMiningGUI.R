@@ -334,6 +334,7 @@ TextMiningGUI <- function() {
 
         console_chunk("dim(DATA)")
         console_chunk("str(DATA)")
+        console_chunk("tm")
 
         l <- if(nrow(DF) > 100) 100 else nrow(DF)
         DF <- DF[1:l,]
