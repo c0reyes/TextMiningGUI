@@ -1,6 +1,4 @@
 TextMiningGUI <- function() {
-    theme_clean <<- theme(plot.background = element_rect(fill = "#ffffff", size = 0),
-                        panel.background = element_rect(fill ="#ffffff", size = 0))
     # Scrollbars
     addScrollbars <<- function(parent, widget) {
         xscr <- ttkscrollbar(parent, orient = "horizontal",
@@ -80,6 +78,7 @@ TextMiningGUI <- function() {
                 output <- paste(output, collapse = "\n")
                 tkinsert(txt, "end", output, "outputTag")
                 tkinsert(txt, "end","\n")
+                tcl(txt ,"see","end")
             }
         }
     }
@@ -291,15 +290,17 @@ TextMiningGUI <- function() {
                 t <- tclvalue(text)
                 l <- tclvalue(lang)
 
-                TMP <- DATA %>% distinct() %>% select(g, t) 
-                colnames(TMP) <- c("GROUP","TEXT")
+                if(g != "" && t != "" && l != "") {
+                    TMP <- DATA %>% distinct() %>% select(g, t) 
+                    colnames(TMP) <- c("GROUP","TEXT")
 
-                RefreshTableFrame()
-                tm <<- DataTM(TMP, l)
-                dataFrameTable(tableFrame, tm$data)
-                tkdestroy(window) 
-                tkentryconfigure(menu_bar, 3, state = "normal")
-                tkentryconfigure(data_menu, 4, state = "normal")
+                    RefreshTableFrame()
+                    tm <<- DataTM(TMP, l)
+                    dataFrameTable(tableFrame, tm$data)
+                    tkdestroy(window) 
+                    tkentryconfigure(menu_bar, 3, state = "normal")
+                    tkentryconfigure(data_menu, 4, state = "normal")
+                }
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
@@ -332,6 +333,7 @@ TextMiningGUI <- function() {
         DF <- cbind(ID, DF)
         colnames(DF) <- c("-", COL)
 
+        tcl(notebook, "select", "0")
         console_chunk("dim(DATA)")
         console_chunk("str(DATA)")
         console_chunk("tm")
@@ -655,16 +657,33 @@ TextMiningGUI <- function() {
         return(page)
     }
 
+    # Main Window
+    window <- tktoplevel(width = 939, height = 831)
+    tkwm.minsize(window, "939", "831")
+    tkwm.title(window, "TextMiningGUI")
+    tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
+            tkdestroy(window)
+        })
+
     # Scale
     hscale <<- 1.5
     vscale <<- 1.5
 
-    # Main Window
-    window <- tktoplevel(width = 800, height = 800)
-    tkwm.minsize(window, "640", "480")
-    tkwm.title(window, "TextMiningGUI")
-    tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
-            tkdestroy(window)
+    g <<- tclvalue(tkwm.geometry(window)) 
+    tkbind(window, "<Configure>", function() {
+            if(g != unlist(strsplit(tclvalue(tkwm.geometry(window)),"\\+"))[1]) {  
+                g <<- unlist(strsplit(tclvalue(tkwm.geometry(window)),"\\+"))[1]
+    
+                geometry <- unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(window)),"\\+"))[1],"x"))
+
+                hscale <<- (as.numeric(geometry[1])-219) / 480
+                vscale <<- (as.numeric(geometry[2])-85) / 480 
+
+                if(as.character(tcl("tk", "windowingsystem")) == "win32") { 
+                    hscale <<- hscale + 0.0125
+                    vscale <<- vscale + 0.0125
+                }
+            }
         })
 
     if(as.character(tcl("tk", "windowingsystem")) == "win32" || Sys.info()["sysname"] == "Windows") {
@@ -744,17 +763,17 @@ TextMiningGUI <- function() {
     # Data
     tkadd(data_menu, "command", label = "Converter", command = Converter)
 
-    tkadd(data_menu, "command", label = "Transformation", command = Transformation)
+    tkadd(data_menu, "command", label = "Create Lexical Table", command = Transformation)
 
     tkadd(data_menu, "separator")
 
-    tkadd(data_menu, "command", label = "View Raw Text", 
+    tkadd(data_menu, "command", label = "View Data", 
         command = function() {
             RefreshTableFrame()
             dataFrameTable(tableFrame, DATA)
         })
 
-    tkadd(data_menu, "command", label = "View Words", state = "disabled",
+    tkadd(data_menu, "command", label = "View Lexical Table", state = "disabled",
         command = function() {
             RefreshTableFrame()
             dataFrameTable(tableFrame, tm$data)
@@ -762,12 +781,13 @@ TextMiningGUI <- function() {
 
     tkadd(data_menu, "separator")
 
-    tkadd(data_menu, "command", label = "Console",
-        command = function() {
-            console()
-        })
+    tkadd(data_menu, "command", label = "Console", command = console)
 
     # Analysis
+    tkadd(analysis_menu, "command", label = "Statistics", command = function() {
+            console()
+            console_chunk("tm")
+        })
     tkadd(analysis_menu, "command", label = "Words Most Used", command = BalloonPlotPage)
 
     tkadd(analysis_menu, "command", label = "Word Counter by Groups", command = ExplorerPage)
@@ -787,7 +807,9 @@ TextMiningGUI <- function() {
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow, state = "disabled")
     tkadd(ca_menu, "command", label = "CA - Quality of representarion of cols", command = QualityCol, state = "disabled")
 
-    tkadd(analysis_menu, "command", label = "HJ-Biplot", command = HJBiplotPage)
+    tkadd(analysis_menu, "command", label = "Characterization value + HJ-Biplot", command = HJBiplotPage)
+
+    tkadd(analysis_menu, "command", label = "Emotions + HJ-Biplot", command = EmotionsPage)
 
     # Help
     tkadd(help_menu, "command", label = "Configure", command = Configure)
@@ -809,7 +831,3 @@ TextMiningGUI <- function() {
     img <- ttklabel(tableFrame, image = "imageID", compound = "image", anchor = "center")
     tkpack(img)
 }
-
-#scrollable-frame
-#example-padding
-#validation

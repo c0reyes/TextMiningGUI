@@ -8,8 +8,10 @@ BalloonPlotPage <- function() {
                 scale_fill_gradientn(colors = colors) +
                 theme_minimal() +
                 guides(size = FALSE) + 
+                theme_white() +
                 theme(axis.title.x = element_blank(),
-                      axis.title.y = element_blank())
+                      axis.title.y = element_blank(),
+                      panel.grid.major = element_line(color = "lightgray")) 
             
         return(pb)
     }

@@ -29,7 +29,8 @@ CorrelationPage <- function() {
         command = function() { 
             Plot <- function(graph) {
                 cor <- tm$data %>% correlate() %>% network_plot(min_cor = tclvalue(min_cor), repel = TRUE) 
-                cor <- cor + theme_void()
+                cor <- cor + theme_white() + theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
+                                                   axis.title.y = element_blank(), axis.text.y = element_blank())
 
                 if(graph$alpha == 1) {
                     cor <- cor + scale_alpha_continuous(range = c(1,1))

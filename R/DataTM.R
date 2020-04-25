@@ -24,6 +24,7 @@ DataTM <- function(DF, language) {
     tm <- list()
     tm$data <- TM
     tm$freq <- df
+    tm$lang <- language
     tm$dist <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
     class(tm) <- "DataTM"
 

@@ -10,12 +10,11 @@ CaTM <- function() {
     }
 
     Plot <- function(graph) {
-        .CA(graph$limit)
+        if(graph$reload == 0)
+            .CA(graph$limit)
         
         bp <- fviz_screeplot(tm.ca, addlabels = TRUE, linecolor = "red") +
-                labs(title = graph$title) +
-                theme(plot.background = element_rect(fill = "#ffffff", size = 0),
-                      panel.background = element_rect(fill ="#ffffff", size = 0))
+                labs(title = graph$title) + theme_white()
         return(bp)
     }
 
@@ -30,12 +29,13 @@ CaBiplot <- function() {
     Plot <- function(graph) {
         cb <- fviz_ca_biplot(tm.ca, arrow = c(FALSE, TRUE), 
                 repel = graph$repel, 
-                col.col = graph$vcolor, col.row = graph$pcolor, map = "colgreen") +
-                labs(title = graph$title)
+                col.col = graph$vcolor, col.row = graph$pcolor, map = "symbiplot") +
+                labs(title = graph$title) + theme_white()
 
         return(cb)        
     }
 
+    # rowprincipal colprincipal symbiplot
     PageGUI("CA - Biplot", Plot, title = "CA - Biplot", vector_color = "red", point_color = "blue", repel = FALSE)
 }
 
@@ -44,7 +44,7 @@ QualityRow <- function() {
         qr <- fviz_ca_row(tm.ca, col.row = "cos2",
                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
                 repel = graph$repel) + 
-                labs(title = graph$title) 
+                labs(title = graph$title) + theme_white()
 
         return(qr)
     }
@@ -57,7 +57,7 @@ QualityCol <- function() {
         qr <- fviz_ca_col(tm.ca, col.col = "cos2", 
                 gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
                 repel = graph$repel) + 
-                labs(title = graph$title) 
+                labs(title = graph$title) + theme_white()
                 
         return(qr)
     }
