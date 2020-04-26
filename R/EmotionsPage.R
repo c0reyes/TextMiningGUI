@@ -54,14 +54,45 @@ EmotionsPage <- function() {
         return(p)
     }
 
+    PlotS <- function(graph) {
+        t <- match.fun(graph$theme)
+
+        p <-  ggplot(sentiments, 
+                    aes(x = group, y = count, fill = sentiment, label = count)) + 
+                    geom_bar(position = "dodge", stat="identity") +
+                    labs(title = graph$title, 
+                        x = graph$xlab, y = graph$ylab) +
+                geom_text(position = position_dodge(width = 0.9), vjust = 1.5, color = "black", size = 5) +
+                t() +
+                theme(plot.title = element_text(hjust = 0.5),
+                    axis.text = element_text(size = 12),
+                    axis.title = element_text(size = 14,face = "bold"),
+                    title = element_text(size = 20,face = "bold"))
+
+        return(p)
+    }
+
     emotions <<- tm$freq %>% select(GROUP, word) %>% group_by(GROUP) %>% group_modify(~ Emotions(.x$word, language = tm$lang))
     emotions <<- emotions %>% group_by(GROUP) %>% pivot_wider(names_from = GROUP, values_from = count) 
     emotions <<- as.data.frame(emotions)
     rownames(emotions) <<- emotions[,1]
     emotions[,1] <<- NULL
+    
+    sentiments <<- emotions
+    emotions <<- emotions[1:8,]
+    
+    sentiments <<- sentiments[9:10,]
+    sentiments <<- as.data.frame(t(sentiments))
+    sentiments <<- cbind(group = rownames(sentiments), sentiments)
+    sentiments <<- gather(sentiments, "sentiment", "count", -group)
+
     console_chunk("print(emotions)")
+    console_chunk("print(sentiments)")
 
     #point_color = "#E69F00"
-    PageGUI("Emotions - HJ-Biplot", Plot, theme = "theme_white", limit = 100, vector_color = "#f8766d", 
+    PageGUI("Emotions - HJ-Biplot", Plot, theme = "theme_white", vector_color = "#f8766d", 
         title = "Emotions - HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 3)
+
+    PageGUI("Sentiments", PlotS, theme = "theme_light",  title = "Sentiment", 
+        xlab = "Groups", ylab = "Count")
 }

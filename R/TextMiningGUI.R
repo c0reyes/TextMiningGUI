@@ -608,9 +608,6 @@ TextMiningGUI <- function() {
         tkentryconfigure(menu_bar, 2, state = "normal")
         tkentryconfigure(menu_bar, 3, state = "disabled")
         tkentryconfigure(data_menu, 4, state = "disabled")
-        tkentryconfigure(ca_menu, 1, state = "disabled")
-        tkentryconfigure(ca_menu, 2, state = "disabled")
-        tkentryconfigure(ca_menu, 3, state = "disabled")
     }
 
     RefreshTableFrame <- function() {
@@ -788,6 +785,7 @@ TextMiningGUI <- function() {
             console()
             console_chunk("tm")
         })
+
     tkadd(analysis_menu, "command", label = "Words Most Used", command = BalloonPlotPage)
 
     tkadd(analysis_menu, "command", label = "Word Counter by Groups", command = ExplorerPage)
@@ -797,19 +795,16 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "separator")
 
     tkadd(analysis_menu, "command", label = "Correlation", command = CorrelationPage)
+
     tkadd(analysis_menu, "command", label = "Correlation Between Groups", command = CorBetweenGroupsPage)
 
     ca_menu <<- tkmenu(analysis_menu, tearoff = "0")
-    tkadd(analysis_menu, "cascade", label = "Correspondence Analysis", menu = ca_menu)
 
-    tkadd(ca_menu, "command", label = "Chisq test & Scree Plot", command = CaTM)
-    tkadd(ca_menu, "command", label = "CA - Biplot", command = CaBiplot, state = "disabled")
-    tkadd(ca_menu, "command", label = "CA - Quality of representarion of rows", command = QualityRow, state = "disabled")
-    tkadd(ca_menu, "command", label = "CA - Quality of representarion of cols", command = QualityCol, state = "disabled")
+    tkadd(analysis_menu, "command", label = "Correspondence Analysis", command = CaPage)
 
     tkadd(analysis_menu, "command", label = "Characterization value + HJ-Biplot", command = HJBiplotPage)
 
-    tkadd(analysis_menu, "command", label = "Emotions + HJ-Biplot", command = EmotionsPage)
+    tkadd(analysis_menu, "command", label = "Emotions & Sentiments + HJ-Biplot", command = EmotionsPage)
 
     # Help
     tkadd(help_menu, "command", label = "Configure", command = Configure)

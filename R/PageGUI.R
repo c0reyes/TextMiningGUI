@@ -398,4 +398,12 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "",
     if(graph$tcolor != "") tkconfigure(tcolor, background = graph$tcolor)
     if(graph$vcolor != "") tkconfigure(vcolor, background = graph$vcolor)
     if(graph$pcolor != "") tkconfigure(pcolor, background = graph$pcolor)
+
+    replot <- function() {
+        tkrreplot(eplot, fun = function() {
+            plot(Plot(graph))
+        }, hscale = hscale, vscale = vscale)
+    }
+
+    return(replot)
 }
