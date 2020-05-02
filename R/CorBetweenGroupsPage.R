@@ -1,5 +1,5 @@
-CorBetweenGroupsPage <- function() {
-    vars <- colnames(tm$data)
+CorBetweenGroupsPage <- function(X, parent, notebook) {
+    vars <- colnames(X$data)
 
     group1 <- tclVar("")
     group2 <- tclVar("")
@@ -43,12 +43,12 @@ CorBetweenGroupsPage <- function() {
         })
     ok_button <- ttkbutton(button_frame, text = "ok",
         command = function() { 
-            g1 <<- tclvalue(group1)
-            g2 <<- tclvalue(group2)
+            g1 <- tclvalue(group1)
+            g2 <- tclvalue(group2)
 
             if(g1 != "" && g2 != "") {
                 Plot <- function(graph) {
-                    w <- tm$data[1:graph$limit,]
+                    w <- X$data[1:graph$limit,]
                     corp <- ggplot(w, aes(w[[g1]], w[[g2]])) +
                                 geom_jitter(alpha = graph$alpha, size = 2.5, width = 0.25, height = 0.25) +
                                 geom_text(aes(label = rownames(w)), check_overlap = TRUE, vjust = 1.5) +
@@ -60,7 +60,7 @@ CorBetweenGroupsPage <- function() {
                     return(corp)
                 }
 
-                PageGUI("Correlation between groups", Plot, limit = 50)
+                PageGUI("Correlation between groups", Plot, limit = 100, parent = parent, notebook = notebook, to = nrow(X$data))
                 tkdestroy(window)
             }   
         })

@@ -1,130 +1,8 @@
 TextMiningGUI <- function() {
-    # Scrollbars
-    addScrollbars <<- function(parent, widget) {
-        xscr <- ttkscrollbar(parent, orient = "horizontal",
-                           command = function(...) tkxview(widget, ...))
-        yscr <- ttkscrollbar(parent, orient = "vertical",
-                           command = function(...) tkyview(widget, ...))
-        tkconfigure(widget,
-                  xscrollcommand = function(...) tkset(xscr,...),
-                  yscrollcommand = function(...) tkset(yscr,...))
-        tkgrid(widget, row = 0, column = 0, sticky = "news")
-        tkgrid(yscr, row = 0, column = 1, sticky = "ns")
-        tkgrid(xscr, row = 1, column = 0, sticky = "ew")
-        tkgrid.columnconfigure(parent, 0, weight = 1)
-        tkgrid.rowconfigure(parent, 0, weight = 1)
-    }
-
-    # Labels
-    put_label <<- function(parent, text, row, column, sticky = "e") {
-        label <- ttklabel(parent, text = text)
-        tkgrid(label, row = row, column = column, sticky = sticky)
-    }
-
-    # Console
-    console <- function() {
-        if(!exists("windowc") || is.null(windowc)) {
-            windowc <<- tktoplevel()
-            tkwm.minsize(windowc, "600", "200")
-            tkwm.title(windowc, "Console")
-            tkwm.protocol(windowc, "WM_DELETE_WINDOW", function() {
-                    tkdestroy(windowc)
-                    windowc <<- NULL
-                    txt <<- NULL
-                })
-            frame <- ttkframe(windowc, padding = c(3,3,12,12))
-            frame_2 <- ttkframe(windowc)
-            tkpack(frame, expand = TRUE, fill = "both")
-            tkpack(frame_2, side = "right")
-
-            txt <<- tktext(frame, width = 80, height = 24, wrap = "none", font = "courier")
-            addScrollbars(frame, txt)
-
-            tktag.configure(txt, "commandTag", foreground = "blue", font = "courier 12 italic")
-            tktag.configure(txt, "outputTag", font = "courier 12")
-            tktag.configure(txt, "errorTag", foreground = "red", font = "courier 12 bold")
-
-            button_frame <- ttkframe(frame_2)
-            close_button <- ttkbutton(button_frame, text = "close",
-                command = function() { 
-                    tkdestroy(windowc) 
-                    windowc <<- NULL
-                    txt <<- NULL
-                })
-            tkpack(button_frame, fill = "x", padx = 5, pady = 5)             
-            tkpack(close_button, side = "right", padx = 0)             
-        }
-    }
-
-    console_chunk <<- function(cmds) {
-        if(exists("txt") && !is.null(txt)) {
-            tkinsert(txt, "end", "\n")
-            tkinsert(txt, "end", "\n")
-
-            cmd_chunks <- try(parse(text = cmds), silent = TRUE)
-
-            for(cmd in cmd_chunks) {
-                cutoff <- 0.75 * getOption("width")
-                dcmd <- deparse(cmd, width.cutoff = cutoff)
-                command <- paste(getOption("prompt"),
-                            paste(dcmd, collapse = paste("\n", 
-                            getOption("continue"), sep = "")),
-                            sep = "", collapse = "")
-                tkinsert(txt, "end", command, "commandTag")
-                tkinsert(txt, "end","\n")
-                
-                output <- capture.output(eval(cmd, envir = .GlobalEnv))
-                output <- iconv(output, to = "ASCII//TRANSLIT")
-                output <- paste(output, collapse = "\n")
-                tkinsert(txt, "end", output, "outputTag")
-                tkinsert(txt, "end","\n")
-                tcl(txt ,"see","end")
-            }
-        }
-    }
-
-    # Configure
-    Configure <- function() {             
-        window <- tktoplevel(width = 350, height = 200)
-        tkwm.minsize(window, "350", "200")
-        tkwm.maxsize(window, "350", "200")
-        tkwm.title(window, "Configure")
-
-        frame <- ttkframe(window, padding = c(3,3,12,12))
-        tkpack(frame, expand = TRUE, fill = "both")
-
-        label_frame <- ttklabelframe(frame, text = "Configure", padding = 10)
-        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
-
-        tkgrid.columnconfigure(label_frame, 0, weight = 1)
-        tkgrid.columnconfigure(label_frame, 1, weight = 10)
-        tkgrid.columnconfigure(label_frame, 2, weight = 1)
-        tkgrid.columnconfigure(label_frame, 1, weight = 10)
-
-        put_label(label_frame, "hscale: ", 1, 0)
-        thscale <- tclVar(init = hscale)
-        hscalef <- tkscale(label_frame, from = 1, to = 3, variable = thscale, showvalue = TRUE, resolution = 0.05, orient = "horiz")
-        tkgrid(hscalef, row = 1, column = 1, sticky = "ew", padx = 2)
-
-        put_label(label_frame, "vscale:  ", 2, 0)
-        tvscale <- tclVar(init = vscale)
-        vscalef <- tkscale(label_frame, from = 1, to = 3, variable = tvscale, showvalue = TRUE, resolution = 0.05, orient = "horiz")
-        tkgrid(vscalef, row = 2, column = 1, sticky = "ew", padx = 2)
-        
-        button_frame <- ttkframe(frame)
-        
-        ok_button <- ttkbutton(button_frame, text = "ok",
-            command = function() { 
-                hscale <<- as.numeric(tclvalue(thscale))
-                vscale <<- as.numeric(tclvalue(tvscale))
-                tkdestroy(window)
-            })
-        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
-        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
-           fill = "y", side = "left")               
-        sapply(list(ok_button), tkpack, side = "left", padx = 6)
-    }
-
+    env = .BaseNamespaceEnv
+    if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
+    assign("x", 1, envir = .BaseNamespaceEnv)
+    
     # About
     About <- function() {             
         window <- tktoplevel(width = 600, height = 400)
@@ -144,7 +22,7 @@ TextMiningGUI <- function() {
         tkconfigure(text1, background = "white")
         text2 <- ttklabel(frame, text = "License: GPL")
         tkconfigure(text2, background = "white")
-        text3 <- ttklabel(frame, text = "Developer: Conrado Reyes\n\n")
+        text3 <- ttklabel(frame, text = "Created by Conrado Reyes\n\n")
         tkconfigure(text3, background = "white")
         tkpack(text1, text2, text3)
 
@@ -155,7 +33,7 @@ TextMiningGUI <- function() {
     }
 
     # Converter
-    Converter <- function() {             
+    Converter <- function() {            
         vars <- colnames(DATA)
         types <- c("factor", "date")
 
@@ -213,16 +91,18 @@ TextMiningGUI <- function() {
                 if(v != "" && t == "factor") {
                     if(vv != "") {
                         labels <- unlist(strsplit(vv, ","))
-                        DATA[[v]] <<- factor(DATA[[v]], labels = labels)
+                        DATA[[v]] <- factor(DATA[[v]], labels = labels)
+                        assign("DATA", DATA, envir = env)
                     }else{
-                        DATA[[v]] <<- factor(DATA[[v]])
+                        DATA[[v]] <- factor(DATA[[v]])
+                        assign("DATA", DATA, envir = env)
                     }
                 }else if(v != "" && t == "date" && vv != "") {
-                    DATA[[v]] <<- as.Date(DATA[[v]], vv)
+                    DATA[[v]] <- as.Date(DATA[[v]], vv)
+                    assign("DATA", DATA, envir = env)
                 }
 
-                RefreshTableFrame()
-                dataFrameTable(tableFrame, DATA)
+                dataFrameTable(DATA)
                 tkdestroy(window)
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
@@ -232,7 +112,7 @@ TextMiningGUI <- function() {
     }
 
     # Transformation
-    Transformation <- function() {    
+    Transformation <- function() {  
         languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(DATA)
         group <- tclVar("")
@@ -294,9 +174,8 @@ TextMiningGUI <- function() {
                     TMP <- DATA %>% distinct() %>% select(g, t) 
                     colnames(TMP) <- c("GROUP","TEXT")
 
-                    RefreshTableFrame()
-                    tm <<- DataTM(TMP, l)
-                    dataFrameTable(tableFrame, tm$data)
+                    assign("tm", DataTM(TMP, l), envir = env)
+                    dataFrameTable(tm$data)
                     tkdestroy(window) 
                     tkentryconfigure(menu_bar, 3, state = "normal")
                     tkentryconfigure(data_menu, 4, state = "normal")
@@ -325,7 +204,9 @@ TextMiningGUI <- function() {
     }
 
     # Table
-    dataFrameTable <- function(frame, DF) {
+    dataFrameTable <- function(DF) {
+        frame <- RefreshTableFrame()
+
         ID <- rownames(DF)
         COL <- colnames(DF)
         count <- nrow(DF)
@@ -334,9 +215,9 @@ TextMiningGUI <- function() {
         colnames(DF) <- c("-", COL)
 
         tcl(notebook, "select", "0")
-        console_chunk("dim(DATA)")
-        console_chunk("str(DATA)")
-        console_chunk("tm")
+        console(cmds = "dim(DATA)")
+        console(cmds = "str(DATA)")
+        console(cmds = "tm")
 
         l <- if(nrow(DF) > 100) 100 else nrow(DF)
         DF <- DF[1:l,]
@@ -448,9 +329,9 @@ TextMiningGUI <- function() {
 
         tkbind(combo_box, "<<ComboboxSelected>>", function() {
             if(is.matrix(get(tclvalue(var)))) {
-                DATA <<- as.data.frame(get(tclvalue(var)))
+                assign("DATA", as.data.frame(get(tclvalue(var))), envir = env)
             }else{
-                DATA <<- get(tclvalue(var))
+                assign("DATA", get(tclvalue(var)), envir = env)
             }
         })
 
@@ -461,7 +342,7 @@ TextMiningGUI <- function() {
             })
         ok_button <- ttkbutton(button_frame, text = "ok",
             command = function() { 
-                dataFrameTable(tableFrame, DATA)
+                dataFrameTable(DATA)
                 tkdestroy(window) 
                 disableMenu()
             })
@@ -503,9 +384,9 @@ TextMiningGUI <- function() {
 
         tkbind(combo_box, "<<ComboboxSelected>>", function() {
             if(is.matrix(get(tclvalue(var)))) {
-                DATA <<- as.data.frame(get(tclvalue(var)))
+                assign("DATA", as.data.frame(get(tclvalue(var))), envir = env)
             }else{
-                DATA <<- get(tclvalue(var))
+                assign("DATA", get(tclvalue(var)), envir = env)
             }
         })
 
@@ -516,7 +397,7 @@ TextMiningGUI <- function() {
             })
         ok_button <- ttkbutton(button_frame, text = "ok",
             command = function() { 
-                dataFrameTable(tableFrame, DATA)
+                dataFrameTable(DATA)
                 tkdestroy(window) 
                 disableMenu()
             })
@@ -528,8 +409,8 @@ TextMiningGUI <- function() {
 
     # Read Excel
     ReadExcel <- function(file_name) {                                                                                                                                                                                                                              
-        DATA <<- read_excel(file_name)                                                                                                                                                                                            
-        dataFrameTable(tableFrame, DATA)
+        assign("DATA", read_excel(file_name), envir = env)                                                                                                                                                                                       
+        dataFrameTable(DATA)
         disableMenu()
     }
 
@@ -585,7 +466,7 @@ TextMiningGUI <- function() {
             command = function() { 
                 h <- if( tclvalue(header) == "1" ) TRUE else FALSE
                 s <- if( tclvalue(sep) == "other:") tclvalue(other.char) else tclvalue(sep)
-                DATA <<- read.table(file_name, 
+                DATA <- read.table(file_name, 
                     encoding = encoding, 
                     header = h, 
                     sep = s, 
@@ -593,8 +474,8 @@ TextMiningGUI <- function() {
                     quote = "", 
                     stringsAsFactors = FALSE, 
                     comment.char = tclvalue(comment.char))
-
-                dataFrameTable(tableFrame, DATA)
+                assign("DATA", DATA, envir = env)
+                dataFrameTable(DATA)
                 tkdestroy(window)
                 disableMenu()
             })
@@ -610,77 +491,20 @@ TextMiningGUI <- function() {
         tkentryconfigure(data_menu, 4, state = "disabled")
     }
 
-    RefreshTableFrame <- function() {
-        if(exists("tableFrame")) {        
-            tkdestroy(tableFrame)
-        }
-        tableFrame <<- ttkframe(frame, padding = c(3,3,3,12))
+    RefreshTableFrame <- function() { 
+        if(exists("tableFrame", envir = env)) tkdestroy(tableFrame)
+        assign("tableFrame", ttkframe(frame, padding = c(3,3,3,12)), envir = env)
         tkpack(tableFrame, expand = TRUE, fill = "both")
-    }
-
-    Page <<- function(parent, name) {
-        iconx <- tclVar()
-        icons <- tclVar()
-        iconl <- tclVar()
-        tcl("image", "create", "photo", iconx, file = system.file("icons/x.png", package = "TextMiningGUI"))
-        tcl("image", "create", "photo", icons, file = system.file("icons/save.png", package = "TextMiningGUI"))
-        tcl("image", "create", "photo", iconl, file = system.file("icons/lupa.png", package = "TextMiningGUI"))
-
-        frame <- ttkframe(parent, padding = c(3,3,3,12))
-        tkadd(parent, frame, sticky = "nswe", text = name, compound = "right")
-        
-        tool_bar <- ttkframe(frame, padding = 2)
-        content <- ttkframe(frame, padding = 2)
-        
-        tkgrid(tool_bar, row = 0, column = 0, sticky = "we")
-        tkgrid(content, row = 1, column = 0, sticky  =  "news")
-        tkgrid.rowconfigure(frame, 0, weight = 0)
-        tkgrid.rowconfigure(frame, 1, weight = 1)
-        tkgrid.columnconfigure(frame, 0, weight = 1)
-
-        img3 <- ttklabel(tool_bar, image = iconl)
-        img1 <- ttklabel(tool_bar, image = icons)
-        img2 <- ttklabel(tool_bar, image = iconx)
-        tkpack(img2, img1, img3, side = "right")
-
-        tkbind(img2, "<ButtonRelease-1>", function() { tcl(parent, "forget", frame)})
-
-        page <- list()
-        page$content <- content
-        page$save <- img1
-        page$zoom <- img3
-        class(page) <- "Page"
-
-        return(page)
+        return(tableFrame)
     }
 
     # Main Window
-    window <- tktoplevel(width = 939, height = 831)
-    tkwm.minsize(window, "939", "831")
+    window <- tktoplevel(width = 939, height = 850)
+    tkwm.minsize(window, "939", "850")
     tkwm.title(window, "TextMiningGUI")
     tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
+            assign("x", NULL, envir = .BaseNamespaceEnv)
             tkdestroy(window)
-        })
-
-    # Scale
-    hscale <<- 1.5
-    vscale <<- 1.5
-
-    g <<- tclvalue(tkwm.geometry(window)) 
-    tkbind(window, "<Configure>", function() {
-            if(g != unlist(strsplit(tclvalue(tkwm.geometry(window)),"\\+"))[1]) {  
-                g <<- unlist(strsplit(tclvalue(tkwm.geometry(window)),"\\+"))[1]
-    
-                geometry <- unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(window)),"\\+"))[1],"x"))
-
-                hscale <<- (as.numeric(geometry[1])-219) / 480
-                vscale <<- (as.numeric(geometry[2])-85) / 480 
-
-                if(as.character(tcl("tk", "windowingsystem")) == "win32") { 
-                    hscale <<- hscale + 0.0125
-                    vscale <<- vscale + 0.0125
-                }
-            }
         })
 
     if(as.character(tcl("tk", "windowingsystem")) == "win32" || Sys.info()["sysname"] == "Windows") {
@@ -712,7 +536,6 @@ TextMiningGUI <- function() {
             file_name <- tkgetOpenFile(filetypes=
                         "{{Text files} {.txt}} {{CSV files} {.csv}} {{All files} *}")
             if(file.exists(file_name <- as.character(file_name))) {
-                RefreshTableFrame()
                 ReadTable(file_name)
             }
         })
@@ -722,7 +545,6 @@ TextMiningGUI <- function() {
             file_name <- tkgetOpenFile(filetypes=
                         "{{Excel files} {.xls}} {{Excel files} {.xlsx}} {{All files} *}")
             if(file.exists(file_name <- as.character(file_name))) {
-                RefreshTableFrame()
                 ReadExcel(file_name)
             }
         })
@@ -732,14 +554,12 @@ TextMiningGUI <- function() {
             file_name <- tkgetOpenFile(filetypes=
                         "{{Rdata files} {.RData}} {{Rdata files} {.Rdata}} {{Rdata files} {.rdata}} {{Rdata files} {.Rda}} {{Rdata files} {.rda}} {{All files} *}")
             if(file.exists(file_name <- as.character(file_name))) {
-                RefreshTableFrame()
                 ReadData(file_name)
             }
         })
 
     tkadd(file_menu,"command", label = "Data Examples...",
         command =  function() {
-            RefreshTableFrame()
             ReadExample()
         })
 
@@ -754,6 +574,7 @@ TextMiningGUI <- function() {
 
     tkadd(file_menu, "command", label = "Quit",
         command = function() {
+            assign("x", NULL, envir = .BaseNamespaceEnv)
             tkdestroy(window)
         })
 
@@ -766,53 +587,58 @@ TextMiningGUI <- function() {
 
     tkadd(data_menu, "command", label = "View Data", 
         command = function() {
-            RefreshTableFrame()
-            dataFrameTable(tableFrame, DATA)
+            dataFrameTable(DATA)
         })
 
     tkadd(data_menu, "command", label = "View Lexical Table", state = "disabled",
         command = function() {
-            RefreshTableFrame()
-            dataFrameTable(tableFrame, tm$data)
+            dataFrameTable(tm$data)
         })
 
     tkadd(data_menu, "separator")
 
-    tkadd(data_menu, "command", label = "Console", command = console)
+    tkadd(data_menu, "command", label = "Console", command = function() { console(start = TRUE) })
 
     # Analysis
     tkadd(analysis_menu, "command", label = "Statistics", command = function() {
-            console()
-            console_chunk("tm")
+            console(start = TRUE)
+            console(cmds = "tm", e = env)
         })
 
-    tkadd(analysis_menu, "command", label = "Words Most Used", command = BalloonPlotPage)
+    tkadd(analysis_menu, "command", label = "Words Most Used", 
+        command = function() BalloonPlotPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Word Counter by Groups", command = ExplorerPage)
+    tkadd(analysis_menu, "command", label = "Word Counter by Groups", 
+        command = function() ExplorerPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Word Cloud", command = WordCloudPage)
+    tkadd(analysis_menu, "command", label = "Word Cloud", 
+        command = function() WordCloudPage(X = tm, parent = window, notebook = notebook))
 
     tkadd(analysis_menu, "separator")
 
-    tkadd(analysis_menu, "command", label = "Correlation", command = CorrelationPage)
+    tkadd(analysis_menu, "command", label = "Dendrogram",
+        command = function() DendogramPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Correlation Between Groups", command = CorBetweenGroupsPage)
+    tkadd(analysis_menu, "command", label = "Correlation", 
+        command = function() CorrelationPage(X = tm, parent = window, notebook = notebook))
 
-    ca_menu <<- tkmenu(analysis_menu, tearoff = "0")
+    tkadd(analysis_menu, "command", label = "Correlation Between Groups", 
+        command = function() CorBetweenGroupsPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Correspondence Analysis", command = CaPage)
+    tkadd(analysis_menu, "command", label = "Correspondence Analysis", 
+        command = function() CaPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Characterization value + HJ-Biplot", command = HJBiplotPage)
+    tkadd(analysis_menu, "command", label = "Characterization value + HJ-Biplot", 
+        command = function() HJBiplotPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Emotions & Sentiments + HJ-Biplot", command = EmotionsPage)
+    tkadd(analysis_menu, "command", label = "Emotions & Sentiments + HJ-Biplot", 
+        command = function() EmotionsPage(X = tm, parent = window, notebook = notebook))
 
     # Help
-    tkadd(help_menu, "command", label = "Configure", command = Configure)
-
     tkadd(help_menu, "command", label = "About", command = About)
 
     # Notebook
-    notebook <<- ttknotebook(window)
+    notebook <- ttknotebook(window)
     tkpack(notebook, expand = TRUE, fill = "both")
 
     # Table
@@ -821,7 +647,7 @@ TextMiningGUI <- function() {
 
     # Image
     tcl("image", "create", "photo", "imageID", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))
-    tableFrame <<- ttkframe(frame, padding = c(3,3,3,12))
+    assign("tableFrame", ttkframe(frame, padding = c(3,3,3,12)), envir = env)
     tkpack(tableFrame, expand = TRUE, fill = "both")
     img <- ttklabel(tableFrame, image = "imageID", compound = "image", anchor = "center")
     tkpack(img)

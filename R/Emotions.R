@@ -1,7 +1,7 @@
 Emotions <- function(X, language) {
     X <- as.vector(X)
 
-    cores <- detectCores() - 1
+    cores <- if(detectCores() - 1 > 0)  detectCores() - 1 else 1
     cl <- makeCluster(cores)
     clusterExport(cl = cl, c("get_sentiment", "get_sent_values", "get_nrc_sentiment", "get_nrc_values", "parLapply"))
     emotion.df <- get_nrc_sentiment(char_v = X, language = language, cl = cl)

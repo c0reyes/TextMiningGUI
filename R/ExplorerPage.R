@@ -1,7 +1,7 @@
-ExplorerPage <- function() {
+ExplorerPage <- function(X, parent, notebook) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
-        pe <- tm$freq %>% ggplot(aes(x = GROUP)) + geom_bar(fill = graph$color) + 
+        pe <- X$freq %>% ggplot(aes(x = GROUP)) + geom_bar(fill = graph$color) + 
             labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + 
             xlab(graph$xlab) + 
             ylab(graph$ylab)
@@ -12,5 +12,6 @@ ExplorerPage <- function() {
     }
 
     PageGUI("Words by Groups", Plot, color = "#323232", theme = "theme_gray", title = "Distinct words by groups", 
-            xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ")
+            xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ",
+            parent = parent, notebook = notebook)
 }

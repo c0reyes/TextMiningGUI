@@ -1,9 +1,9 @@
-WordCloudPage <- function() {
+WordCloudPage <- function(X, parent, notebook) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
         set.seed(0)
-        w <- tm$freq[1:graph$limit,]
+        w <- X$freq[1:graph$limit,]
         pw <- w %>% ggplot(aes(label = word, size = freq, color = freq)) +
             geom_text_wordcloud(aes(angle = 45 * sample(-2:2, nrow(w),
                                     replace = TRUE,
@@ -13,5 +13,6 @@ WordCloudPage <- function() {
         return(pw)
     }
 
-    PageGUI("Word Cloud", Plot, theme = "theme_white", palette = "Dark2", background = "#ffffff", limit = 100)
+    PageGUI("Word Cloud", Plot, theme = "theme_white", palette = "Dark2", background = "#ffffff", limit = 100,
+        parent = parent, notebook = notebook, to = nrow(X$data))
 }
