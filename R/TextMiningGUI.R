@@ -617,7 +617,7 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "separator")
 
     tkadd(analysis_menu, "command", label = "Dendrogram",
-        command = function() DendogramPage(X = tm, parent = window, notebook = notebook))
+        command = function() DendrogramPage(X = tm, parent = window, notebook = notebook))
 
     tkadd(analysis_menu, "command", label = "Correlation", 
         command = function() CorrelationPage(X = tm, parent = window, notebook = notebook))

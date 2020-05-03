@@ -18,11 +18,9 @@ HJBiplotPage <- function(X, parent, notebook) {
             plotdf$kcluster <- factor(plotdf$kcluster)
         }
 
-        if(graph$reload == 0) {
-            console(cmds = "head(x)", e = environment())
-            console(cmds = "head(w)", e = environment())
-            console(cmds = "b", e = environment())
-        }
+        console(cmds = "head(x)", e = environment())
+        console(cmds = "head(w)", e = environment())
+        console(cmds = "b", e = environment())
 
         line_alpha <- 0.50
         vector_alpha <- 0.75

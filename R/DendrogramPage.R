@@ -1,4 +1,4 @@
-DendogramPage <- function(X, parent, notebook) {
+DendrogramPage <- function(X, parent, notebook) {
     Plot <- function(graph) {
         w <- X$data[1:graph$limit,]
         w <- Convert(w)
@@ -9,6 +9,6 @@ DendogramPage <- function(X, parent, notebook) {
         return(w_hc)
     }
 
-    PageGUI("Dendogram", Plot, limit = 100,
-        parent = parent, notebook = notebook, to = nrow(X$data))
+    PageGUI("Dendrogram", Plot, limit = 100,
+        parent = parent, notebook = notebook, to = nrow(X$data), title = "Cluster Dendrogram", type = "hclust")
 }
