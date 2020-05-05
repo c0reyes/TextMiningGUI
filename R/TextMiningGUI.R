@@ -499,8 +499,9 @@ TextMiningGUI <- function() {
     }
 
     # Main Window
-    window <- tktoplevel(width = 939, height = 850)
-    tkwm.minsize(window, "939", "850")
+    window <- tktoplevel(width = 800, height = 600)
+    tkwm.minsize(window, "800", "600")
+    tkwm.maxsize(window, tclvalue(tkwinfo("screenwidth",".")), tclvalue(tkwinfo("screenheight",".")))
     tkwm.title(window, "TextMiningGUI")
     tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
             assign("x", NULL, envir = .BaseNamespaceEnv)

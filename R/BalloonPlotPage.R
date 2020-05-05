@@ -3,7 +3,7 @@ BalloonPlotPage <- function(X, parent, notebook) {
         colors <- c("#0D0887FF", "#6A00A8FF", "#B12A90FF", "#E16462FF", "#FCA636FF", "#F0F921FF")
         
         w <- X$data[1:graph$limit,]
-        pb <- ggballoonplot(w, fill = "value") +
+        plot <- ggballoonplot(w, fill = "value") +
                 scale_fill_gradientn(colors = colors) +
                 theme_minimal() +
                 guides(size = FALSE) + 
@@ -12,7 +12,7 @@ BalloonPlotPage <- function(X, parent, notebook) {
                       axis.title.y = element_blank(),
                       panel.grid.major = element_line(color = "lightgray")) 
             
-        return(pb)
+        return(plot)
     }
 
     PageGUI("Words Most Used", Plot, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))

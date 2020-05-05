@@ -2,11 +2,13 @@ EmotionsPage <- function(X, parent, notebook) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
-        w <- Convert(emotions)
-        b <- HJBiplot(w)
-        plotdf <- as.data.frame(b)
+        convert <- Convert(emotions)
+        biplot <- HJBiplot(convert)
+        plotdf <- as.data.frame(biplot)
 
-        console(cmds = "b", e = environment())
+        console(cmds = "head(convert)", e = environment())
+        console(cmds = "biplot", e = environment())
+        console(cmds = "plotdf", e = environment())
 
         plotdf$sum <- 1
         plotdf[which(plotdf$Variable == "Rows"),] <- plotdf[which(plotdf$Variable == "Rows"),] %>% mutate(sum = row_number() + 1)
@@ -20,7 +22,7 @@ EmotionsPage <- function(X, parent, notebook) {
             line_alpha <- 1
         }
         
-        p <- ggplot(plotdf, aes(x = Dim1, y = Dim2,
+        plot <- ggplot(plotdf, aes(x = Dim1, y = Dim2,
                         col = sum, shape = Variable,
                         label = Label)) +
                     geom_vline(xintercept = 0, lty = "dashed", alpha = line_alpha) +
@@ -32,42 +34,42 @@ EmotionsPage <- function(X, parent, notebook) {
                     scale_shape_manual(values = c(4, 17))
 
         if(graph$vtext == TRUE) 
-            p <- p + geom_text(data = plotdf[which(plotdf$Variable == "Columns"),],
+            plot <- plot + geom_text(data = plotdf[which(plotdf$Variable == "Columns"),],
                          aes(x = Dim1, y = Dim2, col = sum, shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$ptext == TRUE) 
-            p <- p + geom_text(data = plotdf[which(plotdf$Variable == "Rows"),],
+            plot <- plot + geom_text(data = plotdf[which(plotdf$Variable == "Rows"),],
                          aes(x = Dim1, y = Dim2, col = sum, shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$distance != "") {
-            r <- b$ColCoordinates[graph$distance,]
+            r <- biplot$ColCoordinates[graph$distance,]
             slope <- r[2] / r[1]
-            distance <- Distance(b$RowCoordinates, slope = slope)
+            distance <- Distance(biplot$RowCoordinates, slope = slope)
 
             console(cmds = "slope", e = environment())
             console(cmds = "distance", e = environment())
 
-            p <- p + geom_abline(intercept = 0, slope = slope, linetype = "dashed", color = graph$vcolor, alpha = vector_alpha) +
+            plot <- plot + geom_abline(intercept = 0, slope = slope, linetype = "dashed", color = graph$vcolor, alpha = vector_alpha) +
                      geom_segment(data = distance, aes(x = Dim1, y = Dim2, xend = xend, yend = yend), 
                                   inherit.aes = FALSE, linetype = "dotted")
         }
 
-        p <- p +
-            labs(x = paste0("Dimension 1 (", round(b$inertia[1]), "%)"),
-                y = paste0("Dimension 2 (", round(b$inertia[2]), "%)"),
+        plot <- plot +
+            labs(x = paste0("Dimension 1 (", round(biplot$inertia[1]), "%)"),
+                y = paste0("Dimension 2 (", round(biplot$inertia[2]), "%)"),
                 title = graph$title) 
 
-        p <- p + t() + theme(legend.position = "none")
+        plot <- plot + t() + theme(legend.position = "none")
 
-        return(p)
+        return(plot)
     }
 
     PlotS <- function(graph) {
         t <- match.fun(graph$theme)
 
-        p <-  ggplot(sentiments, 
+        plot <-  ggplot(sentiments, 
                     aes(x = group, y = count, fill = sentiment, label = count)) + 
                     geom_bar(position = "dodge", stat="identity") +
                     labs(title = graph$title, 
@@ -79,7 +81,7 @@ EmotionsPage <- function(X, parent, notebook) {
                     axis.title = element_text(size = 14,face = "bold"),
                     title = element_text(size = 20,face = "bold"))
 
-        return(p)
+        return(plot)
     }
 
     env <- environment()

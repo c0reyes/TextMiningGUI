@@ -1,12 +1,12 @@
 PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "",
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "",
-                    vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0) {
+                    vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0, map = "") {
     
     resize <- function(parent, env) {
         geometry <- unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(parent)),"\\+"))[1],"x"))
         
-        assign("hscale", (as.numeric(geometry[1])-219) / 480, envir = env)
+        assign("hscale", (as.numeric(geometry[1])-240) / 480, envir = env)
         assign("vscale", (as.numeric(geometry[2])-85) / 480 , envir = env)
 
         if(as.character(tcl("tk", "windowingsystem")) == "win32") { 
@@ -54,21 +54,40 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
     graph$psize <- point_size
     graph$cluster <- cluster
     graph$distance <- ""
+    graph$map <- map
     class(graph) <- "graph"
 
     page <- Page(notebook, name)
     content <- page$content
 
-    sidebar <- ttklabelframe(content, width = 200, text = "Options")
+    bar <- ttklabelframe(content, width = 200, text = "Options")
     frame <- tkframe(content)
 
-    tkgrid(sidebar, row = 0, column = 0, sticky = "nsw", padx = 5, pady = 5)
+    tkgrid(bar, row = 0, column = 0, sticky = "nsw", padx = 5, pady = 5)
     tkgrid(frame, row = 0, column = 1, sticky = "nsw", padx = 5, pady = 5)
     tkgrid.columnconfigure(content, 0, weight = 1)
     tkgrid.columnconfigure(content, 1, weight = 2)
     tkgrid.rowconfigure(content, 0, weight = 1)
 
     # Sidebar
+    sidecanvas <- tkcanvas(bar, width = 180, borderwidth = 0, highlightthickness = 0)
+    addScrollbars(bar, sidecanvas, horiz = FALSE)
+
+    sidebar <- ttkframe(sidecanvas, padding = c(0,0,0,0))
+    frame_id <- tkcreate(sidecanvas, "window", 0, 0, anchor = "nw", window = sidebar, width = 180)
+
+    tkitemconfigure(sidecanvas, frame_id, width =  as.numeric(tkwinfo("width", sidebar)))
+    tkbind(sidebar, "<Configure>", function() {  
+            bbox <- tcl(sidecanvas, "bbox", "all")
+            tcl(sidecanvas, "config", scrollregion = bbox)
+        })
+    tkbind(sidecanvas, "<Configure>", function(W) {
+            width <- as.numeric(tkwinfo("width", W))
+            frame_width <- as.numeric(tkwinfo("width", sidebar))
+            if(frame_width < width)
+                tkitemconfigure(sidecanvas, frame_id, width = width)
+        })
+
     tkgrid.columnconfigure(sidebar, 0, weight = 1)
     tkgrid.rowconfigure(sidebar, 0, weight = 0)
     tkgrid.rowconfigure(sidebar, 1, weight = 0)
@@ -109,6 +128,8 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
     tkgrid.rowconfigure(sidebar, 36, weight = 0)
     tkgrid.rowconfigure(sidebar, 37, weight = 0)
     tkgrid.rowconfigure(sidebar, 38, weight = 0)
+    tkgrid.rowconfigure(sidebar, 39, weight = 0)
+    tkgrid.rowconfigure(sidebar, 40, weight = 0)
 
     limit <- tclVar(init = limit)
     put_label(sidebar, "Limit: ", 1, 1, sticky = "nw")
@@ -259,6 +280,15 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                         justify = "left", state = "disabled")
     tkgrid(cluster_box, row = 38, column = 1, sticky = "nw", padx = 2)
 
+    put_label(sidebar, "Map: ", 39, 1, sticky = "nw")
+    map <- tclVar()
+    map_box <- ttkcombobox(sidebar, 
+                        values = c("symbiplot", "rowprincipal", "colprincipal"), 
+                        textvariable = map,
+                        state = "normal",
+                        justify = "left", state = "disabled")
+    tkgrid(map_box, row = 40, column = 1, sticky = "nw", padx = 2)
+
     tkbind(color, "<Button-1>", function(W) {
             if(graph$color != "") {
                 color <- tcl("tk_chooseColor", parent = W, title = "Set box color")
@@ -347,6 +377,13 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
 
     tkbind(cluster_box, "<<ComboboxSelected>>", function() {
             graph$cluster <<- as.numeric(tclvalue(cluster))
+            tkrreplot(eplot, fun = function() {
+                draw()
+            }, hscale = hscale, vscale = vscale)
+        })
+
+    tkbind(map_box, "<<ComboboxSelected>>", function() {
+            graph$map <<- tclvalue(map)
             tkrreplot(eplot, fun = function() {
                 draw()
             }, hscale = hscale, vscale = vscale)
@@ -466,4 +503,5 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
 
     if(distances != "") tcl(distance_box, "config", "-state", "normal")
     if(graph$cluster > 0) tcl(cluster_box, "config", "-state", "normal")
+    if(graph$map != "") tcl(map_box, "config", "-state", "normal")
 }

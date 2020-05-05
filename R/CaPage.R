@@ -4,15 +4,17 @@ CaPage <- function(X, parent, notebook) {
         chisq <- chisq.test(w)
         tm.ca <- FactoMineR::CA(w, graph = FALSE)
 
-        cb <- fviz_ca_biplot(tm.ca, arrow = c(FALSE, TRUE), 
+        console(cmds = "chisq", e = environment())
+
+        plot <- fviz_ca_biplot(tm.ca, arrow = c(FALSE, TRUE), 
                 repel = graph$repel, 
-                col.col = graph$vcolor, col.row = graph$pcolor, map = "symbiplot") +
+                col.col = graph$vcolor, col.row = graph$pcolor, map = graph$map) +
                 labs(title = graph$title) + theme_white()
     
-        return(cb) 
+        return(plot) 
     }
 
     PageGUI("CA - Biplot", Plot, title = "CA - Biplot", limit = 100, 
-        vector_color = "red", point_color = "blue", repel = FALSE,
+        vector_color = "red", point_color = "blue", repel = FALSE, map = "symbiplot",
         parent = parent, notebook = notebook, to = nrow(X$data))
 }
