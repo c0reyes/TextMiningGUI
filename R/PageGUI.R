@@ -10,8 +10,8 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
         assign("vscale", (as.numeric(geometry[2])-85) / 480 , envir = env)
 
         if(as.character(tcl("tk", "windowingsystem")) == "win32") { 
-            assign("hscale", hscale + 0.0125, envir = env)
-            assign("vscale", vscale + 0.0125, envir = env)
+            assign("hscale", hscale * 1.25, envir = env)
+            assign("vscale", vscale * 1.25, envir = env)
         }
 
         return(geometry)
@@ -273,12 +273,9 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
 
     put_label(sidebar, "Cluster: ", 37, 1, sticky = "nw")
     cluster <- tclVar()
-    cluster_box <- ttkcombobox(sidebar, 
-                        values = c(1:6), 
-                        textvariable = cluster,
-                        state = "normal",
-                        justify = "left", state = "disabled")
-    tkgrid(cluster_box, row = 38, column = 1, sticky = "nw", padx = 2)
+    cluster_box <- tkscale(sidebar, from = 1, to = 10, variable = cluster, 
+        showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
+    tkgrid(cluster_box, row = 38, column = 1, sticky = "ew", padx = 2)
 
     put_label(sidebar, "Map: ", 39, 1, sticky = "nw")
     map <- tclVar()
@@ -375,12 +372,13 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
             }, hscale = hscale, vscale = vscale)
         })
 
-    tkbind(cluster_box, "<<ComboboxSelected>>", function() {
-            graph$cluster <<- as.numeric(tclvalue(cluster))
-            tkrreplot(eplot, fun = function() {
-                draw()
-            }, hscale = hscale, vscale = vscale)
-        })
+    if(as.numeric(graph$cluster) > 0)
+        tkbind(cluster_box, "<ButtonRelease-1>", function() {
+                graph$cluster <<- as.numeric(tclvalue(cluster))
+                tkrreplot(eplot, fun = function() {
+                    draw()
+                }, hscale = hscale, vscale = vscale)
+            })
 
     tkbind(map_box, "<<ComboboxSelected>>", function() {
             graph$map <<- tclvalue(map)
@@ -459,15 +457,23 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
 
     # Save
     tkbind(page$save, "<ButtonRelease-1>", function() {
-            graph$alpha <- 0.1
-            ggsave(paste0(name, ".png"), plot = Plot(graph))
+            if(type == "hclust") {
+                png(file = paste0(name, ".png"), width = 1920, height = 1080)
+                plot(Plot(graph), sub = "", xlab = "", main = graph$title)
+                dev.off()
+            }else{
+                graph$alpha <<- 0.1
+                ggsave(paste0(name, ".png"), plot = Plot(graph))
+                graph$alpha <<- 1
+            }
             tkmessageBox(title = "Save", message = "Plot", detail = "The graph was saved.", type = "ok")
         })
 
     # Zoom
     tkbind(page$zoom, "<ButtonRelease-1>", function() {
-            graph$alpha <- 0.1
+            graph$alpha <<- 0.1
             draw()
+            graph$alpha <<- 1
         })
  
     tkbind(content, "<Configure>", function() {

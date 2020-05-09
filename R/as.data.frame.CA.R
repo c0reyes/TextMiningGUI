@@ -1,0 +1,1 @@
+as.data.frame.CA <- function (X, ...) as.data.frame.Biplot(X, ...)
