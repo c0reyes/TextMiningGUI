@@ -16,7 +16,7 @@ WordCloudPage <- function(X, parent, notebook) {
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank())
 
-        return(plot)
+        plot(plot)
     }
 
     PageGUI("Word Cloud", Plot, palette = "Dark2", background = "#ffffff", limit = 100,

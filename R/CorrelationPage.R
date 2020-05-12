@@ -11,7 +11,7 @@ CorrelationPage <- function(X, parent, notebook) {
             plot <- plot + scale_alpha_continuous(range = c(1,1))
         }
 
-        return(plot)
+        plot(plot)
     }
 
     PageGUI("Correlation", Plot, parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)

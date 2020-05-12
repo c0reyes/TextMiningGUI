@@ -12,7 +12,7 @@ BalloonPlotPage <- function(X, parent, notebook) {
                       axis.title.y = element_blank(),
                       panel.grid.major = element_line(color = "lightgray")) 
             
-        return(plot)
+        plot(plot)
     }
 
     PageGUI("Words Most Used", Plot, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))

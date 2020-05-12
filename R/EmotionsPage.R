@@ -2,11 +2,9 @@ EmotionsPage <- function(X, parent, notebook) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
-        convert <- Convert(emotions)
-        biplot <- HJBiplot(convert)
+        biplot <- HJBiplot(emotions)
         plotdf <- as.data.frame(biplot)
 
-        console(cmds = "head(convert)", e = environment())
         console(cmds = "biplot", e = environment())
         console(cmds = "plotdf", e = environment())
 
@@ -63,7 +61,7 @@ EmotionsPage <- function(X, parent, notebook) {
 
         plot <- plot + t() + theme(legend.position = "none")
 
-        return(plot)
+        plot(plot)
     }
 
     PlotS <- function(graph) {
@@ -81,7 +79,7 @@ EmotionsPage <- function(X, parent, notebook) {
                     axis.title = element_text(size = 14,face = "bold"),
                     title = element_text(size = 20,face = "bold"))
 
-        return(plot)
+        plot(plot)
     }
 
     env <- environment()

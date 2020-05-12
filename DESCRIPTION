@@ -4,8 +4,8 @@ Date: 2020-04-12
 Title: Text Mining GUI interface
 Author: Conrado Reyes, with...
 Maintainer: Conrado Reyes <coreyes@gmail.com>
-Depends: R(>= 3.6.3), tcltk, tkrplot, readxl, dplyr, tidyr, tibble, tm, SnowballC, slam, corrr, syuzhet, ggplot2, ggwordcloud, RColorBrewer, ggpubr, ggrepel
-Suggests: parallel
+Depends: R(>= 3.6.3), tcltk, tkrplot, dplyr, tidyr, tibble, tm, SnowballC, slam, ca, corrr, syuzhet, ggplot2, ggwordcloud, RColorBrewer, ggpubr, ggrepel
+Suggests: parallel, jsonlite, readxl
 Description: A simple GUI to analysis text.
 License: GPL (>= 2)
 LazyData: true

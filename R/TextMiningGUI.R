@@ -119,9 +119,9 @@ TextMiningGUI <- function() {
         text <- tclVar("")
         lang <- tclVar("")
 
-        window <- tktoplevel(width = 300, height = 175)
-        tkwm.minsize(window, "300", "175")
-        tkwm.maxsize(window, "300", "175")
+        window <- tktoplevel(width = 300, height = 240)
+        tkwm.minsize(window, "300", "240")
+        tkwm.maxsize(window, "300", "240")
 
         tkwm.title(window, "Transformation")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -159,6 +159,26 @@ TextMiningGUI <- function() {
                         justify = "left")
         tkgrid(combo_box3, row = 3, column = 1, sticky = "ew", padx = 2)
 
+        steam <- tclVar(TRUE)
+        put_label(label_frame, "Stemming: ", 4, 0)
+        steam_check <- ttkcheckbutton(label_frame, variable = steam)
+        tkgrid(steam_check, row = 4, column = 1, sticky = "ew", padx = 2)
+
+        normalize <- tclVar("char-value")
+        put_label(label_frame, "Normalize: ", 5, 0)
+        radio <- ttkframe(label_frame)
+        sapply(c("char-value","tf-idf"), function(i) {
+            normalize_button <- ttkradiobutton(radio, variable = normalize, text = i, value = i)
+            tkpack(normalize_button, side = "left")
+        })
+        tkgrid(radio, row = 5, column = 1, sticky = "ew", padx = 2)
+
+        sparse <- tclVar(init = 0.99)
+        put_label(label_frame, "Remove Sparse: ", 6, 0, sticky = "es")
+        removebar <- tkscale(label_frame, from = 0.5, to = 1, variable = sparse, 
+                             showvalue = TRUE, resolution = 0.01, orient = "horiz")
+        tkgrid(removebar, row = 6, column = 1, sticky = "ew", padx = 2)
+        
         button_frame <- ttkframe(frame)
         cancel_button <- ttkbutton(button_frame, text = "cancel",
             command = function() { 
@@ -169,12 +189,15 @@ TextMiningGUI <- function() {
                 g <- tclvalue(group)
                 t <- tclvalue(text)
                 l <- tclvalue(lang)
+                sparse <- as.numeric(tclvalue(sparse))
+                steam <- if( tclvalue(steam) == "1" ) TRUE else FALSE
+                normalize <- tclvalue(normalize)
 
                 if(g != "" && t != "" && l != "") {
                     TMP <- DATA %>% distinct() %>% select(g, t) 
                     colnames(TMP) <- c("GROUP","TEXT")
 
-                    assign("tm", DataTM(TMP, l), envir = env)
+                    assign("tm", DataTM(TMP, language = l, steam = steam, sparse = sparse, normalize = normalize), envir = env)
                     dataFrameTable(tm$data)
                     tkdestroy(window) 
                     tkentryconfigure(menu_bar, 3, state = "normal")
@@ -414,6 +437,13 @@ TextMiningGUI <- function() {
         disableMenu()
     }
 
+    # Read Json
+    ReadJson <- function(file_name) {
+        assign("DATA", fromJSON(file_name), envir = env)                                                                                                                                                                                    
+        dataFrameTable(DATA)
+        disableMenu()
+    }
+
     # Read Table
     ReadTable <- function(file_name) {
         encoding <- "UTF-8"
@@ -532,7 +562,7 @@ TextMiningGUI <- function() {
     tkadd(menu_bar, "cascade", label = "Help", menu = help_menu)
 
     # File
-    tkadd(file_menu,"command", label = "Text file...",
+    tkadd(file_menu, "command", label = "Text file...",
         command =  function() {
             file_name <- tkgetOpenFile(filetypes=
                         "{{Text files} {.txt}} {{CSV files} {.csv}} {{All files} *}")
@@ -541,7 +571,7 @@ TextMiningGUI <- function() {
             }
         })
 
-    tkadd(file_menu,"command", label = "Excel file...",
+    tkadd(file_menu, "command", label = "Excel file...", state = "disabled",
         command =  function() {
             file_name <- tkgetOpenFile(filetypes=
                         "{{Excel files} {.xls}} {{Excel files} {.xlsx}} {{All files} *}")
@@ -550,7 +580,7 @@ TextMiningGUI <- function() {
             }
         })
 
-    tkadd(file_menu,"command", label = "Data file...",
+    tkadd(file_menu, "command", label = "Data file...",
         command =  function() {
             file_name <- tkgetOpenFile(filetypes=
                         "{{Rdata files} {.RData}} {{Rdata files} {.Rdata}} {{Rdata files} {.rdata}} {{Rdata files} {.Rda}} {{Rdata files} {.rda}} {{All files} *}")
@@ -559,7 +589,16 @@ TextMiningGUI <- function() {
             }
         })
 
-    tkadd(file_menu,"command", label = "Data Examples...",
+    tkadd(file_menu, "command", label = "JSON file...", state = "disabled",
+        command =  function() {
+            file_name <- tkgetOpenFile(filetypes=
+                        "{{JSON files} {.json}} {{All files} *}")
+            if(file.exists(file_name <- as.character(file_name))) {
+                ReadJson(file_name)
+            }
+        })
+
+    tkadd(file_menu, "command", label = "Data Examples...",
         command =  function() {
             ReadExample()
         })
@@ -617,8 +656,8 @@ TextMiningGUI <- function() {
 
     tkadd(analysis_menu, "separator")
 
-    tkadd(analysis_menu, "command", label = "Dendrogram",
-        command = function() DendrogramPage(X = tm, parent = window, notebook = notebook))
+    tkadd(analysis_menu, "command", label = "Cluster",
+        command = function() ClusterPage(X = tm, parent = window, notebook = notebook))
 
     tkadd(analysis_menu, "command", label = "Correlation", 
         command = function() CorrelationPage(X = tm, parent = window, notebook = notebook))
@@ -629,10 +668,10 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Correspondence Analysis", 
         command = function() CaPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Characterization value + HJ-Biplot", 
+    tkadd(analysis_menu, "command", label = "HJ-Biplot", 
         command = function() HJBiplotPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Emotions & Sentiments + HJ-Biplot", 
+    tkadd(analysis_menu, "command", label = "Emotions & Sentiments", 
         command = function() EmotionsPage(X = tm, parent = window, notebook = notebook))
 
     # Help
@@ -652,4 +691,7 @@ TextMiningGUI <- function() {
     tkpack(tableFrame, expand = TRUE, fill = "both")
     img <- ttklabel(tableFrame, image = "imageID", compound = "image", anchor = "center")
     tkpack(img)
+
+    if(require(readxl)) tkentryconfigure(file_menu, 1, state = "normal")
+    if(require(jsonlite)) tkentryconfigure(file_menu, 3, state = "normal")
 }

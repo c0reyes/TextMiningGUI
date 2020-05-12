@@ -6,6 +6,6 @@ Convert <- function(DF) {
     }
 
     df.col.max <- colMax(DF)
-    df <- t(apply(DF, 1, calc, maxj = df.col.max))
+    df <- as.data.frame(t(apply(DF, 1, calc, maxj = df.col.max)))
     return(df)
 }

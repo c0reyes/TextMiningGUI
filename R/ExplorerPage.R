@@ -6,15 +6,17 @@ ExplorerPage <- function(X, parent, notebook) {
             labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + 
             xlab(graph$xlab) + 
             ylab(graph$ylab)
-        plot <- plot + theme(text = element_text(size = 12)) + t()
+
+        plot <- plot + theme(text = element_text(size = 12)) + t() +
+            geom_text(stat='count', aes(label=..count..), position = position_dodge(width = 0.9), vjust = 1.5, color = graph$tcolor, size = 5)
 
         if(graph$flip == TRUE)
             plot <- plot + coord_flip()
         
-        return(plot)
+        plot(plot)
     }
 
-    PageGUI("Words by Groups", Plot, color = "#323232", theme = "theme_gray", title = "Distinct words by groups", 
-            xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ",
+    PageGUI("Words by Groups", Plot, color = "lightblue", theme = "theme_gray", title = "Distinct words by groups", 
+            xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ", text_color = "#323232",
             parent = parent, notebook = notebook)
 }

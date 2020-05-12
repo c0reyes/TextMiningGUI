@@ -2,25 +2,16 @@ HJBiplotPage <- function(X, parent, notebook) {
      Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
-        w <- X$data[1:graph$limit,]
-
-        convert <- Convert(w)
-        biplot <- HJBiplot(convert)
-        plotdf <- as.data.frame(biplot)
-        plotdf$Variable <- factor(plotdf$Variable)
-
         if(graph$cluster > 1) {
-            kcluster <- kmeans(convert, graph$cluster)
+            X$data[is.na(X$data)] <- 0
+            kcluster <- kmeans(X$data, graph$cluster)
             kcluster <- kcluster$cluster
-            kcluster <- c(rep(0, ncol(w)), kcluster)
+            kcluster <- c(rep(0, ncol(X$data)), kcluster)
             plotdf <- cbind(plotdf, kcluster)
             plotdf$kcluster <- factor(plotdf$kcluster)
         }
 
-        console(cmds = "head(w)", e = environment())
-        console(cmds = "head(convert)", e = environment())
-        console(cmds = "biplot", e = environment())
-        console(cmds = "plotdf", e = environment())
+        w <- plotdf[1:(graph$limit+ncol(X$data)),]
 
         line_alpha <- 0.50
         vector_alpha <- 0.75
@@ -29,24 +20,25 @@ HJBiplotPage <- function(X, parent, notebook) {
             line_alpha <- 1
         }
         
-        plot <- ggplot(plotdf, aes(x = Dim1, y = Dim2,
-                        col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
-                        label = Label)) +
+        plot <- ggplot(plotdf) +
                     geom_vline(xintercept = 0, lty = "dashed", alpha = line_alpha) +
                     geom_hline(yintercept = 0, lty = "dashed", alpha = line_alpha) +
                     geom_segment(data = plotdf[which(plotdf$Variable == "Columns"),], 
                         aes(x = 0, y = 0, xend = Dim1, yend = Dim2), arrow = arrow(length = unit(0.2, "cm")), 
                             alpha = vector_alpha, color = graph$vcolor, size = graph$vsize) +
-                    geom_point(size = graph$psize) +
                     scale_shape_manual(values = c(4, 17))
 
+         plot <- plot + geom_point(data = w, aes(x = Dim1, y = Dim2, 
+                                  col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
+                                  label = Label), size = graph$psize)
+
         if(graph$vtext == TRUE) 
-            plot <- plot + geom_text(data = plotdf[which(plotdf$Variable == "Columns"),],
+            plot <- plot + geom_text(data = w[which(plotdf$Variable == "Columns"),],
                          aes(x = Dim1, y = Dim2, col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$ptext == TRUE) 
-            plot <- plot + geom_text(data = plotdf[which(plotdf$Variable == "Rows"),],
+            plot <- plot + geom_text(data = w[which(plotdf$Variable == "Rows"),],
                          aes(x = Dim1, y = Dim2, col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                              label = Label), vjust = -0.5)
 
@@ -75,8 +67,16 @@ HJBiplotPage <- function(X, parent, notebook) {
         plot <- plot + scale_color_manual(values = color) 
         plot <- plot + t() + theme(legend.position = "none")
 
-        return(plot)
+        plot(plot)
     }
+
+    biplot <- HJBiplot(X$data)
+    plotdf <- as.data.frame(biplot)
+    plotdf$Variable <- factor(plotdf$Variable)
+
+    console(cmds = "head(X$data)", e = environment())
+    console(cmds = "biplot", e = environment())
+    console(cmds = "plotdf", e = environment())
 
     PageGUI("HJ-Biplot", Plot, theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
         title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2,

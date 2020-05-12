@@ -58,7 +58,7 @@ CorBetweenGroupsPage <- function(X, parent, notebook) {
                                 theme(axis.text.x = element_blank(),
                                       axis.text.y = element_blank())
                                       
-                    return(plot)
+                    plot(plot)
                 }
 
                 PageGUI("Correlation between groups", Plot, limit = 100, parent = parent, notebook = notebook, to = nrow(X$data))

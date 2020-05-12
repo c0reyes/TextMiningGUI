@@ -22,6 +22,8 @@ Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale 
   VarNames <- colnames(X)
   DimNames <- unlist(lapply(1:dimension, function(x) paste0("Dim", x)))
   
+  X[is.na(X)] <- 0
+  set.seed(0)
   SD <- svd(X, nu = dimension, nv = dimension)
   EV <- SD$d^2
   
@@ -29,19 +31,40 @@ Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale 
   biplot$cuminertia <- cumsum(biplot$inertia)
   
   if(A)
-    biplot$RowCoordinates <- (SD$u %*% diag(SD$d[1:dimension])) * scale
+    biplot$RowCoordinates <- SD$u * rep(SD$d[1:dimension], rep.int(nrow(SD$u), dimension))
   else
     biplot$RowCoordinates <- SD$u
   
   if(B)
-    biplot$ColCoordinates <- (SD$v %*% diag(SD$d[1:dimension])) / scale
+    biplot$ColCoordinates <- SD$v * rep(SD$d[1:dimension], rep.int(nrow(SD$v), dimension))
   else
     biplot$ColCoordinates <- SD$v
-  
+
+  sf <- apply((X^2), 1, sum)
+  biplot$RowContributions <- matrix(0, nrow(X), dimension)
+  for (k in 1:dimension)
+    biplot$RowContributions[,k] <- round((biplot$RowCoordinates[,k]^2 / sf) * 100, digits = 2)
+
+  sc <- apply((X^2), 2, sum)
+  biplot$ColContributions <- round(((diag(1/sc)) %*% biplot$ColCoordinates^2) * 100, digits = 2)
+
+  if(A)
+    biplot$RowCoordinates <- biplot$RowCoordinates * scale
+
+  if(B)
+    biplot$ColCoordinates <- biplot$ColCoordinates / scale
+
   rownames(biplot$RowCoordinates) <- RowNames
   colnames(biplot$RowCoordinates) <- DimNames
+  
   rownames(biplot$ColCoordinates) <- VarNames
   colnames(biplot$ColCoordinates) <- DimNames
+  
+  rownames(biplot$RowContributions) <- RowNames
+  colnames(biplot$RowContributions) <- DimNames
+
+  rownames(biplot$ColContributions) <- VarNames
+  colnames(biplot$ColContributions) <- DimNames
   
   class(biplot) <- name
   

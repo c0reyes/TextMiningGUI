@@ -2,6 +2,3 @@ export(TextMiningGUI)
 
 S3method(print, DataTM)
 S3method(as.data.frame, HJBiplot)
-S3method(as.data.frame, JKBiplot)
-S3method(as.data.frame, GHBiplot)
-S3method(as.data.frame, CA)
