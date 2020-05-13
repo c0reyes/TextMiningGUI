@@ -32,13 +32,15 @@ HJBiplotPage <- function(X, parent, notebook) {
                                   col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                                   label = Label), size = graph$psize)
 
+        g_text <- if(graph$repel == TRUE && require(ggrepel)) geom_text_repel else geom_text
+
         if(graph$vtext == TRUE) 
-            plot <- plot + geom_text(data = w[which(plotdf$Variable == "Columns"),],
+            plot <- plot + g_text(data = w[which(plotdf$Variable == "Columns"),],
                          aes(x = Dim1, y = Dim2, col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$ptext == TRUE) 
-            plot <- plot + geom_text(data = w[which(plotdf$Variable == "Rows"),],
+            plot <- plot + g_text(data = w[which(plotdf$Variable == "Rows"),],
                          aes(x = Dim1, y = Dim2, col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                              label = Label), vjust = -0.5)
 
@@ -56,8 +58,8 @@ HJBiplotPage <- function(X, parent, notebook) {
         }
 
         plot <- plot +
-            labs(x = paste0("Dimension 1 (", round(biplot$inertia[1]), "%)"),
-                y = paste0("Dimension 2 (", round(biplot$inertia[2]), "%)"),
+            labs(x = paste0("Dim 1 (", round(biplot$inertia[1]), "%)"),
+                y = paste0("Dim 2 (", round(biplot$inertia[2]), "%)"),
                 title = graph$title) 
 
         color <- c(graph$vcolor, graph$pcolor)
@@ -70,7 +72,12 @@ HJBiplotPage <- function(X, parent, notebook) {
         plot(plot)
     }
 
-    biplot <- HJBiplot(X$data)
+    biplot <- tryCatch({ 
+            HJBiplot(X$data) 
+        }, error = function(cond) {
+            tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
+        })
+
     plotdf <- as.data.frame(biplot)
     plotdf$Variable <- factor(plotdf$Variable)
 
@@ -79,6 +86,6 @@ HJBiplotPage <- function(X, parent, notebook) {
     console(cmds = "plotdf", e = environment())
 
     PageGUI("HJ-Biplot", Plot, theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
-        title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2,
+        title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
         parent = parent, notebook = notebook, to = nrow(X$data), distances = c(colnames(X$data), ""), cluster = 1, palette = "Dark2")
 }

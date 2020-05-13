@@ -1,7 +1,7 @@
 PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
-                    xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "",
+                    xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "",
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "",
-                    vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0, map = "") {
+                    vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0) {
     
     resize <- function(parent, env) {
         geometry <- unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(parent)),"\\+"))[1],"x"))
@@ -47,7 +47,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
     graph$psize <- point_size
     graph$cluster <- cluster
     graph$distance <- ""
-    graph$map <- map
+    graph$clustert <- clustert
     class(graph) <- "graph"
 
     page <- Page(notebook, name)
@@ -270,14 +270,14 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
         showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
     tkgrid(cluster_box, row = 38, column = 1, sticky = "ew", padx = 2)
 
-    #put_label(sidebar, "Map: ", 39, 1, sticky = "nw")
-    #map <- tclVar()
-    #map_box <- ttkcombobox(sidebar, 
-    #                    values = c("symbiplot", "rowprincipal", "colprincipal"), 
-    #                    textvariable = map,
-    #                    state = "normal",
-    #                    justify = "left", state = "disabled")
-    #tkgrid(map_box, row = 40, column = 1, sticky = "nw", padx = 2)
+    put_label(sidebar, "Cluster type: ", 39, 1, sticky = "nw")
+    cluster_type <- tclVar()
+    clustert_box <- ttkcombobox(sidebar, 
+                        values = c("rectangle", "phylogram", "cladogram", "unrooted", "fan", "radial", "cladogram"), 
+                        textvariable = cluster_type,
+                        state = "normal",
+                        justify = "left", state = "disabled")
+    tkgrid(clustert_box, row = 40, column = 1, sticky = "nw", padx = 2)
 
     tkbind(color, "<Button-1>", function(W) {
             if(graph$color != "") {
@@ -373,12 +373,12 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                 }, hscale = hscale, vscale = vscale)
             })
 
-    #tkbind(map_box, "<<ComboboxSelected>>", function() {
-    #        graph$map <<- tclvalue(map)
-    #        tkrreplot(eplot, fun = function() {
-    #            Plot(graph)
-    #        }, hscale = hscale, vscale = vscale)
-    #    })
+    tkbind(clustert_box, "<<ComboboxSelected>>", function() {
+            graph$clustert <<- tclvalue(cluster_type)
+            tkrreplot(eplot, fun = function() {
+                Plot(graph)
+            }, hscale = hscale, vscale = vscale)
+        })
 
     tkbind(entry1, "<Return>", function() {
             graph$title <<- tclvalue(title) 
@@ -502,5 +502,5 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
 
     if(distances != "") tcl(distance_box, "config", "-state", "normal")
     if(graph$cluster > 0) tcl(cluster_box, "config", "-state", "normal")
-    #if(graph$map != "") tcl(map_box, "config", "-state", "normal")
+    if(graph$clustert != "" && require(ape)) tcl(clustert_box, "config", "-state", "normal")
 }

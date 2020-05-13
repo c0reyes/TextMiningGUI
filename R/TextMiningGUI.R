@@ -119,11 +119,11 @@ TextMiningGUI <- function() {
         text <- tclVar("")
         lang <- tclVar("")
 
-        window <- tktoplevel(width = 300, height = 240)
-        tkwm.minsize(window, "300", "240")
-        tkwm.maxsize(window, "300", "240")
+        window <- tktoplevel(width = 420, height = 240)
+        tkwm.minsize(window, "420", "240")
+        tkwm.maxsize(window, "420", "240")
 
-        tkwm.title(window, "Transformation")
+        tkwm.title(window, "Create Lexical Table")
         frame <- ttkframe(window, padding = c(3,3,12,12))
         tkpack(frame, expand = TRUE, fill = "both")
 
@@ -164,10 +164,10 @@ TextMiningGUI <- function() {
         steam_check <- ttkcheckbutton(label_frame, variable = steam)
         tkgrid(steam_check, row = 4, column = 1, sticky = "ew", padx = 2)
 
-        normalize <- tclVar("char-value")
+        normalize <- tclVar("chara-value")
         put_label(label_frame, "Normalize: ", 5, 0)
         radio <- ttkframe(label_frame)
-        sapply(c("char-value","tf-idf"), function(i) {
+        sapply(c("chara-value","tf-idf","media","none"), function(i) {
             normalize_button <- ttkradiobutton(radio, variable = normalize, text = i, value = i)
             tkpack(normalize_button, side = "left")
         })
@@ -202,6 +202,12 @@ TextMiningGUI <- function() {
                     tkdestroy(window) 
                     tkentryconfigure(menu_bar, 3, state = "normal")
                     tkentryconfigure(data_menu, 4, state = "normal")
+
+                    if(ncol(tm$dat) < 3) {
+                        tkmessageBox(title = "Warning", message = "Warning:", icon = "warning", 
+                                     detail = "Some procedure cannot implement, verify your data.", 
+                                     type = "ok")
+                    }
                 }
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)
@@ -648,11 +654,14 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Words Most Used", 
         command = function() BalloonPlotPage(X = tm, parent = window, notebook = notebook))
 
-    tkadd(analysis_menu, "command", label = "Word Counter by Groups", 
+    tkadd(analysis_menu, "command", label = "Word Counter", 
         command = function() ExplorerPage(X = tm, parent = window, notebook = notebook))
 
     tkadd(analysis_menu, "command", label = "Word Cloud", 
         command = function() WordCloudPage(X = tm, parent = window, notebook = notebook))
+
+    tkadd(analysis_menu, "command", label = "co-occurrence", 
+        command = function() cooccPage(X = tm, parent = window, notebook = notebook))
 
     tkadd(analysis_menu, "separator")
 

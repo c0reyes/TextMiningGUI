@@ -23,19 +23,21 @@ CaPage <- function(X, parent, notebook) {
                                   col = Variable, shape = Variable,
                                   label = Label), size = graph$psize)
 
+        g_text <- if(graph$repel == TRUE && require(ggrepel)) geom_text_repel else geom_text
+
         if(graph$vtext == TRUE) 
-            plot <- plot + geom_text(data = w[which(plotdf$Variable == "Columns"),],
+            plot <- plot + g_text(data = w[which(plotdf$Variable == "Columns"),],
                          aes(x = Dim1, y = Dim2, col = Variable, shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$ptext == TRUE) 
-            plot <- plot + geom_text(data = w[which(plotdf$Variable == "Rows"),],
+            plot <- plot + g_text(data = w[which(plotdf$Variable == "Rows"),],
                          aes(x = Dim1, y = Dim2, col = Variable, shape = Variable,
                              label = Label), vjust = -0.5)
-    
+
         plot <- plot +
-            labs(x = paste0("Dimension 1 (", round(ca$inertia[1]), "%)"),
-                y = paste0("Dimension 2 (", round(ca$inertia[2]), "%)"),
+            labs(x = paste0("Dim 1 (", round(ca$inertia[1]), "%)"),
+                y = paste0("Dim 2 (", round(ca$inertia[2]), "%)"),
                 title = graph$title) 
 
         color <- c(graph$vcolor, graph$pcolor)     
@@ -45,13 +47,22 @@ CaPage <- function(X, parent, notebook) {
         plot(plot)
     }
 
-    ca <- ca(X$data)
+    ca <- tryCatch({ 
+            ca(X$data)
+        }, error = function(cond) {
+            tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
+        })
+
     ca$inertia <- round(100 * ca$sv / sum(ca$sv), 2)
-    plotdf <- as.data.frame(ca)
+    plotdf <- tryCatch({ 
+            as.data.frame(ca)
+        }, error = function(cond) {
+            tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
+        })
     plotdf$Variable <- factor(plotdf$Variable)
     console(cmds = "ca", e = environment())
 
     PageGUI("CA - Biplot", Plot, theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
-        vector_text = " ", point_text = " ", vector_size = 1, point_size = 2,
+        vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
         parent = parent, notebook = notebook, to = nrow(X$data))
 }
