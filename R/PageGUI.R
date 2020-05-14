@@ -450,16 +450,9 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
 
     # Save
     tkbind(page$save, "<ButtonRelease-1>", function() {
-            if(type == "plot") {
-                png(file = paste0(name, ".png"), width = 1920, height = 1080)
-                Plot(graph)
-                dev.off()
-            }else{
-                graph$alpha <<- 0.1
-                ggsave(paste0(name, ".png"), plot = Plot(graph))
-                graph$alpha <<- 1
-            }
-            tkmessageBox(title = "Save", message = "Plot", detail = "The graph was saved.", type = "ok")
+            graph$alpha <<- 0.1
+            Save(X = Plot(graph), name = name, type = type)
+            graph$alpha <<- 1
         })
 
     # Zoom
