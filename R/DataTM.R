@@ -40,7 +40,10 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     TM[is.na(TM)] <- 0
 
     tm <- list()
+    tm$lang <- language
     tm$normalize <- normalize
+    tm$steam <- steam
+    tm$sparse <- sparse
     
     if(normalize == "chara-value") 
         tm$data <- Convert(TM) 
@@ -51,7 +54,6 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     
     tm$bigrams <- bigrams()
     tm$freq <- df
-    tm$lang <- language
     tm$dist <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
     class(tm) <- "DataTM"
 

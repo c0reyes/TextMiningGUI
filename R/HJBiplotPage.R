@@ -85,7 +85,7 @@ HJBiplotPage <- function(X, parent, notebook) {
     console(cmds = "biplot", e = environment())
     console(cmds = "plotdf", e = environment())
 
-    PageGUI("HJ-Biplot", Plot, theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
+    PageGUI("HJ-Biplot", Plot, id = as.character(match.call()[[1]]), theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
         title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
         parent = parent, notebook = notebook, to = nrow(X$data), distances = c(colnames(X$data), ""), cluster = 1, palette = "Dark2")
 }

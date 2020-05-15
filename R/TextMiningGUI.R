@@ -1,7 +1,7 @@
 TextMiningGUI <- function() {
-    env = .BaseNamespaceEnv
-    if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
-    assign("x", 1, envir = .BaseNamespaceEnv)
+    env = .GlobalEnv
+    if(exists("x", envir = env) && !is.null(x)) stop("You have one session running...") 
+        assign("x", 1, envir = env)
     
     # About
     About <- function() {             
@@ -112,12 +112,16 @@ TextMiningGUI <- function() {
     }
 
     # Transformation
+    group <- tclVar("")
+    text <- tclVar("")
+    lang <- tclVar("")
+    steam <- tclVar(TRUE)
+    normalize <- tclVar("chara-value")
+    sparse <- tclVar(init = 0.99)
+
     Transformation <- function() {  
         languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
-        names <- colnames(DATA)
-        group <- tclVar("")
-        text <- tclVar("")
-        lang <- tclVar("")
+        names <- colnames(DATA)      
 
         window <- tktoplevel(width = 420, height = 240)
         tkwm.minsize(window, "420", "240")
@@ -158,13 +162,11 @@ TextMiningGUI <- function() {
                         state = "normal",
                         justify = "left")
         tkgrid(combo_box3, row = 3, column = 1, sticky = "ew", padx = 2)
-
-        steam <- tclVar(TRUE)
+        
         put_label(label_frame, "Stemming: ", 4, 0)
         steam_check <- ttkcheckbutton(label_frame, variable = steam)
         tkgrid(steam_check, row = 4, column = 1, sticky = "ew", padx = 2)
 
-        normalize <- tclVar("chara-value")
         put_label(label_frame, "Normalize: ", 5, 0)
         radio <- ttkframe(label_frame)
         sapply(c("chara-value","tf-idf","media","none"), function(i) {
@@ -173,7 +175,6 @@ TextMiningGUI <- function() {
         })
         tkgrid(radio, row = 5, column = 1, sticky = "ew", padx = 2)
 
-        sparse <- tclVar(init = 0.99)
         put_label(label_frame, "Remove Sparse: ", 6, 0, sticky = "es")
         removebar <- tkscale(label_frame, from = 0.5, to = 1, variable = sparse, 
                              showvalue = TRUE, resolution = 0.01, orient = "horiz")
@@ -540,7 +541,7 @@ TextMiningGUI <- function() {
     tkwm.maxsize(window, tclvalue(tkwinfo("screenwidth",".")), tclvalue(tkwinfo("screenheight",".")))
     tkwm.title(window, "TextMiningGUI")
     tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
-            assign("x", NULL, envir = .BaseNamespaceEnv)
+            assign("x", NULL, envir = env)
             tkdestroy(window)
         })
 
@@ -618,9 +619,17 @@ TextMiningGUI <- function() {
 
     tkadd(file_menu, "separator")
 
+    tkadd(file_menu, "command", label = "Save project...",
+        command = function() {
+            if(file.exists("project.RData")) file.remove("project.RData")
+            save.image(file = "project.RData")
+        })
+
+    tkadd(file_menu, "separator")
+
     tkadd(file_menu, "command", label = "Quit",
         command = function() {
-            assign("x", NULL, envir = .BaseNamespaceEnv)
+            assign("x", NULL, envir = env)
             tkdestroy(window)
         })
 

@@ -108,12 +108,11 @@ EmotionsPage <- function(X, parent, notebook) {
         assign("plotdf", plotdf, envir = env)
         assign("biplot", biplot, envir = env)
 
-        #point_color = "#E69F00"
-        PageGUI("Emotions - HJ-Biplot", Plot, theme = "theme_white", vector_color = "#f8766d", 
+        PageGUI("Emotions - HJ-Biplot", id = "EmotionsPage", Plot, theme = "theme_white", vector_color = "#f8766d", 
             title = "Emotions - HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 3,
             parent = parent, notebook = notebook, distances = c(colnames(emotions), ""))
 
-        PageGUI("Sentiments", PlotS, theme = "theme_light",  title = "Sentiments", 
+        PageGUI("Sentiments", PlotS, id = "SentimentsPage", theme = "theme_light",  title = "Sentiments", 
             xlab = "Groups", ylab = "Count",
             parent = parent, notebook = notebook)
     }

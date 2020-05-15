@@ -21,6 +21,6 @@ ClusterPage <- function(X, parent, notebook) {
         }
     }
 
-    PageGUI("Cluster", Plot, limit = 100,
+    PageGUI("Cluster", Plot, id = as.character(match.call()[[1]]), limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data), title = "Cluster", type = "plot", cluster = 1, clustert = "rectangle")
 }

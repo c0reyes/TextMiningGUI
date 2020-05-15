@@ -19,6 +19,6 @@ WordCloudPage <- function(X, parent, notebook) {
         plot(plot)
     }
 
-    PageGUI("Word Cloud", Plot, palette = "Dark2", background = "#ffffff", limit = 100,
+    PageGUI("Word Cloud", Plot, id = as.character(match.call()[[1]]), palette = "Dark2", background = "#ffffff", limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data))
 }

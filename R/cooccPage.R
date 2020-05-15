@@ -9,8 +9,7 @@ cooccPage <- function(X, parent, notebook) {
         plot <- ggraph(graph = w, layout = 'fr') + # nicely
             geom_edge_link0(aes(edge_width = n), colour = graph$vcolor, alpha = (if(graph$alpha == 1) 1 else 0.50))  +
             geom_node_point(aes(fill = as.numeric(V(w)$clu), size = size), stroke = 0, shape = 21)+
-            geom_node_text(aes(filter = size >= 10, label = name), color = graph$tcolor, size = 8, repel = FALSE) +
-            geom_node_text(aes(filter = size < 10, label = name), color = graph$tcolor, size = 4, repel = FALSE) +
+            geom_node_text(aes(label = name), color = graph$tcolor, size = graph$tsize, repel = FALSE) +
             scale_fill_distiller(palette = graph$palette)+
             scale_edge_width(range = c(0.2,3))+
             scale_size(range = c(1,6))+
@@ -40,6 +39,7 @@ cooccPage <- function(X, parent, notebook) {
     t.min <- t %>% min
     t.max <- t %>% max
 
-    PageGUI("co-occurrence", Plot, palette = "Dark2", vector_color = "gray70", text_color = "#000000", background = "#ffffff", limit = 10, from = t.min, to = t.max, resolution = 1,
+    PageGUI("co-occurrence", Plot, id = as.character(match.call()[[1]]), palette = "Dark2", vector_color = "gray70", text_color = "#000000", 
+        background = "#ffffff", limit = 10, from = t.min, to = t.max, resolution = 1, text_size = 4,
         parent = parent, notebook = notebook)
 }

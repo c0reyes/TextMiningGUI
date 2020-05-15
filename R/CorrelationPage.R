@@ -19,5 +19,5 @@ CorrelationPage <- function(X, parent, notebook) {
 
     console(cmds = "cor %>% fashion()", e = environment())
 
-    PageGUI("Correlation", Plot, parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)
+    PageGUI("Correlation", Plot, id = as.character(match.call()[[1]]), parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)
 }

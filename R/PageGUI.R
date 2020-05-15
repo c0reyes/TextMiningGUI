@@ -1,5 +1,5 @@
-PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
-                    xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "",
+PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", type = "",
+                    xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "", text_size = 0,
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "",
                     vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0) {
     
@@ -15,6 +15,13 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
         }
 
         return(geometry)
+    }
+
+    replot <- function() {
+        if(id != "") assign(id, graph, envir = .GlobalEnv)
+        tkrreplot(eplot, fun = function() {
+            Plot(graph)
+        }, hscale = hscale, vscale = vscale)
     }
                    
     themes <- c("theme_white","theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
@@ -45,6 +52,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
     graph$ptext <- point_text
     graph$vsize <- vector_size
     graph$psize <- point_size
+    graph$tsize <- text_size
     graph$cluster <- cluster
     graph$distance <- ""
     graph$clustert <- clustert
@@ -123,40 +131,42 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
     tkgrid.rowconfigure(sidebar, 38, weight = 0)
     tkgrid.rowconfigure(sidebar, 39, weight = 0)
     tkgrid.rowconfigure(sidebar, 40, weight = 0)
+    tkgrid.rowconfigure(sidebar, 41, weight = 0)
+    tkgrid.rowconfigure(sidebar, 42, weight = 0)
 
-    limit <- tclVar(init = limit)
+    limit <- tclVar(init = graph$limit)
     put_label(sidebar, "Limit: ", 1, 1, sticky = "nw")
     limitbar <- tkscale(sidebar, from = from, to = to, variable = limit, 
         showvalue = TRUE, resolution = resolution, orient = "horiz", state = "disabled")
     tkgrid(limitbar, row = 2, column = 1, sticky = "ew", padx = 2)
 
-    title <- tclVar()
+    title <- tclVar(graph$title)
     put_label(sidebar, "Title: ", 3, 1, sticky = "nw")
     entry1 <- ttkentry(sidebar, textvariable = title, state = "disabled")
     tkgrid(entry1, row = 4, column = 1, sticky = "nw", padx = 2)
 
-    subtitle <- tclVar()
+    subtitle <- tclVar(graph$subtitle)
     put_label(sidebar, "Subtitle: ", 5, 1, sticky = "nw")
     subentry <- ttkentry(sidebar, textvariable = subtitle, state = "disabled")
     tkgrid(subentry, row = 6, column = 1, sticky = "nw", padx = 2)
 
-    caption <- tclVar()
+    caption <- tclVar(graph$caption)
     put_label(sidebar, "Caption: ", 7, 1, sticky = "nw")
     capentry <- ttkentry(sidebar, textvariable = caption, state = "disabled")
     tkgrid(capentry, row = 8, column = 1, sticky = "nw", padx = 2)
     
-    xlab <- tclVar()
+    xlab <- tclVar(graph$xlab)
     put_label(sidebar, "xlab: ", 9, 1, sticky = "nw")
     entry2 <- ttkentry(sidebar, textvariable = xlab, state = "disabled")
     tkgrid(entry2, row = 10, column = 1, sticky = "nw", padx = 2)
 
-    ylab <- tclVar()
+    ylab <- tclVar(graph$ylab)
     put_label(sidebar, "ylab: ", 11, 1, sticky = "nw")
     entry3 <- ttkentry(sidebar, textvariable = ylab, state = "disabled")
     tkgrid(entry3, row = 12, column = 1, sticky = "nw", padx = 2)
 
+    themex <- tclVar(graph$theme)
     put_label(sidebar, "Theme: ", 13, 1, sticky = "nw")
-    themex <- tclVar()
     theme_box <- ttkcombobox(sidebar, 
                         values = themes, 
                         textvariable = themex,
@@ -164,8 +174,8 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                         justify = "left", state = "disabled")
     tkgrid(theme_box, row = 14, column = 1, sticky = "nw", padx = 2)
 
+    palette <- tclVar(graph$palette)
     put_label(sidebar, "Palette: ", 15, 1, sticky = "nw")
-    palette <- tclVar()
     palette_box <- ttkcombobox(sidebar, 
                         values = palettes, 
                         textvariable = palette,
@@ -191,7 +201,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
         highlightbackground = "#ababab")
     tkgrid(tcolor, row = 22, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Vector: ", 23, 1, sticky = "nw")
+    put_label(sidebar, "Vector/Link: ", 23, 1, sticky = "nw")
     vcolor <- tkcanvas(sidebar, width = 40, height = 16, 
         background = "#d3d3d3",
         highlightbackground = "#ababab")
@@ -203,81 +213,79 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
         highlightbackground = "#ababab")
     tkgrid(pcolor, row = 26, column = 1, sticky = "nw", padx = 2)
 
-    flip <- tclVar(FALSE)
+    flip <- tclVar(graph$flip)
     ft <- tclVar("Flip graph")
     check_button <- ttkcheckbutton(sidebar, variable = flip, textvariable = ft, state = "disabled", command = function() {
             graph$flip <<- if( tclvalue(flip) == "1" ) TRUE else FALSE
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
     tkgrid(check_button, row = 27, column = 1, sticky = "nw", padx = 2)
 
-    repel <- tclVar(FALSE)
+    repel <- tclVar(graph$repel)
     rt <- tclVar("Repel point text")
     repel_button <- ttkcheckbutton(sidebar, variable = repel, textvariable = rt, state = "disabled", command = function() {
             graph$repel <<- if( tclvalue(repel) == "1" ) TRUE else FALSE
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
     tkgrid(repel_button, row = 28, column = 1, sticky = "nw", padx = 2)
 
-    vtext <- tclVar(FALSE)
+    vtext <- tclVar(graph$vtext)
     tt <- tclVar("Show vector text")
     text_button <- ttkcheckbutton(sidebar, variable = vtext, textvariable = tt, state = "disabled", command = function() {
             graph$vtext <<- if( tclvalue(vtext) == "1" ) TRUE else FALSE
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
     tkgrid(text_button, row = 29, column = 1, sticky = "nw", padx = 2)
 
-    ptext <- tclVar(FALSE)
+    ptext <- tclVar(graph$ptext)
     vt <- tclVar("Show point text")
     vector_button <- ttkcheckbutton(sidebar, variable = ptext, textvariable = vt, state = "disabled", command = function() {
             graph$ptext <<- if( tclvalue(ptext) == "1" ) TRUE else FALSE
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
     tkgrid(vector_button, row = 30, column = 1, sticky = "nw", padx = 2)
 
-    vector_size <- tclVar(init = vector_size)
+    vector_size <- tclVar(init = graph$vsize)
     put_label(sidebar, "Vector size: ", 31, 1, sticky = "nw")
     vectorsize <- tkscale(sidebar, from = 1, to = 5, variable = vector_size, 
         showvalue = TRUE, resolution = 0.5, orient = "horiz", state = "disabled")
     tkgrid(vectorsize, row = 32, column = 1, sticky = "ew", padx = 2)
 
-    point_size <- tclVar(init = point_size)
+    point_size <- tclVar(init = graph$psize)
     put_label(sidebar, "Point size: ", 33, 1, sticky = "nw")
     pointsize <- tkscale(sidebar, from = 1, to = 5, variable = point_size, 
         showvalue = TRUE, resolution = 0.5, orient = "horiz", state = "disabled")
     tkgrid(pointsize, row = 34, column = 1, sticky = "ew", padx = 2)
 
-    put_label(sidebar, "Projection: ", 35, 1, sticky = "nw")
-    distance <- tclVar()
+    text_size <- tclVar(init = graph$tsize)
+    put_label(sidebar, "Text size: ", 35, 1, sticky = "nw")
+    textsize <- tkscale(sidebar, from = 1, to = 48, variable = text_size, 
+        showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
+    tkgrid(textsize, row = 36, column = 1, sticky = "ew", padx = 2)
+
+    distance <- tclVar(graph$distance)
+    put_label(sidebar, "Projection: ", 37, 1, sticky = "nw")
     distance_box <- ttkcombobox(sidebar, 
                         values = distances, 
                         textvariable = distance,
                         state = "normal",
                         justify = "left", state = "disabled")
-    tkgrid(distance_box, row = 36, column = 1, sticky = "nw", padx = 2)
+    tkgrid(distance_box, row = 38, column = 1, sticky = "nw", padx = 2)
 
-    put_label(sidebar, "Cluster: ", 37, 1, sticky = "nw")
-    cluster <- tclVar()
+    cluster <- tclVar(graph$cluster)
+    put_label(sidebar, "Cluster: ", 39, 1, sticky = "nw")
     cluster_box <- tkscale(sidebar, from = 1, to = 8, variable = cluster, 
         showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
-    tkgrid(cluster_box, row = 38, column = 1, sticky = "ew", padx = 2)
+    tkgrid(cluster_box, row = 40, column = 1, sticky = "ew", padx = 2)
 
-    put_label(sidebar, "Cluster type: ", 39, 1, sticky = "nw")
-    cluster_type <- tclVar()
+    cluster_type <- tclVar(graph$clustert)
+    put_label(sidebar, "Cluster type: ", 41, 1, sticky = "nw")
     clustert_box <- ttkcombobox(sidebar, 
                         values = c("rectangle", "phylogram", "cladogram", "unrooted", "fan", "radial", "cladogram"), 
                         textvariable = cluster_type,
                         state = "normal",
                         justify = "left", state = "disabled")
-    tkgrid(clustert_box, row = 40, column = 1, sticky = "nw", padx = 2)
+    tkgrid(clustert_box, row = 42, column = 1, sticky = "nw", padx = 2)
 
     tkbind(color, "<Button-1>", function(W) {
             if(graph$color != "") {
@@ -285,9 +293,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                 graph$color <<- tclvalue(color)
                 if(nchar(tclvalue(color))) {
                     tkconfigure(W, background = tclvalue(color)) 
-                    tkrreplot(eplot, fun = function() {
-                            Plot(graph)
-                        }, hscale = hscale, vscale = vscale)
+                    replot()
                 }
             }
         })
@@ -298,9 +304,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                 graph$background <<- tclvalue(bcolor)
                 if(nchar(tclvalue(bcolor))) {
                     tkconfigure(W, background = tclvalue(bcolor)) 
-                    tkrreplot(eplot, fun = function() {
-                            Plot(graph)
-                        }, hscale = hscale, vscale = vscale)
+                    replot()
                 }
             }
         })
@@ -311,9 +315,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                 graph$tcolor <<- tclvalue(tcolor)
                 if(nchar(tclvalue(tcolor))) {
                     tkconfigure(W, background = tclvalue(tcolor)) 
-                    tkrreplot(eplot, fun = function() {
-                            Plot(graph)
-                        }, hscale = hscale, vscale = vscale)
+                    replot()
                 }
             }
         })
@@ -324,9 +326,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                 graph$vcolor <<- tclvalue(vcolor)
                 if(nchar(tclvalue(vcolor))) {
                     tkconfigure(W, background = tclvalue(vcolor)) 
-                    tkrreplot(eplot, fun = function() {
-                            Plot(graph)
-                        }, hscale = hscale, vscale = vscale)
+                    replot()
                 }
             }
         })
@@ -337,106 +337,84 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
                 graph$pcolor <<- tclvalue(pcolor)
                 if(nchar(tclvalue(pcolor))) {
                     tkconfigure(W, background = tclvalue(pcolor)) 
-                    tkrreplot(eplot, fun = function() {
-                            Plot(graph)
-                        }, hscale = hscale, vscale = vscale)
+                    replot()
                 }
             }
         })
 
     tkbind(theme_box, "<<ComboboxSelected>>", function() {
             graph$theme <<- tclvalue(themex)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     tkbind(palette_box, "<<ComboboxSelected>>", function() {
             graph$palette <<- tclvalue(palette)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     tkbind(distance_box, "<<ComboboxSelected>>", function() {
             graph$distance <<- tclvalue(distance)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     if(as.numeric(graph$cluster) > 0)
         tkbind(cluster_box, "<ButtonRelease-1>", function() {
                 graph$cluster <<- as.numeric(tclvalue(cluster))
-                tkrreplot(eplot, fun = function() {
-                    Plot(graph)
-                }, hscale = hscale, vscale = vscale)
+                replot()
             })
 
     tkbind(clustert_box, "<<ComboboxSelected>>", function() {
             graph$clustert <<- tclvalue(cluster_type)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     tkbind(entry1, "<Return>", function() {
             graph$title <<- tclvalue(title) 
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     tkbind(entry2, "<Return>", function() {
             graph$xlab <<- tclvalue(xlab)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     tkbind(entry3, "<Return>", function() {
             graph$ylab <<- tclvalue(ylab)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     tkbind(subentry, "<Return>", function() {
             graph$subtitle <<- tclvalue(subtitle)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     tkbind(capentry, "<Return>", function() {
             graph$caption <<- tclvalue(caption)
-            tkrreplot(eplot, fun = function() {
-                Plot(graph)
-            }, hscale = hscale, vscale = vscale)
+            replot()
         })
 
     if(as.numeric(graph$limit) > 0)
         tkbind(limitbar, "<ButtonRelease-1>", function() {
                 graph$limit <<- as.numeric(tclvalue(limit))
-                tkrreplot(eplot, fun = function() {
-                    Plot(graph)
-                }, hscale = hscale, vscale = vscale)
+                replot()
             })
 
     if(as.numeric(graph$vsize) > 0)
         tkbind(vectorsize, "<ButtonRelease-1>", function() {
                 graph$vsize <<- as.numeric(tclvalue(vector_size))
-                tkrreplot(eplot, fun = function() {
-                    Plot(graph)
-                }, hscale = hscale, vscale = vscale)
+                replot()
             })
 
     if(as.numeric(graph$psize) > 0)
         tkbind(pointsize, "<ButtonRelease-1>", function() {
                 graph$psize <<- as.numeric(tclvalue(point_size))
-                tkrreplot(eplot, fun = function() {
-                    Plot(graph)
-                }, hscale = hscale, vscale = vscale)
+                replot()
+            })
+
+    if(as.numeric(graph$tsize) > 0)
+        tkbind(textsize, "<ButtonRelease-1>", function() {
+                graph$tsize <<- as.numeric(tclvalue(text_size))
+                replot()
             })
 
     # Graph
@@ -444,6 +422,8 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
             Plot(graph)
         }, hscale = hscale, vscale = vscale)
     tkpack(eplot)
+
+    if(id != "") assign(id, graph, envir = .GlobalEnv)
 
     l <- length(as.character(tcl(notebook,"tabs")))
     tcl(notebook, "select", l-1)
@@ -486,6 +466,7 @@ PageGUI <- function(name, Plot, color = "", theme = "", title = "", type = "",
     if(graph$vtext != "") tcl(vector_button, "config", "-state", "normal")
     if(graph$vsize > 0) tcl(vectorsize, "config", "-state", "normal")
     if(graph$psize > 0) tcl(pointsize, "config", "-state", "normal")
+    if(graph$tsize > 0) tcl(textsize, "config", "-state", "normal")
 
     if(graph$color != "") tkconfigure(color, background = graph$color )
     if(graph$background  != "") tkconfigure(bcolor, background = graph$background)

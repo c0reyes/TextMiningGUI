@@ -62,7 +62,7 @@ CaPage <- function(X, parent, notebook) {
     plotdf$Variable <- factor(plotdf$Variable)
     console(cmds = "ca", e = environment())
 
-    PageGUI("CA - Biplot", Plot, theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
+    PageGUI("CA - Biplot", Plot, id = as.character(match.call()[[1]]), theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
         vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
         parent = parent, notebook = notebook, to = nrow(X$data))
 }

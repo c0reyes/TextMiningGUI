@@ -18,5 +18,5 @@ BalloonPlotPage <- function(X, parent, notebook) {
 
     if(!require(ggpubr)) return(NULL)
 
-    PageGUI("Words Most Used", Plot, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
+    PageGUI("Words Most Used", Plot, id = as.character(match.call()[[1]]), limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
 }
