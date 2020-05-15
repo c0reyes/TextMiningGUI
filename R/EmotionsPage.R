@@ -2,17 +2,6 @@ EmotionsPage <- function(X, parent, notebook) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
-        biplot <- HJBiplot(emotions)
-        plotdf <- as.data.frame(biplot)
-
-        console(cmds = "biplot", e = environment())
-        console(cmds = "plotdf", e = environment())
-
-        plotdf$sum <- 1
-        plotdf[which(plotdf$Variable == "Rows"),] <- plotdf[which(plotdf$Variable == "Rows"),] %>% mutate(sum = row_number() + 1)
-        plotdf$sum <- factor(plotdf$sum)
-        plotdf$Variable <- factor(plotdf$Variable)
-
         line_alpha <- 0.50
         vector_alpha <- 0.75
         if(graph$alpha == 1) {
@@ -105,6 +94,20 @@ EmotionsPage <- function(X, parent, notebook) {
         console(cmds = "emotions", e = env)
         console(cmds = "sentiments", e = env)
 
+        biplot <- HJBiplot(emotions)
+        plotdf <- as.data.frame(biplot)
+
+        console(cmds = "biplot", e = environment())
+        console(cmds = "plotdf", e = environment())
+
+        plotdf$sum <- 1
+        plotdf[which(plotdf$Variable == "Rows"),] <- plotdf[which(plotdf$Variable == "Rows"),] %>% mutate(sum = row_number() + 1)
+        plotdf$sum <- factor(plotdf$sum)
+        plotdf$Variable <- factor(plotdf$Variable)
+
+        assign("plotdf", plotdf, envir = env)
+        assign("biplot", biplot, envir = env)
+
         #point_color = "#E69F00"
         PageGUI("Emotions - HJ-Biplot", Plot, theme = "theme_white", vector_color = "#f8766d", 
             title = "Emotions - HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 3,
@@ -132,7 +135,8 @@ EmotionsPage <- function(X, parent, notebook) {
 
         ok_button <- ttkbutton(frame_2, text = "OK", 
                        command = function() {
-                                ok_callback()
+                                time <- system.time({ ok_callback() })
+                                console(cmds = "time", e = environment())
                                 tkdestroy(window)
                             })
         cancel_button <- ttkbutton(frame_2, text = "Cancel", 

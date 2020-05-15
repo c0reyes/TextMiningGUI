@@ -1,9 +1,6 @@
 cooccPage <- function(X, parent, notebook) {
     Plot <- function(graph) {
-        w <- X$bigrams %>%
-        separate(bigram, c("word1", "word2"), sep = " ") %>% 
-        count(word1, word2, sort = TRUE) %>%
-        filter(n > graph$limit) %>% graph_from_data_frame(directed = FALSE)
+        w <- w %>% filter(n > graph$limit) %>% graph_from_data_frame(directed = FALSE)
 
         V(w)$size <- degree(w)
         V(w)$clu <- as.character(membership(cluster_louvain(w)))
@@ -34,9 +31,11 @@ cooccPage <- function(X, parent, notebook) {
     if(!require(ggraph)) return(NULL)
     if(is.null(X$bigrams)) return(NULL)
 
-    t <- X$bigrams %>%
+    w <- X$bigrams %>%
         separate(bigram, c("word1", "word2"), sep = " ") %>% 
-        count(word1, word2, sort = TRUE) %>% select(n)
+        count(word1, word2, sort = TRUE)
+
+    t <- w %>% select(n)
     
     t.min <- t %>% min
     t.max <- t %>% max
