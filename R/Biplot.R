@@ -23,7 +23,6 @@ Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale 
   DimNames <- unlist(lapply(1:dimension, function(x) paste0("Dim", x)))
   
   X[is.na(X)] <- 0
-  set.seed(0)
   SD <- svd(X, nu = dimension, nv = dimension)
   EV <- SD$d^2
   
