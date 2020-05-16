@@ -1,4 +1,4 @@
-cooccPage <- function(X, parent, notebook) {
+cooccPage <- function(X, parent, notebook, env) {
     Plot <- function(graph) {
         w <- w %>% filter(n > graph$limit) %>% graph_from_data_frame(directed = FALSE)
 
@@ -39,7 +39,7 @@ cooccPage <- function(X, parent, notebook) {
     t.min <- t %>% min
     t.max <- t %>% max
 
-    PageGUI("co-occurrence", Plot, id = as.character(match.call()[[1]]), palette = "Dark2", vector_color = "gray70", text_color = "#000000", 
+    PageGUI("co-occurrence", Plot, id = as.character(match.call()[[1]]), e = env, palette = "Dark2", vector_color = "gray70", text_color = "#000000", 
         background = "#ffffff", limit = 10, from = t.min, to = t.max, resolution = 1, text_size = 4,
         parent = parent, notebook = notebook)
 }

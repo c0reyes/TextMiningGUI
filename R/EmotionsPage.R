@@ -1,4 +1,4 @@
-EmotionsPage <- function(X, parent, notebook) {
+EmotionsPage <- function(X, parent, notebook, env) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
@@ -71,7 +71,7 @@ EmotionsPage <- function(X, parent, notebook) {
         plot(plot)
     }
 
-    env <- environment()
+    e <- environment()
 
     ok_callback <- function() {
         emotions <- X$freq %>% select(GROUP, word) %>% group_by(GROUP) %>% group_modify(~ Emotions(.x$word, language = X$lang))
@@ -88,11 +88,11 @@ EmotionsPage <- function(X, parent, notebook) {
         sentiments <- cbind(group = rownames(sentiments), sentiments)
         sentiments <- gather(sentiments, "sentiment", "count", -group)
 
-        assign("emotions", emotions, envir = env)
-        assign("sentiments", sentiments, envir = env)
+        assign("emotions", emotions, envir = e)
+        assign("sentiments", sentiments, envir = e)
 
-        console(cmds = "emotions", e = env)
-        console(cmds = "sentiments", e = env)
+        console(cmds = "emotions", e = e)
+        console(cmds = "sentiments", e = e)
 
         biplot <- HJBiplot(emotions)
         plotdf <- as.data.frame(biplot)
@@ -105,14 +105,14 @@ EmotionsPage <- function(X, parent, notebook) {
         plotdf$sum <- factor(plotdf$sum)
         plotdf$Variable <- factor(plotdf$Variable)
 
-        assign("plotdf", plotdf, envir = env)
-        assign("biplot", biplot, envir = env)
+        assign("plotdf", plotdf, envir = e)
+        assign("biplot", biplot, envir = e)
 
-        PageGUI("Emotions - HJ-Biplot", id = "EmotionsPage", Plot, theme = "theme_white", vector_color = "#f8766d", 
+        PageGUI("Emotions - HJ-Biplot", Plot, id = "EmotionsPage", e = env, theme = "theme_white", vector_color = "#f8766d", 
             title = "Emotions - HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 3,
             parent = parent, notebook = notebook, distances = c(colnames(emotions), ""))
 
-        PageGUI("Sentiments", PlotS, id = "SentimentsPage", theme = "theme_light",  title = "Sentiments", 
+        PageGUI("Sentiments", PlotS, id = "SentimentsPage", e = env, theme = "theme_light",  title = "Sentiments", 
             xlab = "Groups", ylab = "Count",
             parent = parent, notebook = notebook)
     }

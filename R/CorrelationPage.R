@@ -1,4 +1,4 @@
-CorrelationPage <- function(X, parent, notebook) {
+CorrelationPage <- function(X, parent, notebook, env) {
     Plot <- function(graph) {
         plot <- cor %>% network_plot(min_cor = graph$limit, repel = TRUE) 
         plot <- plot + theme_white() + theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
@@ -19,5 +19,5 @@ CorrelationPage <- function(X, parent, notebook) {
 
     console(cmds = "cor %>% fashion()", e = environment())
 
-    PageGUI("Correlation", Plot, id = as.character(match.call()[[1]]), parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)
+    PageGUI("Correlation", Plot, id = as.character(match.call()[[1]]), e = env, parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)
 }

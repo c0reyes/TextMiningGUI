@@ -1,4 +1,4 @@
-ExplorerPage <- function(X, parent, notebook) {
+ExplorerPage <- function(X, parent, notebook, env) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
         
@@ -16,7 +16,7 @@ ExplorerPage <- function(X, parent, notebook) {
         plot(plot)
     }
 
-    PageGUI("Words by Groups", Plot, id = as.character(match.call()[[1]]), color = "lightblue", theme = "theme_gray", title = "Distinct words by groups", 
+    PageGUI("Words by Groups", Plot, id = as.character(match.call()[[1]]), e = env, color = "lightblue", theme = "theme_gray", title = "Distinct words by groups", 
             xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ", text_color = "#323232",
             parent = parent, notebook = notebook)
 }

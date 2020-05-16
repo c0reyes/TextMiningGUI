@@ -1,4 +1,4 @@
-BalloonPlotPage <- function(X, parent, notebook) {
+BalloonPlotPage <- function(X, parent, notebook, env) {
     Plot <- function(graph) {
         colors <- c("#0D0887FF", "#6A00A8FF", "#B12A90FF", "#E16462FF", "#FCA636FF", "#F0F921FF")
         
@@ -18,5 +18,5 @@ BalloonPlotPage <- function(X, parent, notebook) {
 
     if(!require(ggpubr)) return(NULL)
 
-    PageGUI("Words Most Used", Plot, id = as.character(match.call()[[1]]), limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
+    PageGUI("Words Most Used", Plot, id = as.character(match.call()[[1]]), e = env, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
 }

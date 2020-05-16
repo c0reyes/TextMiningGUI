@@ -1,4 +1,4 @@
-PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", type = "",
+PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", type = "", e = parent.frame(),
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "", text_size = 0,
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "",
                     vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0) {
@@ -18,7 +18,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     }
 
     replot <- function() {
-        if(id != "") assign(id, graph, envir = .GlobalEnv)
+        if(id != "") assign(id, graph, envir = e)
         tkrreplot(eplot, fun = function() {
             Plot(graph)
         }, hscale = hscale, vscale = vscale)
@@ -423,7 +423,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
         }, hscale = hscale, vscale = vscale)
     tkpack(eplot)
 
-    if(id != "") assign(id, graph, envir = .GlobalEnv)
+    if(id != "") assign(id, graph, envir = e)
 
     l <- length(as.character(tcl(notebook,"tabs")))
     tcl(notebook, "select", l-1)
