@@ -1,4 +1,4 @@
-EmotionsPage <- function(X, parent, notebook, env) {
+EmotionsPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
@@ -35,8 +35,8 @@ EmotionsPage <- function(X, parent, notebook, env) {
             slope <- r[2] / r[1]
             distance <- Distance(biplot$RowCoordinates, slope = slope)
 
-            console(cmds = "slope", e = environment())
-            console(cmds = "distance", e = environment())
+            console(cmds = "slope", envir = environment())
+            console(cmds = "distance", envir = environment())
 
             plot <- plot + geom_abline(intercept = 0, slope = slope, linetype = "dashed", color = graph$vcolor, alpha = vector_alpha) +
                      geom_segment(data = distance, aes(x = Dim1, y = Dim2, xend = xend, yend = yend), 
@@ -91,14 +91,14 @@ EmotionsPage <- function(X, parent, notebook, env) {
         assign("emotions", emotions, envir = e)
         assign("sentiments", sentiments, envir = e)
 
-        console(cmds = "emotions", e = e)
-        console(cmds = "sentiments", e = e)
+        console(cmds = "emotions", envir = e)
+        console(cmds = "sentiments", envir = e)
 
         biplot <- HJBiplot(emotions)
         plotdf <- as.data.frame(biplot)
 
-        console(cmds = "biplot", e = environment())
-        console(cmds = "plotdf", e = environment())
+        console(cmds = "biplot", envir = environment())
+        console(cmds = "plotdf", envir = environment())
 
         plotdf$sum <- 1
         plotdf[which(plotdf$Variable == "Rows"),] <- plotdf[which(plotdf$Variable == "Rows"),] %>% mutate(sum = row_number() + 1)
@@ -108,11 +108,11 @@ EmotionsPage <- function(X, parent, notebook, env) {
         assign("plotdf", plotdf, envir = e)
         assign("biplot", biplot, envir = e)
 
-        PageGUI("Emotions - HJ-Biplot", Plot, id = "EmotionsPage", e = env, theme = "theme_white", vector_color = "#f8766d", 
+        PageGUI("Emotions - HJ-Biplot", Plot, id = "EmotionsPage", envir = envir, theme = "theme_white", vector_color = "#f8766d", 
             title = "Emotions - HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 3,
             parent = parent, notebook = notebook, distances = c(colnames(emotions), ""))
 
-        PageGUI("Sentiments", PlotS, id = "SentimentsPage", e = env, theme = "theme_light",  title = "Sentiments", 
+        PageGUI("Sentiments", PlotS, id = "SentimentsPage", envir = envir, theme = "theme_light",  title = "Sentiments", 
             xlab = "Groups", ylab = "Count",
             parent = parent, notebook = notebook)
     }
@@ -135,7 +135,7 @@ EmotionsPage <- function(X, parent, notebook, env) {
         ok_button <- ttkbutton(frame_2, text = "OK", 
                        command = function() {
                                 time <- system.time({ ok_callback() })
-                                console(cmds = "time", e = environment())
+                                console(cmds = "time", envir = environment())
                                 tkdestroy(window)
                             })
         cancel_button <- ttkbutton(frame_2, text = "Cancel", 

@@ -1,4 +1,4 @@
-CorBetweenGroupsPage <- function(X, parent, notebook, env) {
+CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
     vars <- colnames(X$data)
 
     group1 <- tclVar("")
@@ -61,7 +61,7 @@ CorBetweenGroupsPage <- function(X, parent, notebook, env) {
                     plot(plot)
                 }
 
-                PageGUI("Correlation between groups", Plot, limit = 100, e = env, parent = parent, notebook = notebook, to = nrow(X$data))
+                PageGUI("Correlation between groups", Plot, limit = 100, envir = envir, parent = parent, notebook = notebook, to = nrow(X$data))
                 tkdestroy(window)
             }   
         })

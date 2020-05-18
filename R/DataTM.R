@@ -19,7 +19,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
         if(sparse < 1)
             tdm = removeSparseTerms(tdm, sparse)
 
-        console(cmds = "inspect(tdm)", e = environment())
+        console(cmds = "inspect(tdm)", envir = environment())
             
         v <- sort(row_sums(tdm), decreasing = TRUE)
 

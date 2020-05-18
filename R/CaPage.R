@@ -1,4 +1,4 @@
-CaPage <- function(X, parent, notebook, env) {
+CaPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
         
@@ -14,7 +14,7 @@ CaPage <- function(X, parent, notebook, env) {
         plot <- ggplot(plotdf) +
                     geom_vline(xintercept = 0, lty = "dashed", alpha = line_alpha) +
                     geom_hline(yintercept = 0, lty = "dashed", alpha = line_alpha) +
-                    geom_segment(data = plotdf[which(plotdf$Variable == "Columns"),], 
+                    geom_segment(data = plotdf[which(w$Variable == "Columns"),], 
                         aes(x = 0, y = 0, xend = Dim1, yend = Dim2), arrow = arrow(length = unit(0.2, "cm")), 
                             alpha = vector_alpha, color = graph$vcolor, size = graph$vsize) +
                     scale_shape_manual(values = c(4, 17))
@@ -26,12 +26,12 @@ CaPage <- function(X, parent, notebook, env) {
         g_text <- if(graph$repel == TRUE && require(ggrepel)) geom_text_repel else geom_text
 
         if(graph$vtext == TRUE) 
-            plot <- plot + g_text(data = w[which(plotdf$Variable == "Columns"),],
+            plot <- plot + g_text(data = w[which(w$Variable == "Columns"),],
                          aes(x = Dim1, y = Dim2, col = Variable, shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$ptext == TRUE) 
-            plot <- plot + g_text(data = w[which(plotdf$Variable == "Rows"),],
+            plot <- plot + g_text(data = w[which(w$Variable == "Rows"),],
                          aes(x = Dim1, y = Dim2, col = Variable, shape = Variable,
                              label = Label), vjust = -0.5)
 
@@ -60,9 +60,9 @@ CaPage <- function(X, parent, notebook, env) {
             tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
         })
     plotdf$Variable <- factor(plotdf$Variable)
-    console(cmds = "ca", e = environment())
+    console(cmds = "ca", envir = environment())
 
-    PageGUI("CA - Biplot", Plot, id = as.character(match.call()[[1]]), e = env, theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
+    PageGUI("CA - Biplot", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
         vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
         parent = parent, notebook = notebook, to = nrow(X$data))
 }

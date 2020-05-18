@@ -1,4 +1,4 @@
-CorrelationPage <- function(X, parent, notebook, env) {
+CorrelationPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         plot <- cor %>% network_plot(min_cor = graph$limit, repel = TRUE) 
         plot <- plot + theme_white() + theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
@@ -17,7 +17,7 @@ CorrelationPage <- function(X, parent, notebook, env) {
             tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
         })
 
-    console(cmds = "cor %>% fashion()", e = environment())
+    console(cmds = "cor %>% fashion()", envir = environment())
 
-    PageGUI("Correlation", Plot, id = as.character(match.call()[[1]]), e = env, parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)
+    PageGUI("Correlation", Plot, id = as.character(match.call()[[1]]), envir = envir, parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)
 }

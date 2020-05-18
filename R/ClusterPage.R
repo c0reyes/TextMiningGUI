@@ -1,4 +1,4 @@
-ClusterPage <- function(X, parent, notebook, env) {
+ClusterPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         w <- X$data[1:graph$limit,]
         w <- Convert(w)
@@ -21,6 +21,6 @@ ClusterPage <- function(X, parent, notebook, env) {
         }
     }
 
-    PageGUI("Cluster", Plot, id = as.character(match.call()[[1]]), e = env, limit = 100,
+    PageGUI("Cluster", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data), title = "Cluster", type = "plot", cluster = 1, clustert = "rectangle")
 }

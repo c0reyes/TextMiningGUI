@@ -1,4 +1,4 @@
-WordCloudPage <- function(X, parent, notebook, env) {
+WordCloudPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         set.seed(0)
         w <- X$freq[1:graph$limit,]
@@ -19,6 +19,6 @@ WordCloudPage <- function(X, parent, notebook, env) {
         plot(plot)
     }
 
-    PageGUI("Word Cloud", Plot, id = as.character(match.call()[[1]]), id = "EmotionsPage", palette = "Dark2", background = "#ffffff", limit = 100,
+    PageGUI("Word Cloud", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", background = "#ffffff", limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data))
 }

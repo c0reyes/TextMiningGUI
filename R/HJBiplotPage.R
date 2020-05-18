@@ -1,4 +1,4 @@
-HJBiplotPage <- function(X, parent, notebook, env) {
+HJBiplotPage <- function(X, parent, notebook, envir) {
      Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
@@ -23,7 +23,7 @@ HJBiplotPage <- function(X, parent, notebook, env) {
         plot <- ggplot(plotdf) +
                     geom_vline(xintercept = 0, lty = "dashed", alpha = line_alpha) +
                     geom_hline(yintercept = 0, lty = "dashed", alpha = line_alpha) +
-                    geom_segment(data = plotdf[which(plotdf$Variable == "Columns"),], 
+                    geom_segment(data = plotdf[which(w$Variable == "Columns"),], 
                         aes(x = 0, y = 0, xend = Dim1, yend = Dim2), arrow = arrow(length = unit(0.2, "cm")), 
                             alpha = vector_alpha, color = graph$vcolor, size = graph$vsize) +
                     scale_shape_manual(values = c(4, 17))
@@ -35,22 +35,22 @@ HJBiplotPage <- function(X, parent, notebook, env) {
         g_text <- if(graph$repel == TRUE && require(ggrepel)) geom_text_repel else geom_text
 
         if(graph$vtext == TRUE) 
-            plot <- plot + g_text(data = w[which(plotdf$Variable == "Columns"),],
+            plot <- plot + g_text(data = w[which(w$Variable == "Columns"),],
                          aes(x = Dim1, y = Dim2, col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$ptext == TRUE) 
-            plot <- plot + g_text(data = w[which(plotdf$Variable == "Rows"),],
+            plot <- plot + g_text(data = w[which(w$Variable == "Rows"),],
                          aes(x = Dim1, y = Dim2, col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                              label = Label), vjust = -0.5)
 
         if(graph$distance != "") {
             r <- biplot$ColCoordinates[graph$distance,]
             slope <- r[2] / r[1]
-            distance <- Distance(biplot$RowCoordinates, slope = slope)
+            distance <- Distance(biplot$RowCoordinates[1:(graph$limit+ncol(X$data)),], slope = slope)
 
-            console(cmds = "slope", e = environment())
-            console(cmds = "distance", e = environment())
+            console(cmds = "slope", envir = environment())
+            console(cmds = "distance", envir = environment())
 
             plot <- plot + geom_abline(intercept = 0, slope = slope, linetype = "dashed", color = graph$vcolor, alpha = vector_alpha) +
                      geom_segment(data = distance, aes(x = Dim1, y = Dim2, xend = xend, yend = yend), 
@@ -81,11 +81,11 @@ HJBiplotPage <- function(X, parent, notebook, env) {
     plotdf <- as.data.frame(biplot)
     plotdf$Variable <- factor(plotdf$Variable)
 
-    console(cmds = "head(X$data)", e = environment())
-    console(cmds = "biplot", e = environment())
-    console(cmds = "plotdf", e = environment())
+    console(cmds = "head(X$data)", envir = environment())
+    console(cmds = "biplot", envir = environment())
+    console(cmds = "plotdf", envir = environment())
 
-    PageGUI("HJ-Biplot", Plot, id = as.character(match.call()[[1]]), e = env, theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
+    PageGUI("HJ-Biplot", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
         title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
         parent = parent, notebook = notebook, to = nrow(X$data), distances = c(colnames(X$data), ""), cluster = 1, palette = "Dark2")
 }

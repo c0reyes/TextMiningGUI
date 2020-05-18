@@ -1,4 +1,4 @@
-PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", type = "", e = parent.frame(),
+PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", type = "", envir = parent.frame(),
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "", text_size = 0,
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "",
                     vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0) {
@@ -18,7 +18,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     }
 
     replot <- function() {
-        if(id != "") assign(id, graph, envir = e)
+        if(id != "") assign(id, graph, envir = envir)
         tkrreplot(eplot, fun = function() {
             Plot(graph)
         }, hscale = hscale, vscale = vscale)
@@ -29,7 +29,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
 
     env = environment()
     resize(parent, env)
-    assign("g", unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(parent)),"\\+"))[1],"x")), env)
+    assign("g", unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(parent)),"\\+"))[1],"x")), envir = env)
 
     graph <- list()
     graph$color <- color
@@ -57,6 +57,8 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     graph$distance <- ""
     graph$clustert <- clustert
     class(graph) <- "graph"
+
+    if(typeof(get(id, envir = envir)) != "closure") graph <- get(id, envir = envir)
 
     page <- Page(notebook, name)
     content <- page$content
@@ -423,7 +425,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
         }, hscale = hscale, vscale = vscale)
     tkpack(eplot)
 
-    if(id != "") assign(id, graph, envir = e)
+    if(id != "") assign(id, graph, envir = envir)
 
     l <- length(as.character(tcl(notebook,"tabs")))
     tcl(notebook, "select", l-1)
@@ -444,7 +446,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
  
     tkbind(content, "<Configure>", function() {
             geometry <- resize(parent, env)
-            if(geometry != get("g", envir = env)) {
+            if(paste0(geometry, collapse = "") != paste0(get("g", envir = env), collapse = "")) {
                 assign("g", geometry, envir = env)
                 tkrreplot(eplot, fun = function() {
                     Plot(graph)
@@ -474,7 +476,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     if(graph$vcolor != "") tkconfigure(vcolor, background = graph$vcolor)
     if(graph$pcolor != "") tkconfigure(pcolor, background = graph$pcolor)
 
-    if(distances != "") tcl(distance_box, "config", "-state", "normal")
+    if(graph$distance != "") tcl(distance_box, "config", "-state", "normal")
     if(graph$cluster > 0) tcl(cluster_box, "config", "-state", "normal")
     if(graph$clustert != "" && require(ape)) tcl(clustert_box, "config", "-state", "normal")
 }

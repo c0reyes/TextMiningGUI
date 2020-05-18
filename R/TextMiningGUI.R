@@ -1,8 +1,10 @@
 TextMiningGUI <- function() {
-    env = new.env()
     if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
         assign("x", 1, envir = .BaseNamespaceEnv)
     
+    env <- new.env()
+    tb <- new.env()
+
     # About
     About <- function() {             
         window <- tktoplevel(width = 600, height = 400)
@@ -245,9 +247,9 @@ TextMiningGUI <- function() {
         colnames(DF) <- c("-", COL)
 
         tcl(notebook, "select", "0")
-        console(cmds = "dim(DATA)")
-        console(cmds = "str(DATA)")
-        console(cmds = "tm")
+        console(cmds = "dim(DATA)", envir = env)
+        console(cmds = "str(DATA)", envir = env)
+        console(cmds = "tm", envir = env)
 
         l <- if(nrow(DF) > 100) 100 else nrow(DF)
         DF <- DF[1:l,]
@@ -358,6 +360,7 @@ TextMiningGUI <- function() {
         tkgrid(combo_box, row = 1, column = 1, sticky = "ew", padx = 2)
 
         tkbind(combo_box, "<<ComboboxSelected>>", function() {
+            rm(list = ls(envir = env), envir = env)
             if(is.matrix(get(tclvalue(var)))) {
                 assign("DATA", as.data.frame(get(tclvalue(var))), envir = env)
             }else{
@@ -413,6 +416,7 @@ TextMiningGUI <- function() {
         tkgrid(combo_box, row = 1, column = 1, sticky = "ew", padx = 2)
 
         tkbind(combo_box, "<<ComboboxSelected>>", function() {
+            rm(list = ls(envir = env), envir = env)
             if(is.matrix(get(tclvalue(var)))) {
                 assign("DATA", as.data.frame(get(tclvalue(var))), envir = env)
             }else{
@@ -438,7 +442,8 @@ TextMiningGUI <- function() {
     }
 
     # Read Excel
-    ReadExcel <- function(file_name) {                                                                                                                                                                                                                              
+    ReadExcel <- function(file_name) {      
+        rm(list = ls(envir = env), envir = env)                                                                                                                                                                                                                        
         assign("DATA", read_excel(file_name), envir = env)                                                                                                                                                                                       
         dataFrameTable(env$DATA)
         disableMenu()
@@ -446,6 +451,7 @@ TextMiningGUI <- function() {
 
     # Read Json
     ReadJson <- function(file_name) {
+        rm(list = ls(envir = env), envir = env)
         assign("DATA", fromJSON(file_name), envir = env)                                                                                                                                                                                    
         dataFrameTable(env$DATA)
         disableMenu()
@@ -503,6 +509,7 @@ TextMiningGUI <- function() {
             command = function() { 
                 h <- if( tclvalue(header) == "1" ) TRUE else FALSE
                 s <- if( tclvalue(sep) == "other:") tclvalue(other.char) else tclvalue(sep)
+                rm(list = ls(envir = env), envir = env)
                 DATA <- read.table(file_name, 
                     encoding = encoding, 
                     header = h, 
@@ -512,7 +519,7 @@ TextMiningGUI <- function() {
                     stringsAsFactors = FALSE, 
                     comment.char = tclvalue(comment.char))
                 assign("DATA", DATA, envir = env)
-                dataFrameTable(DATA)
+                dataFrameTable(env$DATA)
                 tkdestroy(window)
                 disableMenu()
             })
@@ -522,17 +529,41 @@ TextMiningGUI <- function() {
         sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
     }
 
+    # Read Project
+    ReadProject <- function(file_name) {
+        rm(list = ls(envir = env), envir = env)
+        load(file = file_name, envir = env)
+        dataFrameTable(env$DATA)
+        tkentryconfigure(menu_bar, 2, state = "normal")
+        tkentryconfigure(menu_bar, 3, state = "normal")
+        tkentryconfigure(data_menu, 4, state = "normal")
+        
+        group <<- tclVar("")
+        text <<- tclVar("")
+        lang <<- env$tm$lang
+        steam <<- env$tm$steam 
+        normalize <<- env$tm$normalize
+        sparse <<- env$tm$sparse
+    }
+
     disableMenu <- function() {
         tkentryconfigure(menu_bar, 2, state = "normal")
         tkentryconfigure(menu_bar, 3, state = "disabled")
         tkentryconfigure(data_menu, 4, state = "disabled")
+
+        group <<- tclVar("")
+        text <<- tclVar("")
+        lang <<- tclVar("")
+        steam <<- tclVar(TRUE)
+        normalize <<- tclVar("chara-value")
+        sparse <<- tclVar(init = 0.99)
     }
 
     RefreshTableFrame <- function() { 
-        if(exists("tableFrame", envir = .BaseNamespaceEnv)) tkdestroy(tableFrame)
-        assign("tableFrame", ttkframe(frame, padding = c(3,3,3,12)), envir = .BaseNamespaceEnv)
-        tkpack(tableFrame, expand = TRUE, fill = "both")
-        return(tableFrame)
+        if(exists("tableFrame", envir = tb)) tkdestroy(tb$tableFrame)
+        assign("tableFrame", ttkframe(frame, padding = c(3,3,3,12)), envir = tb)
+        tkpack(tb$tableFrame, expand = TRUE, fill = "both")
+        return(tb$tableFrame)
     }
 
     # Main Window
@@ -541,7 +572,7 @@ TextMiningGUI <- function() {
     tkwm.maxsize(window, tclvalue(tkwinfo("screenwidth",".")), tclvalue(tkwinfo("screenheight",".")))
     tkwm.title(window, "TextMiningGUI")
     tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
-            assign("x", NULL, envir = env)
+            assign("x", NULL, envir = .BaseNamespaceEnv)
             tkdestroy(window)
         })
 
@@ -624,15 +655,23 @@ TextMiningGUI <- function() {
     tkadd(file_menu, "command", label = "Save project...",
         command = function() {
             if(file.exists("project.RData")) file.remove("project.RData")
-            #save.image(file = "project.RData")
             save(list = ls(envir = env), file = "project.RData", envir = env)
+        })
+
+    tkadd(file_menu, "command", label = "Open project...",
+        command =  function() {
+            file_name <- tkgetOpenFile(filetypes=
+                        "{{Rdata files} {.RData}} {{Rdata files} {.Rdata}} {{Rdata files} {.rdata}} {{Rdata files} {.Rda}} {{Rdata files} {.rda}} {{All files} *}")
+            if(file.exists(file_name <- as.character(file_name))) {
+                ReadProject(file_name)
+            }
         })
 
     tkadd(file_menu, "separator")
 
     tkadd(file_menu, "command", label = "Quit",
         command = function() {
-            assign("x", NULL, envir = env)
+            assign("x", NULL, envir = .BaseNamespaceEnv)
             tkdestroy(window)
         })
 
@@ -645,12 +684,12 @@ TextMiningGUI <- function() {
 
     tkadd(data_menu, "command", label = "View Data", 
         command = function() {
-            dataFrameTable(DATA)
+            dataFrameTable(env$DATA)
         })
 
     tkadd(data_menu, "command", label = "View Lexical Table", state = "disabled",
         command = function() {
-            dataFrameTable(tm$data)
+            dataFrameTable(env$tm$data)
         })
 
     tkadd(data_menu, "separator")
@@ -660,40 +699,40 @@ TextMiningGUI <- function() {
     # Analysis
     tkadd(analysis_menu, "command", label = "Statistics", command = function() {
             console(start = TRUE)
-            console(cmds = "tm", e = env)
+            console(cmds = "tm", envir = env)
         })
 
     tkadd(analysis_menu, "command", label = "Words Most Used", 
-        command = function() BalloonPlotPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() BalloonPlotPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Word Counter", 
-        command = function() ExplorerPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() ExplorerPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Word Cloud", 
-        command = function() WordCloudPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() WordCloudPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "co-occurrence", 
-        command = function() cooccPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() cooccPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "separator")
 
     tkadd(analysis_menu, "command", label = "Cluster",
-        command = function() ClusterPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() ClusterPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Correlation", 
-        command = function() CorrelationPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() CorrelationPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Correlation Between Groups", 
-        command = function() CorBetweenGroupsPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() CorBetweenGroupsPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Correspondence Analysis", 
-        command = function() CaPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() CaPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "HJ-Biplot", 
-        command = function() HJBiplotPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() HJBiplotPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Emotions & Sentiments", 
-        command = function() EmotionsPage(X = env$tm, parent = window, notebook = notebook, env = env))
+        command = function() EmotionsPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     # Help
     tkadd(help_menu, "command", label = "About", command = About)
@@ -708,9 +747,9 @@ TextMiningGUI <- function() {
 
     # Image
     tcl("image", "create", "photo", "imageID", file = system.file("logos/TextMiningGUI.png", package = "TextMiningGUI"))
-    assign("tableFrame", ttkframe(frame, padding = c(3,3,3,12)), envir = .BaseNamespaceEnv)
-    tkpack(tableFrame, expand = TRUE, fill = "both")
-    img <- ttklabel(tableFrame, image = "imageID", compound = "image", anchor = "center")
+    assign("tableFrame", ttkframe(frame, padding = c(3,3,3,12)), envir = tb)
+    tkpack(tb$tableFrame, expand = TRUE, fill = "both")
+    img <- ttklabel(tb$tableFrame, image = "imageID", compound = "image", anchor = "center")
     tkpack(img)
 
     if(require(readxl)) tkentryconfigure(file_menu, 1, state = "normal")

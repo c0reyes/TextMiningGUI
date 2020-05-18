@@ -1,4 +1,4 @@
-console <- function(start = FALSE, cmds = "", e = .BaseNamespaceEnv) {
+console <- function(start = FALSE, cmds = "", envir = .BaseNamespaceEnv) {
     if(start == TRUE) {
         if(!exists("windowc", envir = .BaseNamespaceEnv) || is.null(windowc)) {
             assign("windowc", tktoplevel(), envir = .BaseNamespaceEnv)
@@ -43,7 +43,7 @@ console <- function(start = FALSE, cmds = "", e = .BaseNamespaceEnv) {
                 tkinsert(txt, "end", command, "commandTag")
                 tkinsert(txt, "end","\n")
 
-                output <- capture.output(eval(cmd, envir = e))
+                output <- capture.output(eval(cmd, envir = envir))
                 output <- iconv(output, to = "ASCII//TRANSLIT")
                 output <- paste(output, collapse = "\n")
                 tkinsert(txt, "end", output, "outputTag")
