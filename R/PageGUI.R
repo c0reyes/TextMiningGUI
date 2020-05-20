@@ -24,7 +24,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
         }, hscale = hscale, vscale = vscale)
     }
                    
-    themes <- c("theme_white","theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
+    themes <- c("theme_white","theme_dark2","theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
     palettes <- c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Paired", "Dark2", "Accent")
 
     env = environment()
