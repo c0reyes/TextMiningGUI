@@ -1,8 +1,14 @@
 CaPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
-        
-        w <- plotdf[1:(graph$limit+ncol(X$data)),] 
+
+        if(graph$dim %in% c("dim1", "dim2")) {
+            w <- plotdf[which(plotdf$Variable == "Rows"),]
+            w <- w[order(w[[(if(graph$dim == "dim1") "Con1" else "Con2")]], decreasing = TRUE),]
+            w <- rbind(plotdf[which(plotdf$Variable == "Columns"),], w[1:graph$limit,])
+        }else {
+            w <- plotdf[1:(graph$limit+ncol(X$data)),]
+        }
 
         line_alpha <- 0.50
         vector_alpha <- 0.75
@@ -54,6 +60,9 @@ CaPage <- function(X, parent, notebook, envir) {
         })
 
     ca$inertia <- round(100 * ca$sv / sum(ca$sv), 2)
+    ca$rowcontrib <- ca$rowmass * ca$rowcoord^2
+    ca$colcontrib <- ca$colmass * ca$colcoord^2
+
     plotdf <- tryCatch({ 
             as.data.frame(ca)
         }, error = function(cond) {
@@ -63,6 +72,6 @@ CaPage <- function(X, parent, notebook, envir) {
     console(cmds = "ca", envir = environment())
 
     PageGUI("CA - Biplot", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
-        vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
+        vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ", dim = "all",
         parent = parent, notebook = notebook, to = nrow(X$data))
 }

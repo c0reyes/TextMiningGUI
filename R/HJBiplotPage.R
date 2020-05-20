@@ -11,7 +11,13 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
             plotdf$kcluster <- factor(plotdf$kcluster)
         }
 
-        w <- plotdf[1:(graph$limit+ncol(X$data)),]
+        if(graph$dim %in% c("dim1", "dim2")) {
+            w <- plotdf[which(plotdf$Variable == "Rows"),]
+            w <- w[order(w[[(if(graph$dim == "dim1") "Con1" else "Con2")]], decreasing = TRUE),]
+            w <- rbind(plotdf[which(plotdf$Variable == "Columns"),], w[1:graph$limit,])
+        }else {
+            w <- plotdf[1:(graph$limit+ncol(X$data)),]
+        }
 
         line_alpha <- 0.50
         vector_alpha <- 0.75
@@ -86,6 +92,6 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
     console(cmds = "plotdf", envir = environment())
 
     PageGUI("HJ-Biplot", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
-        title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ",
+        title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ", dim = "all",
         parent = parent, notebook = notebook, to = nrow(X$data), distances = c(colnames(X$data), ""), cluster = 1, palette = "Dark2")
 }

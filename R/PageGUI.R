@@ -1,5 +1,5 @@
 PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", type = "", envir = parent.frame(),
-                    xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "", text_size = 0,
+                    xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "", text_size = 0, dim = "",
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "",
                     vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0) {
     
@@ -56,9 +56,11 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     graph$cluster <- cluster
     graph$distance <- ""
     graph$clustert <- clustert
+    graph$dim <- dim
     class(graph) <- "graph"
 
     if(typeof(get(id, envir = envir)) != "closure") graph <- get(id, envir = envir)
+    graph$dim <- if(is.null(graph$dim)) dim else graph$dim
 
     page <- Page(notebook, name)
     content <- page$content
@@ -135,6 +137,8 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     tkgrid.rowconfigure(sidebar, 40, weight = 0)
     tkgrid.rowconfigure(sidebar, 41, weight = 0)
     tkgrid.rowconfigure(sidebar, 42, weight = 0)
+    tkgrid.rowconfigure(sidebar, 43, weight = 0)
+    tkgrid.rowconfigure(sidebar, 44, weight = 0)
 
     limit <- tclVar(init = graph$limit)
     put_label(sidebar, "Limit: ", 1, 1, sticky = "nw")
@@ -274,20 +278,29 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
                         justify = "left", state = "disabled")
     tkgrid(distance_box, row = 38, column = 1, sticky = "nw", padx = 2)
 
+    dim <- tclVar(graph$dim)
+    put_label(sidebar, "Contributions: ", 39, 1, sticky = "nw")
+    radio_box <- ttkcombobox(sidebar, 
+                        values = c("all", "dim1", "dim2"), 
+                        textvariable = dim,
+                        state = "normal",
+                        justify = "left", state = "disabled")
+    tkgrid(radio_box, row = 40, column = 1, sticky = "nw", padx = 2)
+
     cluster <- tclVar(graph$cluster)
-    put_label(sidebar, "Cluster: ", 39, 1, sticky = "nw")
+    put_label(sidebar, "Cluster: ", 41, 1, sticky = "nw")
     cluster_box <- tkscale(sidebar, from = 1, to = 8, variable = cluster, 
         showvalue = TRUE, resolution = 1, orient = "horiz", state = "disabled")
-    tkgrid(cluster_box, row = 40, column = 1, sticky = "ew", padx = 2)
+    tkgrid(cluster_box, row = 42, column = 1, sticky = "ew", padx = 2)
 
     cluster_type <- tclVar(graph$clustert)
-    put_label(sidebar, "Cluster type: ", 41, 1, sticky = "nw")
+    put_label(sidebar, "Cluster type: ", 43, 1, sticky = "nw")
     clustert_box <- ttkcombobox(sidebar, 
                         values = c("rectangle", "phylogram", "cladogram", "unrooted", "fan", "radial", "cladogram"), 
                         textvariable = cluster_type,
                         state = "normal",
                         justify = "left", state = "disabled")
-    tkgrid(clustert_box, row = 42, column = 1, sticky = "nw", padx = 2)
+    tkgrid(clustert_box, row = 44, column = 1, sticky = "nw", padx = 2)
 
     tkbind(color, "<Button-1>", function(W) {
             if(graph$color != "") {
@@ -356,6 +369,11 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
 
     tkbind(distance_box, "<<ComboboxSelected>>", function() {
             graph$distance <<- tclvalue(distance)
+            replot()
+        })
+
+    tkbind(radio_box, "<<ComboboxSelected>>", function() {
+            graph$dim <<- tclvalue(dim)
             replot()
         })
 
@@ -469,6 +487,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     if(graph$vsize > 0) tcl(vectorsize, "config", "-state", "normal")
     if(graph$psize > 0) tcl(pointsize, "config", "-state", "normal")
     if(graph$tsize > 0) tcl(textsize, "config", "-state", "normal")
+    if(graph$dim != "") tcl(radio_box, "config", "-state", "normal")
 
     if(graph$color != "") tkconfigure(color, background = graph$color )
     if(graph$background  != "") tkconfigure(bcolor, background = graph$background)

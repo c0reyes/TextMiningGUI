@@ -34,6 +34,83 @@ TextMiningGUI <- function() {
         tkpack(img2)
     }
 
+    # Slice
+    Slice <- function(X, name = "", type = "") {
+        window <- tktoplevel(width = 470, height = 420)
+        tkwm.minsize(window, "470", "240")
+        tkwm.maxsize(window, "470", "240")
+    
+        tkwm.title(window, "Slice")
+        frame <- ttkframe(window, padding = c(3,3,12,12))
+        tkpack(frame, expand = TRUE, fill = "both")
+    
+        label_frame <- ttklabelframe(frame, text = "Options", padding = 10)
+        tkpack(label_frame, expand = TRUE, fill = "both", padx = 5, pady = 5)
+    
+        tkgrid.columnconfigure(label_frame, 0, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+        tkgrid.columnconfigure(label_frame, 2, weight = 1)
+        tkgrid.columnconfigure(label_frame, 1, weight = 10)
+
+        frame1 <- ttkframe(label_frame)
+        treeview1 <- ttktreeview(frame1, columns = 1, show = "headings", height = 5)
+        addScrollbars(frame1, treeview1)
+        tcl(treeview1, "heading", 1, text = "Variable", anchor = "center")
+        tkgrid(frame1, row = 1, column = 0, sticky = "ew", padx = 2)
+
+        frame2 <- ttkframe(label_frame)
+        treeview2 <- ttktreeview(frame2, columns = 1, show = "headings", height = 5) 
+        addScrollbars(frame2, treeview2)
+        tcl(treeview2, "heading", 1, text = "Slice", anchor = "center")
+        tkgrid(frame2, row = 1, column = 1, sticky = "ew", padx = 2)
+    
+        if(!exists("data_", envir = env)) assign("data_", env$tm$data, envir = env)
+        if(!exists("freq_", envir = env)) assign("freq_", env$tm$freq, envir = env)
+
+        V <- colnames(env$data_)
+        X <- colnames(env$tm$data)
+
+        for(i in seq_along(V))
+            tkinsert(treeview1, "", "end", values = as.tclObj(V[i]))
+    
+        for(i in seq_along(X))
+            tkinsert(treeview2, "", "end", values = as.tclObj(X[i]))
+
+        button_frame <- ttkframe(frame)
+        cancel_button <- ttkbutton(button_frame, text = "cancel",
+                                   command = function() { 
+                                        tkdestroy(window) 
+                                   })
+        ok_button <- ttkbutton(button_frame, text = "ok",
+                               command = function() {
+                                    if(length(X) >= 3) {
+                                        env$tm$data <- env$data_[,X]
+                                        env$tm$freq <- env$freq_[env$freq_$GROUP %in% X,]
+                                        dataFrameTable(env$tm$data)
+                                        tkdestroy(window) 
+                                    }
+                               })
+        tkpack(button_frame, fill = "x", padx = 5, pady = 5)
+        tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
+               fill = "y", side = "left")               
+        sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+    
+        tkbind(treeview1, "<Button-1>", function(W, x, y) {
+            id <- as.character(tcl(W, "identify", "row", x, y))
+            value <- as.character(tcl(W, "item", id, "-values"))
+            if(value %in% X) return(NULL)
+            X <<- c(X, value)
+            tkinsert(treeview2, "", "end", values = as.tclObj(c(value)))
+        })  
+    
+        tkbind(treeview2, "<Button-1>", function(W, x, y) {
+            id <- as.character(tcl(W, "identify", "row", x, y))
+            value <- as.character(tcl(W, "item", id, "-values"))
+            X <<- X[X != value]
+            tcl(W, "delete", id)
+        }) 
+    }
+
     # Converter
     Converter <- function() {            
         vars <- colnames(env$DATA)
@@ -204,7 +281,9 @@ TextMiningGUI <- function() {
                     dataFrameTable(env$tm$data)
                     tkdestroy(window) 
                     tkentryconfigure(menu_bar, 3, state = "normal")
+                    tkentryconfigure(data_menu, 2, state = "normal")
                     tkentryconfigure(data_menu, 4, state = "normal")
+                    tkentryconfigure(data_menu, 5, state = "normal")
 
                     if(ncol(env$tm$data) < 3) {
                         tkmessageBox(title = "Warning", message = "Warning:", icon = "warning", 
@@ -536,7 +615,9 @@ TextMiningGUI <- function() {
         dataFrameTable(env$DATA)
         tkentryconfigure(menu_bar, 2, state = "normal")
         tkentryconfigure(menu_bar, 3, state = "normal")
+        tkentryconfigure(data_menu, 2, state = "normal")
         tkentryconfigure(data_menu, 4, state = "normal")
+        tkentryconfigure(data_menu, 5, state = "normal")
         
         group <<- tclVar("")
         text <<- tclVar("")
@@ -549,7 +630,9 @@ TextMiningGUI <- function() {
     disableMenu <- function() {
         tkentryconfigure(menu_bar, 2, state = "normal")
         tkentryconfigure(menu_bar, 3, state = "disabled")
+        tkentryconfigure(data_menu, 2, state = "disabled")
         tkentryconfigure(data_menu, 4, state = "disabled")
+        tkentryconfigure(data_menu, 5, state = "disabled")
 
         group <<- tclVar("")
         text <<- tclVar("")
@@ -679,6 +762,8 @@ TextMiningGUI <- function() {
     tkadd(data_menu, "command", label = "Converter", command = Converter)
 
     tkadd(data_menu, "command", label = "Create Lexical Table", command = Transformation)
+
+    tkadd(data_menu, "command", label = "Slice Lexical Table", command = Slice, state = "disabled")
 
     tkadd(data_menu, "separator")
 
