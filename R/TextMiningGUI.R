@@ -1,3 +1,4 @@
+print <- new.env()
 TextMiningGUI <- function() {
     if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
         assign("x", 1, envir = .BaseNamespaceEnv)
@@ -36,9 +37,9 @@ TextMiningGUI <- function() {
 
     # Slice
     Slice <- function(X, name = "", type = "") {
-        window <- tktoplevel(width = 470, height = 420)
-        tkwm.minsize(window, "470", "240")
-        tkwm.maxsize(window, "470", "240")
+        window <- tktoplevel(width = 470, height = 260)
+        tkwm.minsize(window, "470", "260")
+        tkwm.maxsize(window, "470", "260")
     
         tkwm.title(window, "Slice")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -202,9 +203,9 @@ TextMiningGUI <- function() {
         languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(env$DATA)      
 
-        window <- tktoplevel(width = 420, height = 240)
-        tkwm.minsize(window, "420", "240")
-        tkwm.maxsize(window, "420", "240")
+        window <- tktoplevel(width = 420, height = 260)
+        tkwm.minsize(window, "420", "260")
+        tkwm.maxsize(window, "420", "260")
 
         tkwm.title(window, "Create Lexical Table")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -748,6 +749,13 @@ TextMiningGUI <- function() {
             if(file.exists(file_name <- as.character(file_name))) {
                 ReadProject(file_name)
             }
+        })
+
+    tkadd(file_menu, "separator")
+
+    tkadd(file_menu, "command", label = "Export to pdf...",
+        command = function() {
+            Export(env$tm)
         })
 
     tkadd(file_menu, "separator")

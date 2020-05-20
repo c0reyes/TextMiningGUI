@@ -19,7 +19,16 @@ ClusterPage <- function(X, parent, notebook, envir) {
             if(graph$cluster > 1)
                 rect.hclust(plot, k = graph$cluster, border = "red")
         }
+
+        save$plot <<- recordPlot()
+        assign(name, save, envir = print)
     }
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- as.character(match.call()[[1]])
+    class(save) <- "save"
+    assign(name, save, envir = print)
 
     PageGUI("Cluster", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data), title = "Cluster", type = "plot", cluster = 1, clustert = "rectangle")

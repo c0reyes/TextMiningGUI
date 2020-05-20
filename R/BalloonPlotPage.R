@@ -13,10 +13,18 @@ BalloonPlotPage <- function(X, parent, notebook, envir) {
                       axis.title.y = element_blank(),
                       panel.grid.major = element_line(color = "lightgray")) 
             
+        save$plot <<- plot
+        assign(name, save, envir = print)
+        
         plot(plot)
     }
 
     if(!require(ggpubr)) return(NULL)
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- as.character(match.call()[[1]])
+    class(save) <- "save"
 
     PageGUI("Words Most Used", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
 }

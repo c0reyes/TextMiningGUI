@@ -23,6 +23,9 @@ cooccPage <- function(X, parent, notebook, envir) {
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank())
 
+        save$plot <<- plot
+        assign(name, save, envir = print)
+
         plot(plot)
     }
 
@@ -38,6 +41,11 @@ cooccPage <- function(X, parent, notebook, envir) {
     
     t.min <- t %>% min
     t.max <- t %>% max
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- as.character(match.call()[[1]])
+    class(save) <- "save"
 
     PageGUI("co-occurrence", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", vector_color = "gray70", text_color = "#000000", 
         background = "#ffffff", limit = 10, from = t.min, to = t.max, resolution = 1, text_size = 4,

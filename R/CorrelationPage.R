@@ -8,6 +8,9 @@ CorrelationPage <- function(X, parent, notebook, envir) {
             plot <- plot + scale_alpha_continuous(range = c(1,1))
         }
 
+        save$plot <<- plot
+        assign(name, save, envir = print)
+        
         plot(plot)
     }
 
@@ -18,6 +21,12 @@ CorrelationPage <- function(X, parent, notebook, envir) {
         })
 
     console(cmds = "cor %>% fashion()", envir = environment())
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- as.character(match.call()[[1]])
+    save$table <- X$data %>% correlate()
+    class(save) <- "save"
 
     PageGUI("Correlation", Plot, id = as.character(match.call()[[1]]), envir = envir, parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)
 }

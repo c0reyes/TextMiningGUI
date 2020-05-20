@@ -50,6 +50,12 @@ EmotionsPage <- function(X, parent, notebook, envir) {
 
         plot <- plot + t() + theme(legend.position = "none")
 
+        name <- as.character(runif(1))
+        save <- list()
+        save$name <- "EmotionsPage"
+        save$plot <- plot
+        class(save) <- "save"
+
         plot(plot)
     }
 
@@ -67,6 +73,12 @@ EmotionsPage <- function(X, parent, notebook, envir) {
                     axis.text = element_text(size = 12),
                     axis.title = element_text(size = 14,face = "bold"),
                     title = element_text(size = 20,face = "bold"))
+
+        name <- as.character(runif(1))
+        save <- list()
+        save$name <- "SentimentsPage"
+        save$plot <- plot
+        class(save) <- "save"
 
         plot(plot)
     }

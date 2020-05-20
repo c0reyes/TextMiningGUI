@@ -16,8 +16,16 @@ WordCloudPage <- function(X, parent, notebook, envir) {
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank())
 
+        save$plot <<- plot
+        assign(name, save, envir = print)
+
         plot(plot)
     }
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- as.character(match.call()[[1]])
+    class(save) <- "save"
 
     PageGUI("Word Cloud", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", background = "#ffffff", limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data))

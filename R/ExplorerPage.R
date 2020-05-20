@@ -13,8 +13,16 @@ ExplorerPage <- function(X, parent, notebook, envir) {
         if(graph$flip == TRUE)
             plot <- plot + coord_flip()
         
+        save$plot <<- plot
+        assign(name, save, envir = print)
+        
         plot(plot)
     }
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- as.character(match.call()[[1]])
+    class(save) <- "save"
 
     PageGUI("Words by Groups", Plot, id = as.character(match.call()[[1]]), envir = envir, color = "lightblue", theme = "theme_gray", title = "Distinct words by groups", 
             xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ", text_color = "#323232",

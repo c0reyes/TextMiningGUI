@@ -49,7 +49,7 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
             if(g1 != "" && g2 != "") {
                 Plot <- function(graph) {
                     w <- X$data[1:graph$limit,]
-                    plot <- ggplot(w, aes(w[[g1]], w[[g2]])) +
+                    plot <- ggplot(w, aes(.data[[g1]], .data[[g2]])) +
                                 geom_jitter(alpha = graph$alpha, size = 2.5, width = 0.25, height = 0.25) +
                                 geom_text(aes(label = rownames(w)), check_overlap = TRUE, vjust = 1.5) +
                                 geom_abline(color = "red") +
@@ -57,11 +57,18 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
                                 labs(x = g1, y = g2) +
                                 theme(axis.text.x = element_blank(),
                                       axis.text.y = element_blank())
-                                      
+
+                    name <- as.character(runif(1))
+                    save <- list()
+                    save$name <- "CorBetweenGroupsPage"
+                    save$plot <- plot
+                    class(save) <- "save"
+                    assign(name, save, envir = print)
+
                     plot(plot)
                 }
 
-                PageGUI("Correlation between groups", Plot, limit = 100, envir = envir, parent = parent, notebook = notebook, to = nrow(X$data))
+                PageGUI("Correlation between groups", Plot, id = "CorBetweenGroupsPage", limit = 100, envir = envir, parent = parent, notebook = notebook, to = nrow(X$data))
                 tkdestroy(window)
             }   
         })

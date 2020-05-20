@@ -50,11 +50,14 @@ CaPage <- function(X, parent, notebook, envir) {
         plot <- plot + scale_color_manual(values = color) 
         plot <- plot + t() + theme(legend.position = "none")
 
+        save$plot <<- plot
+        assign(name, save, envir = print)
+
         plot(plot)
     }
 
     ca <- tryCatch({ 
-            ca(X$data)
+            ca(X$data, nd = 3)
         }, error = function(cond) {
             tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
         })
@@ -70,6 +73,17 @@ CaPage <- function(X, parent, notebook, envir) {
         })
     plotdf$Variable <- factor(plotdf$Variable)
     console(cmds = "ca", envir = environment())
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- as.character(match.call()[[1]])
+
+    colnames(ca$colcontrib) <- c("Con1", "Con2")
+    colnames(ca$rowcontrib) <- c("Con1", "Con2")
+    save$table <- list(cbind(ca$colcoord, ca$colcontrib), cbind(ca$rowcoord, ca$rowcontrib))
+    save$more <- TRUE
+
+    class(save) <- "save"
 
     PageGUI("CA - Biplot", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
         vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ", dim = "all",

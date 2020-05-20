@@ -1,0 +1,74 @@
+Export <- function(X) {
+    file <- "output.Rmd"
+
+    require(knitr)
+    require(rmarkdown)
+
+    cat("---\ntitle: TextMiningGUI\n---\n\n", file = file)
+    time <- format(Sys.time(), "%a %b %d %X %Y")
+    cat(time, file = file, append = TRUE)
+
+    cat("\n\n# Language\n\n", file = file, append = TRUE)
+    cat(X$lang, file = file, append = TRUE)
+
+    cat("\n\n# Normalize\n\n", file = file, append = TRUE)
+    cat(X$normalize, file = file, append = TRUE)
+
+    cat("\n\n# Steam\n\n", file = file, append = TRUE)
+    cat(X$steam, file = file, append = TRUE)
+
+    cat("\n\n# Sparse\n\n", file = file, append = TRUE)
+    cat(X$sparse, file = file, append = TRUE)
+
+    cat("\n\n# Summary\n\n", file = file, append = TRUE)
+    table <- kable(summary(X$freq[1:2]), format = "markdown")
+    cat(table, sep = "\n", file = file, append = TRUE)
+
+    cat("\n\n# Words Total\n\n", file = file, append = TRUE)
+    table <- kable(sum(X$freq[3]), format = "markdown")
+    cat(table, sep = "\n", file = file, append = TRUE)
+
+    cat("\n\n# Distinct words by groups\n\n", file = file, append = TRUE)
+    table <- kable(X$dist, format = "markdown")
+    cat(table, sep = "\n", file = file, append = TRUE)
+
+    cat("\n\n# Lexical table - head()\n\n", file = file, append = TRUE)
+    table <- kable(head(X$data), format = "markdown")
+    cat(table, sep = "\n", file = file, append = TRUE)
+
+    if(!is.null(X$bigrams)) {
+        cat("\n\n# Bigrams\n\n", file = file, append = TRUE)
+        table <- kable(head(X$bigrams), format = "markdown")
+        cat(table, sep="\n", file = file, append = TRUE)
+    }
+
+    params <- list()
+    x <- as.integer(1)
+    for(i in ls(envir = print)) {
+        i <- get(i, envir = print)
+        cat(paste0("\n\n# ", i$name, "\n\n"), file = file, append = TRUE)
+        
+        if(!is.null(getElement(i, "table"))) {
+            if(!is.null(getElement(i, "more"))) {
+                for(tt in i$table) {
+                    table <- kable(tt, format = "markdown")
+                    cat(table, sep = "\n", file = file, append = TRUE)
+                    cat("\n\n", file = file, append = TRUE)
+                }
+            }else{
+                table <- kable(i$table, format = "markdown")
+                cat(table, sep = "\n", file = file, append = TRUE)
+            }
+        }
+
+        if(!is.null(getElement(i, "plot"))) {
+            cat(paste0("\n\n```{r echo=FALSE, warning=FALSE, message=FALSE}\nparams[", x ,"]\n```"), file = file, append = TRUE) 
+            params[[x]] <- i$plot
+            x <- x + 1
+        }
+    }
+
+    render("output.Rmd", output_format = "pdf_document", params = list(params))
+    file.remove(file)
+    tkmessageBox(title = "Export", message = "Export:", detail = "output.pdf was created.", type = "ok") 
+}

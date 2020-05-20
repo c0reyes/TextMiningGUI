@@ -59,7 +59,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     graph$dim <- dim
     class(graph) <- "graph"
 
-    if(typeof(get(id, envir = envir)) != "closure") graph <- get(id, envir = envir)
+    try(if(typeof(get(id, envir = envir)) != "closure") graph <- get(id, envir = envir), silent = TRUE)
     graph$dim <- if(is.null(graph$dim)) dim else graph$dim
 
     page <- Page(notebook, name)
