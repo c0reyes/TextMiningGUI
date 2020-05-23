@@ -1,4 +1,5 @@
 print <- new.env()
+
 TextMiningGUI <- function() {
     if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
         assign("x", 1, envir = .BaseNamespaceEnv)
@@ -115,15 +116,16 @@ TextMiningGUI <- function() {
     # Converter
     Converter <- function() {            
         vars <- colnames(env$DATA)
-        types <- c("factor", "date")
 
         var <- tclVar("")
         type <- tclVar("")
         value <- tclVar("")
+        breaks <- tclVar("")
+        name <- tclVar("")
 
-        window <- tktoplevel(width = 300, height = 175)
-        tkwm.minsize(window, "300", "175")
-        tkwm.maxsize(window, "300", "175")
+        window <- tktoplevel(width = 420, height = 200)
+        tkwm.minsize(window, "420", "200")
+        tkwm.maxsize(window, "420", "200")
 
         tkwm.title(window, "Converter")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -147,7 +149,7 @@ TextMiningGUI <- function() {
 
         put_label(label_frame, "Type: ", 2, 0)
         combo_box2 <- ttkcombobox(label_frame, 
-                        values = types, 
+                        values = c("factor", "date", "range"), 
                         textvariable = type,
                         state = "normal",
                         justify = "left")
@@ -157,6 +159,14 @@ TextMiningGUI <- function() {
         options <- ttkentry(label_frame, width = 15, textvariable = value)
         tkgrid(options, row = 3, column = 1, sticky = "ew", padx = 2)
 
+        put_label(label_frame, "Breaks: ", 4, 0)
+        options <- ttkentry(label_frame, width = 15, textvariable = breaks)
+        tkgrid(options, row = 4, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "New name: ", 5, 0)
+        options <- ttkentry(label_frame, width = 15, textvariable = name)
+        tkgrid(options, row = 5, column = 1, sticky = "ew", padx = 2)
+
         button_frame <- ttkframe(frame)
         cancel_button <- ttkbutton(button_frame, text = "cancel",
             command = function() { 
@@ -164,24 +174,45 @@ TextMiningGUI <- function() {
             })
         ok_button <- ttkbutton(button_frame, text = "ok",
             command = function() { 
-                v <- tclvalue(var)
-                t <- tclvalue(type)
-                vv <- tclvalue(value)
+                var <- tclvalue(var)
+                type <- tclvalue(type)
+                value <- tclvalue(value)
+                breaks <- tclvalue(breaks)
+                name <- tclvalue(name)
 
-                if(v != "" && t == "factor") {
-                    if(vv != "") {
-                        labels <- unlist(strsplit(vv, ","))
-                        env$DATA[[v]] <- factor(env$DATA[[v]], labels = labels)
-                        assign("DATA", env$DATA, envir = env)
-                    }else{
-                        env$DATA[[v]] <- factor(env$DATA[[v]])
-                        assign("DATA", env$DATA, envir = env)
-                    }
-                }else if(v != "" && t == "date" && vv != "") {
-                    env$DATA[[v]] <- as.Date(env$DATA[[v]], vv)
-                    assign("DATA", env$DATA, envir = env)
-                }
+                labels <- if(value != "") trimws(unlist(strsplit(value, ","))) else ""
 
+                col <- tryCatch({ 
+                        if(var != "" && type == "factor") {
+                            col <- factor(env$DATA[[var]], labels = labels)
+                        }else if(var != "" && type == "date" && value != "") {
+                            col <- as.Date(env$DATA[[var]], value)
+                        }else if(var != "" && type == "range" && breaks != "") {
+                            breaks <- as.numeric(unlist(strsplit(breaks, ",")))
+
+                            if(NA %in% as.numeric(env$DATA[[var]])) return(NULL)
+                            if(NA %in% breaks) return(NULL)
+
+                            minvalue <- min(env$DATA[[var]])
+                            if(min(breaks) > minvalue)
+                                breaks <- c(minvalue, breaks)
+
+                            maxvalue <- max(env$DATA[[var]])
+                            if(max(breaks) < maxvalue) 
+                                breaks <- c(breaks, maxvalue)
+
+                            col <- cut(env$DATA[[var]], breaks = breaks, labels = labels, right = TRUE)
+                        }
+                        col
+                    }, error = function(cond) {
+                            tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error ocurred.", type = "ok")
+                            message(cond)
+                        })
+
+                if(name == "") env$DATA[[var]] <- col
+                else env$DATA[[name]] <- col
+
+                assign("DATA", env$DATA, envir = env)
                 dataFrameTable(env$DATA)
                 tkdestroy(window)
             })
@@ -198,14 +229,15 @@ TextMiningGUI <- function() {
     steam <- tclVar(TRUE)
     normalize <- tclVar("chara-value")
     sparse <- tclVar(init = 0.99)
+    bigrams <- tclVar(FALSE)
 
     Transformation <- function() {  
         languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(env$DATA)      
 
-        window <- tktoplevel(width = 420, height = 260)
-        tkwm.minsize(window, "420", "260")
-        tkwm.maxsize(window, "420", "260")
+        window <- tktoplevel(width = 420, height = 280)
+        tkwm.minsize(window, "420", "280")
+        tkwm.maxsize(window, "420", "280")
 
         tkwm.title(window, "Create Lexical Table")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -247,18 +279,22 @@ TextMiningGUI <- function() {
         steam_check <- ttkcheckbutton(label_frame, variable = steam)
         tkgrid(steam_check, row = 4, column = 1, sticky = "ew", padx = 2)
 
-        put_label(label_frame, "Normalize: ", 5, 0)
+        put_label(label_frame, "Bigrams: ", 5, 0)
+        bigrams_check <- ttkcheckbutton(label_frame, variable = bigrams, state = "disabled")
+        tkgrid(bigrams_check, row = 5, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "Normalize: ", 6, 0)
         radio <- ttkframe(label_frame)
         sapply(c("chara-value","tf-idf","media","none"), function(i) {
             normalize_button <- ttkradiobutton(radio, variable = normalize, text = i, value = i)
             tkpack(normalize_button, side = "left")
         })
-        tkgrid(radio, row = 5, column = 1, sticky = "ew", padx = 2)
+        tkgrid(radio, row = 6, column = 1, sticky = "ew", padx = 2)
 
-        put_label(label_frame, "Remove Sparse: ", 6, 0, sticky = "es")
+        put_label(label_frame, "Remove Sparse: ", 7, 0, sticky = "es")
         removebar <- tkscale(label_frame, from = 0.5, to = 1, variable = sparse, 
                              showvalue = TRUE, resolution = 0.01, orient = "horiz")
-        tkgrid(removebar, row = 6, column = 1, sticky = "ew", padx = 2)
+        tkgrid(removebar, row = 7, column = 1, sticky = "ew", padx = 2)
         
         button_frame <- ttkframe(frame)
         cancel_button <- ttkbutton(button_frame, text = "cancel",
@@ -273,18 +309,21 @@ TextMiningGUI <- function() {
                 sparse <- as.numeric(tclvalue(sparse))
                 steam <- if( tclvalue(steam) == "1" ) TRUE else FALSE
                 normalize <- tclvalue(normalize)
+                bigrams <- if( tclvalue(bigrams) == "1" ) TRUE else FALSE
 
                 if(g != "" && t != "" && l != "") {
                     TMP <- env$DATA %>% distinct() %>% select(g, t) 
                     colnames(TMP) <- c("GROUP","TEXT")
 
-                    assign("tm", DataTM(TMP, language = l, steam = steam, sparse = sparse, normalize = normalize), envir = env)
+                    assign("tm", DataTM(TMP, language = l, steam = steam, sparse = sparse, normalize = normalize, ngrams = bigrams), envir = env)
                     dataFrameTable(env$tm$data)
                     tkdestroy(window) 
                     tkentryconfigure(menu_bar, 3, state = "normal")
                     tkentryconfigure(data_menu, 2, state = "normal")
                     tkentryconfigure(data_menu, 4, state = "normal")
                     tkentryconfigure(data_menu, 5, state = "normal")
+                    tkentryconfigure(file_menu, 8, state = "normal")
+                    tkentryconfigure(file_menu, 11, state = "normal")
 
                     if(ncol(env$tm$data) < 3) {
                         tkmessageBox(title = "Warning", message = "Warning:", icon = "warning", 
@@ -297,6 +336,8 @@ TextMiningGUI <- function() {
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
            fill = "y", side = "left")               
         sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
+
+        if(require(tidytext)) tcl(bigrams_check, "config", "-state", "normal")
     }
 
     # Fill Table
@@ -613,19 +654,24 @@ TextMiningGUI <- function() {
     ReadProject <- function(file_name) {
         rm(list = ls(envir = env), envir = env)
         load(file = file_name, envir = env)
+
         dataFrameTable(env$DATA)
+
         tkentryconfigure(menu_bar, 2, state = "normal")
         tkentryconfigure(menu_bar, 3, state = "normal")
         tkentryconfigure(data_menu, 2, state = "normal")
         tkentryconfigure(data_menu, 4, state = "normal")
         tkentryconfigure(data_menu, 5, state = "normal")
-        
+        tkentryconfigure(file_menu, 8, state = "normal")
+        tkentryconfigure(file_menu, 11, state = "normal")
+
         group <<- tclVar("")
         text <<- tclVar("")
-        lang <<- env$tm$lang
-        steam <<- env$tm$steam 
-        normalize <<- env$tm$normalize
-        sparse <<- env$tm$sparse
+        lang <<- tclVar(env$tm$lang)
+        steam <<- tclVar(env$tm$steam)
+        normalize <<- tclVar(env$tm$normalize)
+        sparse <<- tclVar(env$tm$sparse)
+        bigrams <<- tclVar(env$tm$ngrams)
     }
 
     disableMenu <- function() {
@@ -634,6 +680,8 @@ TextMiningGUI <- function() {
         tkentryconfigure(data_menu, 2, state = "disabled")
         tkentryconfigure(data_menu, 4, state = "disabled")
         tkentryconfigure(data_menu, 5, state = "disabled")
+        tkentryconfigure(file_menu, 8, state = "disabled")
+        tkentryconfigure(file_menu, 11, state = "disabled")
 
         group <<- tclVar("")
         text <<- tclVar("")
@@ -641,6 +689,10 @@ TextMiningGUI <- function() {
         steam <<- tclVar(TRUE)
         normalize <<- tclVar("chara-value")
         sparse <<- tclVar(init = 0.99)
+        bigrams <<- tclVar(FALSE)
+
+        rm(list = ls(envir = print), envir = print)
+        #rm(list = ls(envir = env), envir = env)
     }
 
     RefreshTableFrame <- function() { 
@@ -736,10 +788,11 @@ TextMiningGUI <- function() {
 
     tkadd(file_menu, "separator")
 
-    tkadd(file_menu, "command", label = "Save project...",
+    tkadd(file_menu, "command", label = "Save project...", state = "disabled",
         command = function() {
             if(file.exists("project.RData")) file.remove("project.RData")
             save(list = ls(envir = env), file = "project.RData", envir = env)
+            tkmessageBox(title = "Save", message = "Save:", detail = "Project saved.", type = "ok")
         })
 
     tkadd(file_menu, "command", label = "Open project...",
@@ -753,7 +806,7 @@ TextMiningGUI <- function() {
 
     tkadd(file_menu, "separator")
 
-    tkadd(file_menu, "command", label = "Export to pdf...",
+    tkadd(file_menu, "command", label = "Export to pdf...", state = "disabled",
         command = function() {
             Export(env$tm)
         })
@@ -795,7 +848,7 @@ TextMiningGUI <- function() {
             console(cmds = "tm", envir = env)
         })
 
-    tkadd(analysis_menu, "command", label = "Words Most Used", 
+    tkadd(analysis_menu, "command", label = "Words Most Used", state = "disabled",
         command = function() BalloonPlotPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Word Counter", 
@@ -804,7 +857,7 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Word Cloud", 
         command = function() WordCloudPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
-    tkadd(analysis_menu, "command", label = "co-occurrence", 
+    tkadd(analysis_menu, "command", label = "co-occurrence", state = "disabled",
         command = function() cooccPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "separator")
@@ -847,4 +900,6 @@ TextMiningGUI <- function() {
 
     if(require(readxl)) tkentryconfigure(file_menu, 1, state = "normal")
     if(require(jsonlite)) tkentryconfigure(file_menu, 3, state = "normal")
+    if(require(ggpubr)) tkentryconfigure(analysis_menu, 1, state = "normal")
+    if(require(igraph) && require(ggraph)) tkentryconfigure(analysis_menu, 4, state = "normal")
 }

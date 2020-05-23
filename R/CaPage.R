@@ -78,8 +78,8 @@ CaPage <- function(X, parent, notebook, envir) {
     save <- list()
     save$name <- as.character(match.call()[[1]])
 
-    colnames(ca$colcontrib) <- c("Con1", "Con2")
-    colnames(ca$rowcontrib) <- c("Con1", "Con2")
+    colnames(ca$colcontrib) <- unlist(lapply(1:ncol(ca$colcontrib), function(x) paste0("Con", x)))
+    colnames(ca$rowcontrib) <- unlist(lapply(1:ncol(ca$rowcontrib), function(x) paste0("Con", x)))
     save$table <- list(cbind(ca$colcoord, ca$colcontrib), cbind(ca$rowcoord, ca$rowcontrib))
     save$more <- TRUE
 

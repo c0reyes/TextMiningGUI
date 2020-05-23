@@ -1,4 +1,4 @@
-DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value") {
+DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value", ngrams = FALSE) {
     tm_group <- function(texto) {
         text = iconv(texto, to = "ASCII//TRANSLIT")
         corpus <- Corpus(VectorSource(text))
@@ -28,7 +28,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     }
 
     bigrams <- function() {
-        if(!require(tidytext)) return(NULL)
+        if(!ngrams) return(NULL)
         bigrams <- txt %>% unnest_tokens(input = txt, output = "bigram", token = "ngrams", n = 2, drop = TRUE)
         return(bigrams)
     }
@@ -44,6 +44,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     tm$normalize <- normalize
     tm$steam <- steam
     tm$sparse <- sparse
+    tm$ngrams <- ngrams
     
     if(normalize == "chara-value") 
         tm$data <- Convert(TM) 

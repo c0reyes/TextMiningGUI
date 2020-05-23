@@ -19,8 +19,6 @@ BalloonPlotPage <- function(X, parent, notebook, envir) {
         plot(plot)
     }
 
-    if(!require(ggpubr)) return(NULL)
-
     name <- as.character(runif(1))
     save <- list()
     save$name <- as.character(match.call()[[1]])

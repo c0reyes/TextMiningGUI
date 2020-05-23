@@ -1,8 +1,8 @@
 Export <- function(X) {
     file <- "output.Rmd"
 
-    require(knitr)
-    require(rmarkdown)
+    if(!require(knitr)) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require knitr library.", type = "ok")
+    if(!require(rmarkdown)) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require rmarkdown library.", type = "ok")
 
     cat("---\ntitle: TextMiningGUI\n---\n\n", file = file)
     time <- format(Sys.time(), "%a %b %d %X %Y")

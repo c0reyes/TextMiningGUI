@@ -61,7 +61,8 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
 
     try(if(typeof(get(id, envir = envir)) != "closure") graph <- get(id, envir = envir), silent = TRUE)
     graph$dim <- if(is.null(graph$dim)) dim else graph$dim
-
+    graph$limit <- if(graph$limit > to) to else graph$limit
+    
     page <- Page(notebook, name)
     content <- page$content
 

@@ -29,9 +29,10 @@ cooccPage <- function(X, parent, notebook, envir) {
         plot(plot)
     }
 
-    if(!require(igraph)) return(NULL)
-    if(!require(ggraph)) return(NULL)
-    if(is.null(X$bigrams)) return(NULL)
+    if(is.null(X$bigrams)) {
+        tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Bigrams it's need.", type = "ok")
+        return(NULL)
+    }
 
     w <- X$bigrams %>%
         separate(bigram, c("word1", "word2"), sep = " ") %>% 
