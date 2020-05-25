@@ -225,8 +225,10 @@ TextMiningGUI <- function() {
     # Transformation
     group <- tclVar("")
     text <- tclVar("")
+    time <- tclVar("")
     lang <- tclVar("")
-    steam <- tclVar(TRUE)
+    steam <- tclVar(FALSE)
+    steamcomp <- tclVar(FALSE)
     normalize <- tclVar("chara-value")
     sparse <- tclVar(init = 0.99)
     bigrams <- tclVar(FALSE)
@@ -235,9 +237,9 @@ TextMiningGUI <- function() {
         languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(env$DATA)      
 
-        window <- tktoplevel(width = 420, height = 280)
-        tkwm.minsize(window, "420", "280")
-        tkwm.maxsize(window, "420", "280")
+        window <- tktoplevel(width = 420, height = 300)
+        tkwm.minsize(window, "420", "300")
+        tkwm.maxsize(window, "420", "300")
 
         tkwm.title(window, "Create Lexical Table")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -267,34 +269,58 @@ TextMiningGUI <- function() {
                         justify = "left")
         tkgrid(combo_box2, row = 2, column = 1, sticky = "ew", padx = 2)
 
-        put_label(label_frame, "Language: ", 3, 0)
+        put_label(label_frame, "Time: ", 3, 0)
+        combo_box3 <- ttkcombobox(label_frame, 
+                        values = c("", names), 
+                        textvariable = time,
+                        state = "normal",
+                        justify = "left")
+        tkgrid(combo_box3, row = 3, column = 1, sticky = "ew", padx = 2)
+
+        put_label(label_frame, "Language: ", 4, 0)
         combo_box3 <- ttkcombobox(label_frame, 
                         values = languages, 
                         textvariable = lang,
                         state = "normal",
                         justify = "left")
-        tkgrid(combo_box3, row = 3, column = 1, sticky = "ew", padx = 2)
+        tkgrid(combo_box3, row = 4, column = 1, sticky = "ew", padx = 2)
         
-        put_label(label_frame, "Stemming: ", 4, 0)
+        put_label(label_frame, "Stemming: ", 5, 0)
         steam_check <- ttkcheckbutton(label_frame, variable = steam)
-        tkgrid(steam_check, row = 4, column = 1, sticky = "ew", padx = 2)
+        tkgrid(steam_check, row = 5, column = 1, sticky = "ew", padx = 2)
 
-        put_label(label_frame, "Bigrams: ", 5, 0)
+        put_label(label_frame, "Completion: ", 6, 0)
+        steam_comp <- ttkcheckbutton(label_frame, variable = steamcomp)
+        tkgrid(steam_comp, row = 6, column = 1, sticky = "ew", padx = 2)
+
+        tkbind(steam_check, "<ButtonRelease-1>", function() {
+                if(tclvalue(steam) != "1") tcl(steam_comp, "configure", "-state", "normal")
+                else tcl(steam_comp, "configure", "-state", "disabled")
+            })
+
+        tkbind(steam_comp, "<ButtonRelease-1>", function() {
+                if(tclvalue(steamcomp) != "1") 
+                    tkmessageBox(title = "Warning", message = "Warning:", icon = "warning", 
+                                     detail = "This can take few minutes and use a lot of cpu.", 
+                                     type = "ok")
+            })
+
+        put_label(label_frame, "Bigrams: ", 7, 0)
         bigrams_check <- ttkcheckbutton(label_frame, variable = bigrams, state = "disabled")
-        tkgrid(bigrams_check, row = 5, column = 1, sticky = "ew", padx = 2)
+        tkgrid(bigrams_check, row = 7, column = 1, sticky = "ew", padx = 2)
 
-        put_label(label_frame, "Normalize: ", 6, 0)
+        put_label(label_frame, "Normalize: ", 8, 0)
         radio <- ttkframe(label_frame)
         sapply(c("chara-value","tf-idf","media","none"), function(i) {
             normalize_button <- ttkradiobutton(radio, variable = normalize, text = i, value = i)
             tkpack(normalize_button, side = "left")
         })
-        tkgrid(radio, row = 6, column = 1, sticky = "ew", padx = 2)
+        tkgrid(radio, row = 8, column = 1, sticky = "ew", padx = 2)
 
-        put_label(label_frame, "Remove Sparse: ", 7, 0, sticky = "es")
+        put_label(label_frame, "Remove Sparse: ", 9, 0, sticky = "es")
         removebar <- tkscale(label_frame, from = 0.5, to = 1, variable = sparse, 
                              showvalue = TRUE, resolution = 0.01, orient = "horiz")
-        tkgrid(removebar, row = 7, column = 1, sticky = "ew", padx = 2)
+        tkgrid(removebar, row = 9, column = 1, sticky = "ew", padx = 2)
         
         button_frame <- ttkframe(frame)
         cancel_button <- ttkbutton(button_frame, text = "cancel",
@@ -303,19 +329,24 @@ TextMiningGUI <- function() {
             })
         ok_button <- ttkbutton(button_frame, text = "ok",
             command = function() { 
-                g <- tclvalue(group)
-                t <- tclvalue(text)
-                l <- tclvalue(lang)
+                group <- tclvalue(group)
+                text <- tclvalue(text)
+                lang <- tclvalue(lang)
+                time <- tclvalue(time)
                 sparse <- as.numeric(tclvalue(sparse))
                 steam <- if( tclvalue(steam) == "1" ) TRUE else FALSE
+                steamcomp <- if( tclvalue(steamcomp) == "1" ) TRUE else FALSE
                 normalize <- tclvalue(normalize)
                 bigrams <- if( tclvalue(bigrams) == "1" ) TRUE else FALSE
 
-                if(g != "" && t != "" && l != "") {
-                    TMP <- env$DATA %>% distinct() %>% select(g, t) 
-                    colnames(TMP) <- c("GROUP","TEXT")
+                if(group != "" && text != "" && lang != "") {
+                    if(time == "")
+                        TMP <- env$DATA %>% distinct() %>% select(group, text)
+                    else
+                        TMP <- env$DATA %>% distinct() %>% select(time, group, text)
+                    colnames(TMP) <- if(time == "") c("GROUP", "TEXT") else c("TIME", "GROUP", "TEXT")
 
-                    assign("tm", DataTM(TMP, language = l, steam = steam, sparse = sparse, normalize = normalize, ngrams = bigrams), envir = env)
+                    assign("tm", DataTM(TMP, language = lang, steam = steam, sparse = sparse, normalize = normalize, ngrams = bigrams, steamcomp = steamcomp), envir = env)
                     dataFrameTable(env$tm$data)
                     tkdestroy(window) 
                     tkentryconfigure(menu_bar, 3, state = "normal")
@@ -667,6 +698,8 @@ TextMiningGUI <- function() {
 
         group <<- tclVar("")
         text <<- tclVar("")
+        time <<- tclVar("")
+        steamcomp <<- tclVar(FALSE)
         lang <<- tclVar(env$tm$lang)
         steam <<- tclVar(env$tm$steam)
         normalize <<- tclVar(env$tm$normalize)
@@ -686,13 +719,14 @@ TextMiningGUI <- function() {
         group <<- tclVar("")
         text <<- tclVar("")
         lang <<- tclVar("")
-        steam <<- tclVar(TRUE)
+        time <<- tclVar("")
+        steam <<- tclVar(FALSE)
+        steamcomp <<- tclVar(FALSE)
         normalize <<- tclVar("chara-value")
         sparse <<- tclVar(init = 0.99)
         bigrams <<- tclVar(FALSE)
 
         rm(list = ls(envir = print), envir = print)
-        #rm(list = ls(envir = env), envir = env)
     }
 
     RefreshTableFrame <- function() { 
@@ -847,8 +881,8 @@ TextMiningGUI <- function() {
             console(start = TRUE)
             console(cmds = "tm", envir = env)
         })
-
-    tkadd(analysis_menu, "command", label = "Words Most Used", state = "disabled",
+ 
+    tkadd(analysis_menu, "command", label = "Most common words", state = "disabled",
         command = function() BalloonPlotPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Word Counter", 
