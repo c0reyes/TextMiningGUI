@@ -9,7 +9,7 @@ CorrelationPage <- function(X, parent, notebook, envir) {
         }
 
         save$plot <<- plot
-        assign(name, save, envir = print)
+        assign(name, save, envir = toprint)
         
         plot(plot)
     }

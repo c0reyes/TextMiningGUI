@@ -1,3 +1,4 @@
+#' @export
 print.DataTM <- function(obj) {
     cat("\n### Language ###\n\n")
     print(obj$lang)
@@ -30,4 +31,10 @@ print.DataTM <- function(obj) {
         cat("\n### Bigrams ###\n\n")
         print(head(obj$bigrams))
     }
+
+    cat("\n### DTM ###\n\n")
+    print(inspect(obj$dtm))
+
+    cat("\n### DF ###\n\n")
+    print(head(obj$df))
 }

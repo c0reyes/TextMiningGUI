@@ -14,7 +14,7 @@ ExplorerPage <- function(X, parent, notebook, envir) {
             plot <- plot + coord_flip()
         
         save$plot <<- plot
-        assign(name, save, envir = print)
+        assign(name, save, envir = toprint)
         
         plot(plot)
     }

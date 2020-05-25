@@ -51,7 +51,7 @@ CaPage <- function(X, parent, notebook, envir) {
         plot <- plot + t() + theme(legend.position = "none")
 
         save$plot <<- plot
-        assign(name, save, envir = print)
+        assign(name, save, envir = toprint)
 
         plot(plot)
     }

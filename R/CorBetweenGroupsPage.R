@@ -63,7 +63,7 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
                     save$name <- "CorBetweenGroupsPage"
                     save$plot <- plot
                     class(save) <- "save"
-                    assign(name, save, envir = print)
+                    assign(name, save, envir = toprint)
 
                     plot(plot)
                 }

@@ -1,4 +1,4 @@
-print <- new.env()
+toprint <- new.env()
 
 TextMiningGUI <- function() {
     if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
@@ -342,13 +342,18 @@ TextMiningGUI <- function() {
                 if(group != "" && text != "" && lang != "") {
                     if(time == "")
                         TMP <- env$DATA %>% distinct() %>% select(group, text)
-                    else
-                        TMP <- env$DATA %>% distinct() %>% select(time, group, text)
+                    else {
+                        if(class(env$DATA[[time]]) == "Date")
+                            TMP <- env$DATA %>% distinct() %>% select(time, group, text)
+                        else
+                            time <- ""
+                    }
                     colnames(TMP) <- if(time == "") c("GROUP", "TEXT") else c("TIME", "GROUP", "TEXT")
 
                     assign("tm", DataTM(TMP, language = lang, steam = steam, sparse = sparse, normalize = normalize, ngrams = bigrams, steamcomp = steamcomp), envir = env)
                     dataFrameTable(env$tm$data)
                     tkdestroy(window) 
+                    
                     tkentryconfigure(menu_bar, 3, state = "normal")
                     tkentryconfigure(data_menu, 2, state = "normal")
                     tkentryconfigure(data_menu, 4, state = "normal")
@@ -617,9 +622,9 @@ TextMiningGUI <- function() {
         comment.char <- tclVar("")
         other.char <- tclVar("")
 
-        window <- tktoplevel(width = 350, height = 200)
-        tkwm.minsize(window, "350", "200")
-        tkwm.maxsize(window, "350", "200")
+        window <- tktoplevel(width = 360, height = 200)
+        tkwm.minsize(window, "360", "200")
+        tkwm.maxsize(window, "360", "200")
 
         tkwm.title(window, "Table Options")
         frame <- ttkframe(window, padding = c(3,3,12,12))
@@ -726,7 +731,7 @@ TextMiningGUI <- function() {
         sparse <<- tclVar(init = 0.99)
         bigrams <<- tclVar(FALSE)
 
-        rm(list = ls(envir = print), envir = print)
+        rm(list = ls(envir = toprint), envir = toprint)
     }
 
     RefreshTableFrame <- function() { 

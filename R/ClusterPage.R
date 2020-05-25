@@ -21,14 +21,14 @@ ClusterPage <- function(X, parent, notebook, envir) {
         }
 
         save$plot <<- recordPlot()
-        assign(name, save, envir = print)
+        assign(name, save, envir = toprint)
     }
 
     name <- as.character(runif(1))
     save <- list()
     save$name <- as.character(match.call()[[1]])
     class(save) <- "save"
-    assign(name, save, envir = print)
+    assign(name, save, envir = toprint)
 
     PageGUI("Cluster", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data), title = "Cluster", type = "plot", cluster = 1, clustert = "rectangle")

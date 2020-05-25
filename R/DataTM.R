@@ -7,8 +7,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
         d <- tm_map(d, removePunctuation)
         d <- tm_map(d, removeNumbers)
         d <- tm_map(d, removeWords, stopwords(language))
-        d <- tm_map(d, stripWhitespace)
-
+    
         if(steam) {
             if(steamcomp) dCopy <- d
             d <- tm_map(d, stemDocument)
@@ -23,10 +22,22 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
                             stripWhitespace(x)
                         }
 
-                        d <- d %>% lapply(stemCompletion2, dictionary = dCopy) %>% VectorSource %>% Corpus()
+                        if(require(parallel)) {
+                            cores <- if(detectCores() - 1 > 0)  detectCores() - 1 else 1
+                            cl <- makeCluster(cores)
+                            clusterExport(cl = cl, c("stemCompletion", "stripWhitespace"))
+                            d <- parLapply(cl, d, stemCompletion2, dCopy)
+                            stopCluster(cl)
+                        }else{
+                            d <- lapply(d, stemCompletion2, dictionary = dCopy)
+                        }
+
+                        d <- Corpus(VectorSource(d))
                     })
                 console(cmds = "time", envir = environment())
             }
+        }else{
+            d <- tm_map(d, stripWhitespace)
         }
 
         tdm <- TermDocumentMatrix(d, control = list(weighting = (if(normalize == "tf-idf") weightTfIdf else weightTf)))

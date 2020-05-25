@@ -44,8 +44,8 @@ Export <- function(X) {
 
     params <- list()
     x <- as.integer(1)
-    for(i in ls(envir = print)) {
-        i <- get(i, envir = print)
+    for(i in ls(envir = toprint)) {
+        i <- get(i, envir = toprint)
         cat(paste0("\n\n# ", i$name, "\n\n"), file = file, append = TRUE)
         
         if(!is.null(getElement(i, "table"))) {

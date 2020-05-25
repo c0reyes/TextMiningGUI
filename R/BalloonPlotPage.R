@@ -14,7 +14,7 @@ BalloonPlotPage <- function(X, parent, notebook, envir) {
                       panel.grid.major = element_line(color = "lightgray")) 
             
         save$plot <<- plot
-        assign(name, save, envir = print)
+        assign(name, save, envir = toprint)
         
         plot(plot)
     }
