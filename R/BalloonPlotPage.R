@@ -2,7 +2,7 @@ BalloonPlotPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         colors <- c("#0D0887FF", "#6A00A8FF", "#B12A90FF", "#E16462FF", "#FCA636FF", "#F0F921FF")
         
-        w <- X$data[1:graph$limit,]
+        w <- X$data[1:graph$limit,,drop = FALSE]
         
         plot <- ggballoonplot(w, fill = "value") +
                 scale_fill_gradientn(colors = colors) +
@@ -24,5 +24,5 @@ BalloonPlotPage <- function(X, parent, notebook, envir) {
     save$name <- as.character(match.call()[[1]])
     class(save) <- "save"
 
-    PageGUI("Words Most Used", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
+    PageGUI("Most commond words", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
 }

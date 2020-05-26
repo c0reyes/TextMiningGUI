@@ -255,7 +255,7 @@ TextMiningGUI <- function() {
 
         put_label(label_frame, "Group: ", 1, 0)
         combo_box1 <- ttkcombobox(label_frame, 
-                        values = names, 
+                        values = c("", names), 
                         textvariable = group,
                         state = "normal",
                         justify = "left")
@@ -339,16 +339,23 @@ TextMiningGUI <- function() {
                 normalize <- tclvalue(normalize)
                 bigrams <- if( tclvalue(bigrams) == "1" ) TRUE else FALSE
 
-                if(group != "" && text != "" && lang != "") {
+                if(text != "" && lang != "") {
                     if(time == "")
-                        TMP <- env$DATA %>% distinct() %>% select(group, text)
+                        TMP <- env$DATA %>% select(text)
                     else {
                         if(class(env$DATA[[time]]) == "Date")
-                            TMP <- env$DATA %>% distinct() %>% select(time, group, text)
+                            TMP <- env$DATA %>% select(time, text)
                         else
                             time <- ""
                     }
-                    colnames(TMP) <- if(time == "") c("GROUP", "TEXT") else c("TIME", "GROUP", "TEXT")
+
+                    if(group == "") {
+                        TMP$GROUP <- "dummy"
+                        normalize <- if(normalize == "tf-idf") "tf-idf" else "none"
+                    } else
+                        TMP$GROUP <- env$DATA[[group]]
+
+                    colnames(TMP) <- if(time == "") c("TEXT", "GROUP") else c("TIME", "TEXT", "GROUP")
 
                     assign("tm", DataTM(TMP, language = lang, steam = steam, sparse = sparse, normalize = normalize, ngrams = bigrams, steamcomp = steamcomp), envir = env)
                     dataFrameTable(env$tm$data)
@@ -363,9 +370,22 @@ TextMiningGUI <- function() {
 
                     if(ncol(env$tm$data) < 3) {
                         tkmessageBox(title = "Warning", message = "Warning:", icon = "warning", 
-                                     detail = "Some procedure cannot implement, verify your data.", 
+                                     detail = "Some analysis cannot implement.", 
                                      type = "ok")
+
+                        tkentryconfigure(analysis_menu, 7, state = "disabled")
+                        tkentryconfigure(analysis_menu, 8, state = "disabled")
+                        tkentryconfigure(analysis_menu, 9, state = "disabled")
+                        tkentryconfigure(analysis_menu, 10, state = "disabled")
+                    }else{
+                        tkentryconfigure(analysis_menu, 7, state = "normal")
+                        tkentryconfigure(analysis_menu, 8, state = "normal")
+                        tkentryconfigure(analysis_menu, 9, state = "normal")
+                        tkentryconfigure(analysis_menu, 10, state = "normal")
                     }
+
+                    if(bigrams) tkentryconfigure(analysis_menu, 4, state = "normal")
+                    else tkentryconfigure(analysis_menu, 4, state = "disabled")
                 }
             })
         tkpack(button_frame, fill = "x", padx = 5, pady = 5)

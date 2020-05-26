@@ -10,8 +10,10 @@ Emotions <- function(X, language) {
     }else{
         emotion.df <- get_nrc_sentiment(char_v = X, language = language)
     }
-    print(emotion.df)
-    print(X)
+    
+    #df <- emotion.df
+    #rownames(df) <- X
+
     emotion.df <- data.frame(t(emotion.df))
     emotion.df <- data.frame(rowSums(emotion.df))
     names(emotion.df)[1] <- "count"

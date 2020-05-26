@@ -29,11 +29,6 @@ cooccPage <- function(X, parent, notebook, envir) {
         plot(plot)
     }
 
-    if(is.null(X$bigrams)) {
-        tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Bigrams it's need.", type = "ok")
-        return(NULL)
-    }
-
     w <- X$bigrams %>%
         separate(bigram, c("word1", "word2"), sep = " ") %>% 
         count(word1, word2, sort = TRUE)

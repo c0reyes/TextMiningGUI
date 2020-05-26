@@ -1,7 +1,6 @@
 ClusterPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
-        w <- X$data[1:graph$limit,]
-        w <- Convert(w)
+        w <- X$data[1:graph$limit,,drop = FALSE]
         
         w_dist <- dist(w, method = "euclidean")
         plot <- hclust(w_dist, method = "ward.D2")
@@ -31,5 +30,5 @@ ClusterPage <- function(X, parent, notebook, envir) {
     assign(name, save, envir = toprint)
 
     PageGUI("Cluster", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 100,
-        parent = parent, notebook = notebook, to = nrow(X$data), title = "Cluster", type = "plot", cluster = 1, clustert = "rectangle")
+        parent = parent, notebook = notebook, to = nrow(X$data)-10, title = "Cluster", type = "plot", cluster = 1, clustert = "rectangle")
 }

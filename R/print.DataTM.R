@@ -8,6 +8,9 @@ print.DataTM <- function(obj) {
     
     cat("\n### Steam ###\n\n")
     print(obj$steam)
+
+    cat("\n### Completion ###\n\n")
+    print(obj$steamcomp)
     
     cat("\n### Sparse ###\n\n")
     print(obj$sparse)

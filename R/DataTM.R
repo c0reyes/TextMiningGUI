@@ -43,7 +43,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
         tdm <- TermDocumentMatrix(d, control = list(weighting = (if(normalize == "tf-idf") weightTfIdf else weightTf)))
 
         txt <<- rbind(txt, data.frame(txt = sapply(d, as.character), stringsAsFactors = FALSE))
-        tdm_global <<- if(!is.null(tdm_global)) c(tdm_global, tdm) else tdm
+        corpus_global <<- if(!is.null(corpus_global)) c(corpus_global, d) else d
 
         if(sparse < 1)
             tdm = removeSparseTerms(tdm, sparse)
@@ -63,7 +63,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     }
 
     txt <- data.frame()
-    tdm_global <- c()
+    corpus_global <- c()
 
     df <- DF %>% group_by(GROUP) %>% group_modify(~ tm_group(.x$TEXT)) 
     TM <- df %>% group_by(GROUP) %>% pivot_wider(names_from = GROUP, values_from = freq) %>% column_to_rownames(var = "word")
@@ -73,6 +73,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     tm$lang <- language
     tm$normalize <- normalize
     tm$steam <- steam
+    tm$steamcomp <- steamcomp
     tm$sparse <- sparse
     tm$ngrams <- ngrams
     
@@ -84,10 +85,10 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
         tm$data <- TM
     
     tm$bigrams <- bigrams()
-    tm$freq <- df
+    tm$freq <- df %>% select(GROUP, word, freq)
     tm$dist <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
 
-    tm$dtm <- as.DocumentTermMatrix(tdm_global)
+    tm$dtm <- DocumentTermMatrix(corpus_global, control = list(weighting = weightTf))
     tm$df <- DF %>% select(-TEXT) %>% add_column(txt) %>% rename(TEXT = txt)
 
     class(tm) <- "DataTM"

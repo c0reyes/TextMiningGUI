@@ -17,6 +17,9 @@ Export <- function(X) {
     cat("\n\n# Steam\n\n", file = file, append = TRUE)
     cat(X$steam, file = file, append = TRUE)
 
+    cat("\n\n# Completion\n\n", file = file, append = TRUE)
+    cat(X$steamcomp, file = file, append = TRUE)
+
     cat("\n\n# Sparse\n\n", file = file, append = TRUE)
     cat(X$sparse, file = file, append = TRUE)
 
@@ -36,11 +39,23 @@ Export <- function(X) {
     table <- kable(head(X$data), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
+    cat("\n\n### str() ###\n\n", file = file, append = TRUE)
+    i <- capture.output(str(X$freq))
+    cat(paste("> ", i, "\n\n"), file = file, append = TRUE)
+
     if(!is.null(X$bigrams)) {
         cat("\n\n# Bigrams\n\n", file = file, append = TRUE)
         table <- kable(head(X$bigrams), format = "markdown")
         cat(table, sep="\n", file = file, append = TRUE)
     }
+
+    cat("\n\n### DTM ###\n\n", file = file, append = TRUE)
+    i <- capture.output(inspect(X$dtm))
+    cat(paste("> ", i, "\n\n"), file = file, append = TRUE)
+
+    cat("\n\n### DF ###\n\n", file = file, append = TRUE)
+    table <- kable(head(X$df), format = "markdown")
+    cat(table, sep = "\n", file = file, append = TRUE)
 
     params <- list()
     x <- as.integer(1)
