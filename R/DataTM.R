@@ -1,9 +1,10 @@
 DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value", ngrams = FALSE, steamcomp = FALSE) {
-    tm_group <- function(texto) {
-        text = iconv(texto, to = "ASCII//TRANSLIT")
-        corpus <- Corpus(VectorSource(text))
+    tm_group <- function(X) {
+        X$text <- iconv(X$text, to = "ASCII//TRANSLIT")
+        corpus <- VCorpus(DataframeSource(X))
+        #corpus <- Corpus(VectorSource(text))
 
-        d <- tm_map(corpus, tolower)
+        d <- tm_map(corpus, content_transformer(tolower))
         d <- tm_map(d, removePunctuation)
         d <- tm_map(d, removeNumbers)
         d <- tm_map(d, removeWords, stopwords(language))
@@ -43,10 +44,12 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
         tdm <- TermDocumentMatrix(d, control = list(weighting = (if(normalize == "tf-idf") weightTfIdf else weightTf)))
 
         txt <<- rbind(txt, data.frame(txt = sapply(d, as.character), stringsAsFactors = FALSE))
-        corpus_global <<- if(!is.null(corpus_global)) c(corpus_global, d) else d
+        tdm_global <<- if(!is.null(tdm_global)) c(tdm_global, TermDocumentMatrix(d)) else TermDocumentMatrix(d)
 
-        if(sparse < 1)
-            tdm = removeSparseTerms(tdm, sparse)
+        if(sparse < 1) {
+            tdm <- removeSparseTerms(tdm, sparse)
+            tdm_global <<- removeSparseTerms(tdm_global, sparse)
+        }
         
         console(cmds = "inspect(tdm)", envir = environment())
             
@@ -63,9 +66,9 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     }
 
     txt <- data.frame()
-    corpus_global <- c()
+    tdm_global <- c()
 
-    df <- DF %>% group_by(GROUP) %>% group_modify(~ tm_group(.x$TEXT)) 
+    df <- DF %>% group_by(GROUP) %>% rename(doc_id = ID, text = TEXT) %>% group_modify(~ tm_group(.x)) 
     TM <- df %>% group_by(GROUP) %>% pivot_wider(names_from = GROUP, values_from = freq) %>% column_to_rownames(var = "word")
     TM[is.na(TM)] <- 0
 
@@ -88,7 +91,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     tm$freq <- df %>% select(GROUP, word, freq)
     tm$dist <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
 
-    tm$dtm <- DocumentTermMatrix(corpus_global, control = list(weighting = weightTf))
+    tm$dtm <- as.DocumentTermMatrix(tdm_global, weighting = weightTf)
     tm$df <- DF %>% select(-TEXT) %>% add_column(txt) %>% rename(TEXT = txt)
 
     class(tm) <- "DataTM"

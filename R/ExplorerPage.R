@@ -21,7 +21,7 @@ ExplorerPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- as.character(match.call()[[1]])
+    save$name <- "Word Counter"
     class(save) <- "save"
 
     PageGUI("Words by Groups", Plot, id = as.character(match.call()[[1]]), envir = envir, color = "lightblue", theme = "theme_gray", title = "Distinct words by groups", 

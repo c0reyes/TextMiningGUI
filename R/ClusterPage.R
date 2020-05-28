@@ -25,7 +25,7 @@ ClusterPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- as.character(match.call()[[1]])
+    save$name <- "Cluster"
     class(save) <- "save"
     assign(name, save, envir = toprint)
 

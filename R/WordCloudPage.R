@@ -24,7 +24,7 @@ WordCloudPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- as.character(match.call()[[1]])
+    save$name <- "Word Cloud"
     class(save) <- "save"
 
     PageGUI("Word Cloud", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", background = "#ffffff", limit = 100,

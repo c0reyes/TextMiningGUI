@@ -52,9 +52,10 @@ EmotionsPage <- function(X, parent, notebook, envir) {
 
         name <- as.character(runif(1))
         save <- list()
-        save$name <- "EmotionsPage"
+        save$name <- "Emotions"
         save$plot <- plot
         class(save) <- "save"
+        assign(name, save, envir = toprint)
 
         plot(plot)
     }
@@ -76,9 +77,10 @@ EmotionsPage <- function(X, parent, notebook, envir) {
 
         name <- as.character(runif(1))
         save <- list()
-        save$name <- "SentimentsPage"
+        save$name <- "Sentiments"
         save$plot <- plot
         class(save) <- "save"
+        assign(name, save, envir = toprint)
 
         plot(plot)
     }
@@ -100,9 +102,10 @@ EmotionsPage <- function(X, parent, notebook, envir) {
 
         name <- as.character(runif(1))
         save <- list()
-        save$name <- "EmotionsPage"
+        save$name <- "Emotions"
         save$plot <- plot
         class(save) <- "save"
+        assign(name, save, envir = toprint)
 
         plot(plot)
     }

@@ -27,19 +27,15 @@ Export <- function(X) {
     table <- kable(summary(X$freq[1:2]), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
-    cat("\n\n# Words Total\n\n", file = file, append = TRUE)
-    table <- kable(sum(X$freq[3]), format = "markdown")
-    cat(table, sep = "\n", file = file, append = TRUE)
-
     cat("\n\n# Distinct words by groups\n\n", file = file, append = TRUE)
     table <- kable(X$dist, format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
-    cat("\n\n# Lexical table - head()\n\n", file = file, append = TRUE)
+    cat("\n\n# Lexical table\n\n", file = file, append = TRUE)
     table <- kable(head(X$data), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
-    cat("\n\n### str() ###\n\n", file = file, append = TRUE)
+    cat("\n\n# str()\n\n", file = file, append = TRUE)
     i <- capture.output(str(X$freq))
     cat(paste("> ", i, "\n\n"), file = file, append = TRUE)
 
@@ -49,19 +45,21 @@ Export <- function(X) {
         cat(table, sep="\n", file = file, append = TRUE)
     }
 
-    cat("\n\n### DTM ###\n\n", file = file, append = TRUE)
+    cat("\n\n# DTM\n\n", file = file, append = TRUE)
     i <- capture.output(inspect(X$dtm))
     cat(paste("> ", i, "\n\n"), file = file, append = TRUE)
 
-    cat("\n\n### DF ###\n\n", file = file, append = TRUE)
+    cat("\n\n# DF\n\n", file = file, append = TRUE)
     table <- kable(head(X$df), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
+
+    cat(paste0("\n\n# Analysis\n\n"), file = file, append = TRUE)
 
     params <- list()
     x <- as.integer(1)
     for(i in ls(envir = toprint)) {
         i <- get(i, envir = toprint)
-        cat(paste0("\n\n# ", i$name, "\n\n"), file = file, append = TRUE)
+        cat(paste0("\n\n## ", i$name, "\n\n"), file = file, append = TRUE)
         
         if(!is.null(getElement(i, "table"))) {
             if(!is.null(getElement(i, "more"))) {
@@ -84,6 +82,6 @@ Export <- function(X) {
     }
 
     render("output.Rmd", output_format = "pdf_document", params = list(params))
-    file.remove(file)
+    #file.remove(file)
     tkmessageBox(title = "Export", message = "Export:", detail = "output.pdf was created.", type = "ok") 
 }

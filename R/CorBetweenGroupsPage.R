@@ -60,7 +60,7 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
 
                     name <- as.character(runif(1))
                     save <- list()
-                    save$name <- "CorBetweenGroupsPage"
+                    save$name <- "Correlation Between Groups"
                     save$plot <- plot
                     class(save) <- "save"
                     assign(name, save, envir = toprint)

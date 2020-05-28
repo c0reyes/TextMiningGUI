@@ -21,7 +21,7 @@ BalloonPlotPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- as.character(match.call()[[1]])
+    save$name <- "Most common words"
     class(save) <- "save"
 
     PageGUI("Most commond words", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))

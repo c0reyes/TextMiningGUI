@@ -40,7 +40,7 @@ cooccPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- as.character(match.call()[[1]])
+    save$name <- "co-occurrence"
     class(save) <- "save"
 
     PageGUI("co-occurrence", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", vector_color = "gray70", text_color = "#000000", 

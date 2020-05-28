@@ -241,7 +241,7 @@ TextMiningGUI <- function() {
         tkwm.minsize(window, "420", "300")
         tkwm.maxsize(window, "420", "300")
 
-        tkwm.title(window, "Create Lexical Table")
+        tkwm.title(window, "Mining")
         frame <- ttkframe(window, padding = c(3,3,12,12))
         tkpack(frame, expand = TRUE, fill = "both")
 
@@ -306,7 +306,7 @@ TextMiningGUI <- function() {
             })
 
         put_label(label_frame, "Bigrams: ", 7, 0)
-        bigrams_check <- ttkcheckbutton(label_frame, variable = bigrams, state = "disabled")
+        bigrams_check <- ttkcheckbutton(label_frame, variable = bigrams)
         tkgrid(bigrams_check, row = 7, column = 1, sticky = "ew", padx = 2)
 
         put_label(label_frame, "Normalize: ", 8, 0)
@@ -355,7 +355,9 @@ TextMiningGUI <- function() {
                     } else
                         TMP$GROUP <- env$DATA[[group]]
 
-                    colnames(TMP) <- if(time == "") c("TEXT", "GROUP") else c("TIME", "TEXT", "GROUP")
+                    TMP$ID <- rownames(env$DATA)
+
+                    colnames(TMP) <- if(time == "") c("TEXT", "GROUP","ID") else c("TIME", "TEXT", "GROUP","ID")
 
                     assign("tm", DataTM(TMP, language = lang, steam = steam, sparse = sparse, normalize = normalize, ngrams = bigrams, steamcomp = steamcomp), envir = env)
                     dataFrameTable(env$tm$data)
@@ -392,8 +394,6 @@ TextMiningGUI <- function() {
         tkpack(ttklabel(button_frame, text = " "), expand = TRUE,
            fill = "y", side = "left")               
         sapply(list(cancel_button, ok_button), tkpack, side = "left", padx = 6)
-
-        if(require(tidytext)) tcl(bigrams_check, "config", "-state", "normal")
     }
 
     # Fill Table
@@ -721,6 +721,18 @@ TextMiningGUI <- function() {
         tkentryconfigure(file_menu, 8, state = "normal")
         tkentryconfigure(file_menu, 11, state = "normal")
 
+        if(ncol(env$tm$data) < 3) {
+            tkentryconfigure(analysis_menu, 7, state = "disabled")
+            tkentryconfigure(analysis_menu, 8, state = "disabled")
+            tkentryconfigure(analysis_menu, 9, state = "disabled")
+            tkentryconfigure(analysis_menu, 10, state = "disabled")
+        }else{
+            tkentryconfigure(analysis_menu, 7, state = "normal")
+            tkentryconfigure(analysis_menu, 8, state = "normal")
+            tkentryconfigure(analysis_menu, 9, state = "normal")
+            tkentryconfigure(analysis_menu, 10, state = "normal")
+        }
+
         group <<- tclVar("")
         text <<- tclVar("")
         time <<- tclVar("")
@@ -881,9 +893,9 @@ TextMiningGUI <- function() {
     # Data
     tkadd(data_menu, "command", label = "Converter", command = Converter)
 
-    tkadd(data_menu, "command", label = "Create Lexical Table", command = Transformation)
+    tkadd(data_menu, "command", label = "Mining", command = Transformation)
 
-    tkadd(data_menu, "command", label = "Slice Lexical Table", command = Slice, state = "disabled")
+    tkadd(data_menu, "command", label = "Slice", command = Slice, state = "disabled")
 
     tkadd(data_menu, "separator")
 
@@ -939,6 +951,9 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Emotions & Sentiments", 
         command = function() EmotionsPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
+    tkadd(analysis_menu, "command", label = "Topic Models", state = "disabled",
+        command = function() TopicModelsPage(X = env$tm, parent = window, notebook = notebook, envir = env))
+
     # Help
     tkadd(help_menu, "command", label = "About", command = About)
 
@@ -960,5 +975,6 @@ TextMiningGUI <- function() {
     if(require(readxl)) tkentryconfigure(file_menu, 1, state = "normal")
     if(require(jsonlite)) tkentryconfigure(file_menu, 3, state = "normal")
     if(require(ggpubr)) tkentryconfigure(analysis_menu, 1, state = "normal")
+    if(require(topicmodels)) tkentryconfigure(analysis_menu, 13, state = "normal")
     if(require(igraph) && require(ggraph)) tkentryconfigure(analysis_menu, 4, state = "normal")
 }
