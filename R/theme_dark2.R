@@ -17,6 +17,7 @@ theme_dark2 <- function (base_size = 11, base_family = "") {
         axis.ticks = element_line(color = "#666666"),
         axis.text = element_text(size = rel(0.8), colour = "#ffffff"),
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()
+        panel.grid.minor = element_blank(),
+        legend.background = element_rect(fill = "#666666")
       )
 }

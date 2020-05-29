@@ -1,14 +1,18 @@
-DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value", ngrams = FALSE, steamcomp = FALSE) {
+DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value", ngrams = FALSE, steamcomp = FALSE, stopwords = TRUE, otherstopwords = "") {
     tm_group <- function(X) {
-        X$text <- iconv(X$text, to = "ASCII//TRANSLIT")
-        corpus <- VCorpus(DataframeSource(X))
-        #corpus <- Corpus(VectorSource(text))
+        X$TEXT <- iconv(X$TEXT, to = "ASCII//TRANSLIT")
+        corpus <- Corpus(VectorSource(X$TEXT))
 
         d <- tm_map(corpus, content_transformer(tolower))
         d <- tm_map(d, removePunctuation)
         d <- tm_map(d, removeNumbers)
-        d <- tm_map(d, removeWords, stopwords(language))
-    
+        
+        if(stopwords)
+            d <- tm_map(d, removeWords, stopwords(language))
+        
+        if(otherstopwords != "")
+            d <- tm_map(d, removeWords, otherstopwords)
+
         if(steam) {
             if(steamcomp) dCopy <- d
             d <- tm_map(d, stemDocument)
@@ -44,7 +48,10 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
         tdm <- TermDocumentMatrix(d, control = list(weighting = (if(normalize == "tf-idf") weightTfIdf else weightTf)))
 
         txt <<- rbind(txt, data.frame(txt = sapply(d, as.character), stringsAsFactors = FALSE))
-        tdm_global <<- if(!is.null(tdm_global)) c(tdm_global, TermDocumentMatrix(d)) else TermDocumentMatrix(d)
+
+        t <- TermDocumentMatrix(d)
+        t$dimnames$Docs <- X$ID
+        tdm_global <<- if(!is.null(tdm_global)) c(tdm_global, t) else t
 
         if(sparse < 1) {
             tdm <- removeSparseTerms(tdm, sparse)
@@ -68,7 +75,12 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     txt <- data.frame()
     tdm_global <- c()
 
-    df <- DF %>% group_by(GROUP) %>% rename(doc_id = ID, text = TEXT) %>% group_modify(~ tm_group(.x)) 
+    otherstopwords <- if(otherstopwords != "") unlist(strsplit(otherstopwords, ",")) else ""
+
+    time <- system.time({
+        df <- DF %>% mutate(ID = rownames(DF)) %>% group_by(GROUP) %>% select(TEXT, GROUP, ID) %>% group_modify(~ tm_group(.x)) 
+    })
+    console(cmds = "time", envir = environment())
     TM <- df %>% group_by(GROUP) %>% pivot_wider(names_from = GROUP, values_from = freq) %>% column_to_rownames(var = "word")
     TM[is.na(TM)] <- 0
 
@@ -77,13 +89,15 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     tm$normalize <- normalize
     tm$steam <- steam
     tm$steamcomp <- steamcomp
+    tm$stopwords <- stopwords
+    tm$otherstopwords <- otherstopwords
     tm$sparse <- sparse
     tm$ngrams <- ngrams
     
     if(normalize == "chara-value") 
         tm$data <- Convert(TM) 
     else if(normalize == "media")
-        tm$data <- TM / rowSums(TM)
+        tm$data <- TM / row_sums(TM)
     else 
         tm$data <- TM
     

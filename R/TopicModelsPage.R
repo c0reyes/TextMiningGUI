@@ -1,33 +1,55 @@
 TopicModelsPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
-        lda <- LDA(X$dtm, k = graph$limit, method = "VEM", control = NULL)
-        topics <- tidy(lda, matrix = "beta")
+        if(!is.null(graph$reload)) { 
+            plot(save$plot)
+            return(NULL)
+        }
 
-        top_terms <- topics %>%
-            group_by(topic) %>%
-            top_n(10, beta) %>%
-            ungroup() %>%
-            arrange(topic, -beta)
+        t <- match.fun(graph$theme)
 
-        term <- terms(lda, 5)
+        if(limit != graph$limit) {
+            lda <<- LDA(X$dtm, k = graph$limit)
+            limit <<- graph$limit
+        }
+        term <- terms(lda, 6)
         term <- apply(term, MARGIN = 2, paste, collapse = ", ")
 
-        top_terms <- top_terms %>% 
-                        select(topic, beta) %>% 
-                        group_by(topic) %>% 
-                        summarize(beta = sum(beta)) 
-        top_terms$term <- term
+        if(graph$time == TRUE && require(data.table)) {
+            topic <- topics(lda, 1)
+            topics <- data.frame(date = as.IDate(X$df[X$dtm$dimnames$Docs,]$TIME), topic)
+            plot <- qplot(date, ..count.., data = topics, geom = "density", fill = term[topic], position = "stack") +
+                        labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t() +
+                        theme(legend.title = element_blank()) +
+                        scale_fill_manual(values = tmPalette(graph$palette, graph$limit))
+        }else {
+            topics <- tidy(lda, matrix = "beta")
 
-        plot <- top_terms %>%
-                    ggplot(aes(topic, beta, fill = factor(topic))) +
-                    geom_col(show.legend = FALSE) +
-                    geom_text(aes(label = term), 
-                              hjust = 1.05, 
-                              size = 4) +
-                    coord_flip()
+            top_terms <- topics %>%
+                group_by(topic) %>%
+                top_n(10, beta) %>%
+                ungroup() %>%
+                arrange(topic, -beta)
+
+            top_terms <- top_terms %>% 
+                            select(topic, beta) %>% 
+                            group_by(topic) %>% 
+                            summarize(beta = sum(beta)) 
+            top_terms$term <- term
+
+            plot <- top_terms %>%
+                        ggplot(aes(topic, beta, fill = factor(topic))) +
+                        geom_col(show.legend = FALSE) +
+                        geom_text(aes(label = term), 
+                                  hjust = 1.05, 
+                                  size = 4) +
+                        labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t() +
+                        scale_fill_brewer(palette = graph$palette) +
+                        coord_flip()
+
+            save$table <<- top_terms
+        }
             
         save$plot <<- plot
-        save$table <<- top_terms
         assign(name, save, envir = toprint)
         
         plot(plot)
@@ -45,6 +67,10 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
     save$name <- "Topic Models"
     class(save) <- "save"
 
-    PageGUI("Topic Models", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = 4, parent = parent, notebook = notebook, 
-        to = 10, from = 2, resolution = 1)
+    time <- if("TIME" %in% colnames(X$df)) " " else ""
+    limit <- 4
+    lda <- LDA(X$dtm, k = limit)
+
+    PageGUI("Topic Models", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = limit, parent = parent, notebook = notebook, 
+        to = 10, from = 2, resolution = 1, time = time, theme = "theme_gray", title = "Topic Models", palette = "Dark2", subtitle = " ", caption = " ")
 }

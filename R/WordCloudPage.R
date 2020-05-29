@@ -1,5 +1,10 @@
 WordCloudPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
+        if(!is.null(graph$reload)) { 
+            plot(save$plot)
+            return(NULL)
+        }
+        
         set.seed(0)
         w <- X$freq[1:graph$limit,]
         plot <- w %>% ggplot(aes(label = word, size = freq, color = freq)) +

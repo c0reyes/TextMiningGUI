@@ -1,5 +1,10 @@
 CaPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
+        if(!is.null(graph$reload)) { 
+            plot(save$plot)
+            return(NULL)
+        }
+        
         t <- match.fun(graph$theme)
 
         if(graph$dim %in% c("dim1", "dim2")) {

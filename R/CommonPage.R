@@ -1,0 +1,43 @@
+CommonPage <- function(X, parent, notebook, envir) {
+    Plot <- function(graph) {
+        if(!is.null(graph$reload)) { 
+            plot(save$plot)
+            return(NULL)
+        }
+        
+        t <- match.fun(graph$theme)
+
+        colors <- c("#0D0887FF", "#6A00A8FF", "#B12A90FF", "#E16462FF", "#FCA636FF", "#F0F921FF")
+        
+        w <- X$data[1:graph$limit,,drop = FALSE]
+        
+        if(require(ggpubr)) 
+            plot <- ggballoonplot(w, fill = "value") +
+                scale_fill_gradientn(colors = colors) +
+                theme_minimal() +
+                guides(size = FALSE) + 
+                theme_white() +
+                theme(axis.title.x = element_blank(),
+                      axis.title.y = element_blank(),
+                      panel.grid.major = element_line(color = "lightgray")) 
+        else
+            plot <- ggplot(X$freq[1:20,], aes(x = word, y = freq)) + 
+                geom_bar(position = "dodge", stat = "identity", fill = graph$color) + 
+                coord_flip() +
+                labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t()
+            
+        save$plot <<- plot
+        assign(name, save, envir = toprint)
+        
+        plot(plot)
+    }
+
+    name <- as.character(runif(1))
+    save <- list()
+    save$name <- "Most common words"
+    class(save) <- "save"
+
+    PageGUI("Most commond words", Plot, id = as.character(match.call()[[1]]), envir = envir, 
+        color = "lightblue", theme = "theme_gray", title = "Most common words", subtitle = " ", caption = " ",
+        limit = 50, parent = parent, notebook = notebook, to = nrow(X$data))
+}

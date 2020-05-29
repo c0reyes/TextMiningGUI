@@ -1,5 +1,10 @@
 CorrelationPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
+        if(!is.null(graph$reload)) { 
+            plot(save$plot)
+            return(NULL)
+        }
+        
         plot <- cor %>% network_plot(min_cor = graph$limit, repel = TRUE) 
         plot <- plot + theme_white() + theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
                                            axis.title.y = element_blank(), axis.text.y = element_blank())

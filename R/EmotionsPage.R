@@ -2,53 +2,13 @@ EmotionsPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 
-        line_alpha <- 0.50
-        vector_alpha <- 0.75
-        if(graph$alpha == 1) {
-            vector_alpha <- 1
-            line_alpha <- 1
-        }
-        
-        plot <- ggplot(plotdf, aes(x = Dim1, y = Dim2,
-                        col = sum, shape = Variable,
-                        label = Label)) +
-                    geom_vline(xintercept = 0, lty = "dashed", alpha = line_alpha) +
-                    geom_hline(yintercept = 0, lty = "dashed", alpha = line_alpha) +
-                    geom_segment(data = plotdf[which(plotdf$Variable == "Columns"),], 
-                        aes(x = 0, y = 0, xend = Dim1, yend = Dim2), arrow = arrow(length = unit(0.2, "cm")), 
-                        alpha = vector_alpha, color = graph$vcolor, size = graph$vsize) +
-                    geom_point(size = graph$psize) +
-                    scale_shape_manual(values = c(4, 17))
+        plot <- ggplot(data = emotions, aes(x = emotion, y = count, group = GROUP, color = GROUP)) +
+            geom_polygon(fill = NA, size = 1) +
+            scale_color_manual(values = tmPalette(graph$palette, ncol(X$data))) +
+            coord_polar() + 
+            labs(title = graph$title, x = "", y = "")
 
-        if(graph$vtext == TRUE) 
-            plot <- plot + geom_text(data = plotdf[which(plotdf$Variable == "Columns"),],
-                         aes(x = Dim1, y = Dim2, col = sum, shape = Variable,
-                             label = Label), vjust = -0.5)
-
-        if(graph$ptext == TRUE) 
-            plot <- plot + geom_text(data = plotdf[which(plotdf$Variable == "Rows"),],
-                         aes(x = Dim1, y = Dim2, col = sum, shape = Variable,
-                             label = Label), vjust = -0.5)
-
-        if(graph$distance != "") {
-            r <- biplot$ColCoordinates[graph$distance,]
-            slope <- r[2] / r[1]
-            distance <- Distance(biplot$RowCoordinates, slope = slope)
-
-            console(cmds = "slope", envir = environment())
-            console(cmds = "distance", envir = environment())
-
-            plot <- plot + geom_abline(intercept = 0, slope = slope, linetype = "dashed", color = graph$vcolor, alpha = vector_alpha) +
-                     geom_segment(data = distance, aes(x = Dim1, y = Dim2, xend = xend, yend = yend), 
-                                  inherit.aes = FALSE, linetype = "dotted")
-        }
-
-        plot <- plot +
-            labs(x = paste0("Dimension 1 (", round(biplot$inertia[1]), "%)"),
-                y = paste0("Dimension 2 (", round(biplot$inertia[2]), "%)"),
-                title = graph$title) 
-
-        plot <- plot + t() + theme(legend.position = "none")
+        plot <- plot + t()
 
         name <- as.character(runif(1))
         save <- list()
@@ -85,31 +45,6 @@ EmotionsPage <- function(X, parent, notebook, envir) {
         plot(plot)
     }
 
-    PlotS2 <- function(graph) {
-        t <- match.fun(graph$theme)
-
-        plot <-  ggplot(emotions, 
-                    aes(x = group, y = count, fill = emotions, label = count)) + 
-                    geom_bar(position = "dodge", stat="identity") +
-                    labs(title = graph$title, 
-                        x = graph$xlab, y = graph$ylab) +
-                geom_text(position = position_dodge(width = 0.9), vjust = 1.5, color = "black", size = 5) +
-                t() +
-                theme(plot.title = element_text(hjust = 0.5),
-                    axis.text = element_text(size = 12),
-                    axis.title = element_text(size = 14,face = "bold"),
-                    title = element_text(size = 20,face = "bold"))
-
-        name <- as.character(runif(1))
-        save <- list()
-        save$name <- "Emotions"
-        save$plot <- plot
-        class(save) <- "save"
-        assign(name, save, envir = toprint)
-
-        plot(plot)
-    }
-
     e <- environment()
 
     ok_callback <- function() {
@@ -117,15 +52,19 @@ EmotionsPage <- function(X, parent, notebook, envir) {
         emotions <- emotions %>% group_by(GROUP) %>% pivot_wider(names_from = GROUP, values_from = count) 
         emotions <- as.data.frame(emotions)
         rownames(emotions) <- emotions[,1]
-        emotions[,1] <- NULL
-
         sentiments <- emotions
-        emotions <- emotions[1:8,,drop = FALSE]
+        sentiments[,1] <- NULL
 
+        emotions <- emotions[1:8,,drop = FALSE]
         sentiments <- sentiments[9:10,,drop = FALSE]
+
         sentiments <- as.data.frame(t(sentiments))
         sentiments <- cbind(group = rownames(sentiments), sentiments)
         sentiments <- gather(sentiments, "sentiment", "count", -group)
+
+        if(ncol(X$data) > 1)
+            emotions[,-1] <- Convert(emotions[,-1])   
+        emotions <- gather(emotions, "GROUP", "count", -emotion)
 
         assign("emotions", emotions, envir = e)
         assign("sentiments", sentiments, envir = e)
@@ -133,34 +72,8 @@ EmotionsPage <- function(X, parent, notebook, envir) {
         console(cmds = "emotions", envir = e)
         console(cmds = "sentiments", envir = e)
 
-        if(ncol(X$data) >= 3) {
-            biplot <- HJBiplot(emotions)
-            plotdf <- as.data.frame(biplot)
-
-            console(cmds = "biplot", envir = environment())
-            console(cmds = "plotdf", envir = environment())
-
-            plotdf$sum <- 1
-            plotdf[which(plotdf$Variable == "Rows"),] <- plotdf[which(plotdf$Variable == "Rows"),] %>% mutate(sum = row_number() + 1)
-            plotdf$sum <- factor(plotdf$sum)
-            plotdf$Variable <- factor(plotdf$Variable)
-
-            assign("plotdf", plotdf, envir = e)
-            assign("biplot", biplot, envir = e)
-
-            PageGUI("Emotions - HJ-Biplot", Plot, id = "EmotionsPage", envir = envir, theme = "theme_white", vector_color = "#f8766d", 
-                title = "Emotions - HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 3,
-                parent = parent, notebook = notebook, distances = c(colnames(emotions), ""))
-        }else{
-            emotions <- as.data.frame(t(emotions))
-            emotions <- cbind(group = rownames(emotions), emotions)
-            emotions <- gather(emotions, "emotions", "count", -group)
-            assign("emotions", emotions, envir = e)
-
-            PageGUI("Emotions", PlotS2, id = "EmotionsPage", envir = envir, theme = "theme_light",  title = "Emotions", 
-                xlab = "Groups", ylab = "Count",
-                parent = parent, notebook = notebook)
-        }
+        PageGUI("Emotions", Plot, id = "EmotionsPage", envir = envir, theme = "theme_minimal", title = "Emotions", palette = "Dark2",
+            parent = parent, notebook = notebook)
 
         PageGUI("Sentiments", PlotS, id = "SentimentsPage", envir = envir, theme = "theme_light",  title = "Sentiments", 
             xlab = "Groups", ylab = "Count",

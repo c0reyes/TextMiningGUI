@@ -1,5 +1,10 @@
 cooccPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
+        if(!is.null(graph$reload)) { 
+            plot(save$plot)
+            return(NULL)
+        }
+        
         w <- w %>% filter(n > graph$limit) %>% graph_from_data_frame(directed = FALSE)
 
         V(w)$size <- degree(w)
@@ -40,10 +45,10 @@ cooccPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- "co-occurrence"
+    save$name <- "Occurrence"
     class(save) <- "save"
 
-    PageGUI("co-occurrence", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", vector_color = "gray70", text_color = "#000000", 
+    PageGUI("Occurrence", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", vector_color = "gray70", text_color = "#000000", 
         background = "#ffffff", limit = 10, from = t.min, to = t.max, resolution = 1, text_size = 4,
         parent = parent, notebook = notebook)
 }
