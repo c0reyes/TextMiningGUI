@@ -48,6 +48,11 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
 
             if(g1 != "" && g2 != "") {
                 Plot <- function(graph) {
+                    if(!is.null(graph$reload)) { 
+                        plot(save$plot)
+                        return(NULL)
+                    }
+
                     w <- X$data[1:graph$limit,]
                     plot <- ggplot(w, aes(.data[[g1]], .data[[g2]])) +
                                 geom_jitter(alpha = graph$alpha, size = 2.5, width = 0.25, height = 0.25) +
@@ -60,7 +65,7 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
 
                     name <- as.character(runif(1))
                     save <- list()
-                    save$name <- "Correlation Between Groups"
+                    save$name <- "Correlation Between Two Groups"
                     save$plot <- plot
                     class(save) <- "save"
                     assign(name, save, envir = toprint)

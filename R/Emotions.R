@@ -12,7 +12,7 @@ Emotions <- function(X, language) {
     }
 
     emotion.df <- data.frame(t(emotion.df))
-    emotion.df <- data.frame(rowSums(emotion.df))
+    emotion.df <- data.frame(row_sums(emotion.df))
     names(emotion.df)[1] <- "count"
     emotion.df <- cbind("emotion" = rownames(emotion.df), emotion.df)
 

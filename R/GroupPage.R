@@ -1,4 +1,4 @@
-ExplorerPage <- function(X, parent, notebook, envir) {
+GroupPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
             plot(save$plot)
@@ -42,12 +42,12 @@ ExplorerPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- "Word Counter"
+    save$name <- "Word Group"
     class(save) <- "save"
 
     time <- if("TIME" %in% colnames(X$df)) " " else ""
 
-    PageGUI("Words Counter", Plot, id = as.character(match.call()[[1]]), envir = envir, color = "lightblue", theme = "theme_gray", title = "Words by groups", 
-            xlab = "Groups", ylab = "Counts", flip = FALSE, subtitle = " ", caption = " ", text_color = "#323232", palette = "Dark2",
+    PageGUI("Word Group", Plot, id = as.character(match.call()[[1]]), envir = envir, color = "lightblue", theme = "theme_gray", title = "Word Group", 
+            xlab = "Groups", ylab = "Freq", flip = FALSE, subtitle = " ", caption = " ", text_color = "#323232", palette = "Dark2",
             parent = parent, notebook = notebook, time = time)
 }

@@ -1,6 +1,6 @@
 HJBiplotPage <- function(X, parent, notebook, envir) {
      Plot <- function(graph) {
-         if(!is.null(graph$reload)) { 
+        if(!is.null(graph$reload)) { 
             plot(save$plot)
             return(NULL)
         }

@@ -26,9 +26,7 @@ TextMiningGUI <- function() {
         tkconfigure(text1, background = "white")
         text2 <- ttklabel(frame, text = "License: GPL")
         tkconfigure(text2, background = "white")
-        text3 <- ttklabel(frame, text = "Created by Conrado Reyes\n\n")
-        tkconfigure(text3, background = "white")
-        tkpack(text1, text2, text3)
+        tkpack(text1, text2)
 
         tcl("image", "create", "photo", "imageID2", file = system.file("logos/usal.png", package = "TextMiningGUI"))
         img2 <- ttklabel(frame, image = "imageID2", compound = "image")
@@ -42,7 +40,7 @@ TextMiningGUI <- function() {
         tkwm.minsize(window, "470", "260")
         tkwm.maxsize(window, "470", "260")
     
-        tkwm.title(window, "Slice")
+        tkwm.title(window, "Slice Groups")
         frame <- ttkframe(window, padding = c(3,3,12,12))
         tkpack(frame, expand = TRUE, fill = "both")
     
@@ -127,7 +125,7 @@ TextMiningGUI <- function() {
         tkwm.minsize(window, "420", "200")
         tkwm.maxsize(window, "420", "200")
 
-        tkwm.title(window, "Converter")
+        tkwm.title(window, "Converter Columns")
         frame <- ttkframe(window, padding = c(3,3,12,12))
         tkpack(frame, expand = TRUE, fill = "both")
 
@@ -235,7 +233,7 @@ TextMiningGUI <- function() {
     sparse <- tclVar(init = 0.99)
     bigrams <- tclVar(FALSE)
 
-    Transformation <- function() {  
+    Transform <- function() {  
         languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(env$DATA)      
 
@@ -243,7 +241,7 @@ TextMiningGUI <- function() {
         tkwm.minsize(window, "420", "350")
         tkwm.maxsize(window, "420", "350")
 
-        tkwm.title(window, "Mining")
+        tkwm.title(window, "Transform Data")
         frame <- ttkframe(window, padding = c(3,3,12,12))
         tkpack(frame, expand = TRUE, fill = "both")
 
@@ -392,7 +390,7 @@ TextMiningGUI <- function() {
 
                     if(ncol(env$tm$data) < 3) {
                         tkmessageBox(title = "Warning", message = "Warning:", icon = "warning", 
-                                     detail = "Some analysis cannot implement.", 
+                                     detail = "Some analysis cannot be implemented.", 
                                      type = "ok")
 
                         tkentryconfigure(analysis_menu, 7, state = "disabled")
@@ -917,11 +915,11 @@ TextMiningGUI <- function() {
         })
 
     # Data
-    tkadd(data_menu, "command", label = "Converter", command = Converter)
+    tkadd(data_menu, "command", label = "Converter Columns", command = Converter)
 
-    tkadd(data_menu, "command", label = "Mining", command = Transformation)
+    tkadd(data_menu, "command", label = "Transform Data", command = Transform)
 
-    tkadd(data_menu, "command", label = "Slice", command = Slice, state = "disabled")
+    tkadd(data_menu, "command", label = "Slice Groups", command = Slice, state = "disabled")
 
     tkadd(data_menu, "separator")
 
@@ -953,8 +951,8 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Most common words",
         command = function() CommonPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
-    tkadd(analysis_menu, "command", label = "Word Counter", 
-        command = function() ExplorerPage(X = env$tm, parent = window, notebook = notebook, envir = env))
+    tkadd(analysis_menu, "command", label = "Word Group", 
+        command = function() GroupPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Word Cloud", 
         command = function() WordCloudPage(X = env$tm, parent = window, notebook = notebook, envir = env))
@@ -970,7 +968,7 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Correlation", 
         command = function() CorrelationPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
-    tkadd(analysis_menu, "command", label = "Correlation Between Groups", 
+    tkadd(analysis_menu, "command", label = "Correlation Between Two Groups", 
         command = function() CorBetweenGroupsPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Correspondence Analysis", 

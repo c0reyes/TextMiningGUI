@@ -17,6 +17,10 @@ print.DataTM <- function(obj) {
     
     cat("\n### Summary ###\n\n")
     print(summary(obj$freq[1:2]))
+
+    cat("\n### Words by groups ###\n\n")
+    t <- obj$freq %>% group_by(GROUP) %>% summarise(total = sum(freq)) %>% arrange(desc(total))
+    print(t)
     
     cat("\n### Distinct words by groups ###\n\n")
     print(obj$dist)

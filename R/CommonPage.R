@@ -20,11 +20,13 @@ CommonPage <- function(X, parent, notebook, envir) {
                 theme(axis.title.x = element_blank(),
                       axis.title.y = element_blank(),
                       panel.grid.major = element_line(color = "lightgray")) 
-        else
-            plot <- ggplot(X$freq[1:20,], aes(x = word, y = freq)) + 
+        else {
+            tt <- X$freq %>% group_by(word) %>% summarise(freq = sum(freq)) %>% arrange(desc(freq))
+            plot <- ggplot(tt[1:graph$limit,,drop = FALSE], aes(x = word, y = freq)) + 
                 geom_bar(position = "dodge", stat = "identity", fill = graph$color) + 
                 coord_flip() +
                 labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t()
+        }
             
         save$plot <<- plot
         assign(name, save, envir = toprint)

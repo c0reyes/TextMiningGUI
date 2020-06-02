@@ -81,7 +81,7 @@ CaPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- as.character(match.call()[[1]])
+    save$name <- "Correspondence Analysis"
 
     colnames(ca$colcontrib) <- unlist(lapply(1:ncol(ca$colcontrib), function(x) paste0("Con", x)))
     colnames(ca$rowcontrib) <- unlist(lapply(1:ncol(ca$rowcontrib), function(x) paste0("Con", x)))

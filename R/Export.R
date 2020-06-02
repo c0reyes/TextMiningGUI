@@ -27,6 +27,11 @@ Export <- function(X) {
     table <- kable(summary(X$freq[1:2]), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
+    cat("\n# Words by groups\n\n", file = file, append = TRUE)
+    t <- X$freq %>% group_by(GROUP) %>% summarise(total = sum(freq)) %>% arrange(desc(total))
+    table <- kable(t, format = "markdown")
+    cat(table, sep = "\n", file = file, append = TRUE)
+
     cat("\n\n# Distinct words by groups\n\n", file = file, append = TRUE)
     table <- kable(X$dist, format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
@@ -82,6 +87,6 @@ Export <- function(X) {
     }
 
     render("output.Rmd", output_format = "pdf_document", params = list(params))
-    #file.remove(file)
+    file.remove(file)
     tkmessageBox(title = "Export", message = "Export:", detail = "output.pdf was created.", type = "ok") 
 }

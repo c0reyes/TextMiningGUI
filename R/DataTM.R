@@ -67,7 +67,6 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     }
 
     bigrams <- function() {
-        if(!ngrams) return(NULL)
         bigrams <- txt %>% unnest_tokens(input = txt, output = "bigram", token = "ngrams", n = 2, drop = TRUE)
         return(bigrams)
     }
@@ -101,7 +100,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     else 
         tm$data <- TM
     
-    tm$bigrams <- bigrams()
+    tm$bigrams <- if(ngrams) bigrams() else NULL
     tm$freq <- df %>% select(GROUP, word, freq)
     tm$dist <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
 
