@@ -96,8 +96,8 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
     plotdf$Variable <- factor(plotdf$Variable)
 
     console(cmds = "head(X$data)", envir = environment())
-    console(cmds = "biplot", envir = environment())
-    console(cmds = "plotdf", envir = environment())
+    console(cmds = "head(biplot)", envir = environment())
+    console(cmds = "head(plotdf)", envir = environment())
 
     name <- as.character(runif(1))
     save <- list()

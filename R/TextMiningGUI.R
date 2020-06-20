@@ -230,7 +230,7 @@ TextMiningGUI <- function() {
     stopwords <- tclVar(TRUE)
     otherstopwords <- tclVar("")
     normalize <- tclVar("chara-value")
-    sparse <- tclVar(init = 0.99)
+    sparse <- tclVar(init = 0.998)
     bigrams <- tclVar(FALSE)
 
     Transform <- function() {  
@@ -241,7 +241,7 @@ TextMiningGUI <- function() {
         tkwm.minsize(window, "420", "350")
         tkwm.maxsize(window, "420", "350")
 
-        tkwm.title(window, "Transform Data")
+        tkwm.title(window, "Transform")
         frame <- ttkframe(window, padding = c(3,3,12,12))
         tkpack(frame, expand = TRUE, fill = "both")
 
@@ -296,7 +296,7 @@ TextMiningGUI <- function() {
         tkbind(otherstopwords_entry, "<Double-1>", function() {
                 file_name <- tkgetOpenFile(filetypes = "{{Text files} {.txt}}")
                 if(file.exists(file_name <- as.character(file_name))) {
-                    words <- paste(unlist(scan(file_name, what = list(name = character()))), collapse = ",")
+                    words <- iconv(paste(unlist(scan(file_name, what = list(name = character()))), collapse = ","), to = "ASCII//TRANSLIT")
                     otherstopwords <<- tclVar(words)
                     tcl(otherstopwords_entry, "configure", "-textvariable", otherstopwords)
                 }
@@ -335,8 +335,8 @@ TextMiningGUI <- function() {
         tkgrid(radio, row = 10, column = 1, sticky = "ew", padx = 2)
 
         put_label(label_frame, "Remove Sparse: ", 11, 0, sticky = "es")
-        removebar <- tkscale(label_frame, from = 0.5, to = 1, variable = sparse, 
-                             showvalue = TRUE, resolution = 0.002, orient = "horiz")
+        removebar <- tkscale(label_frame, from = 0.499, to = 1, variable = sparse, 
+                             showvalue = TRUE, resolution = 0.001, orient = "horiz")
         tkgrid(removebar, row = 11, column = 1, sticky = "ew", padx = 2)
         
         button_frame <- ttkframe(frame)
@@ -398,10 +398,10 @@ TextMiningGUI <- function() {
                         tkentryconfigure(analysis_menu, 9, state = "disabled")
                         tkentryconfigure(analysis_menu, 10, state = "disabled")
                     }else{
-                        tkentryconfigure(analysis_menu, 7, state = "normal")
                         tkentryconfigure(analysis_menu, 8, state = "normal")
-                        tkentryconfigure(analysis_menu, 9, state = "normal")
                         tkentryconfigure(analysis_menu, 10, state = "normal")
+                        if(require(corrr)) tkentryconfigure(analysis_menu, 7, state = "normal")
+                        if(require(ca)) tkentryconfigure(analysis_menu, 9, state = "normal")
                     }
 
                     if(bigrams) tkentryconfigure(analysis_menu, 4, state = "normal")
@@ -746,10 +746,10 @@ TextMiningGUI <- function() {
             tkentryconfigure(analysis_menu, 9, state = "disabled")
             tkentryconfigure(analysis_menu, 10, state = "disabled")
         }else{
-            tkentryconfigure(analysis_menu, 7, state = "normal")
             tkentryconfigure(analysis_menu, 8, state = "normal")
-            tkentryconfigure(analysis_menu, 9, state = "normal")
             tkentryconfigure(analysis_menu, 10, state = "normal")
+            if(require(corrr)) tkentryconfigure(analysis_menu, 7, state = "normal")
+            if(require(ca)) tkentryconfigure(analysis_menu, 9, state = "normal")
         }
 
         group <<- tclVar("")
@@ -917,7 +917,7 @@ TextMiningGUI <- function() {
     # Data
     tkadd(data_menu, "command", label = "Converter Columns", command = Converter)
 
-    tkadd(data_menu, "command", label = "Transform Data", command = Transform)
+    tkadd(data_menu, "command", label = "Transform", command = Transform)
 
     tkadd(data_menu, "command", label = "Slice Groups", command = Slice, state = "disabled")
 
@@ -957,7 +957,7 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Word Cloud", 
         command = function() WordCloudPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
-    tkadd(analysis_menu, "command", label = "Occurrence", state = "disabled",
+    tkadd(analysis_menu, "command", label = "Co-occurrence", state = "disabled",
         command = function() cooccPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "separator")
@@ -965,13 +965,13 @@ TextMiningGUI <- function() {
     tkadd(analysis_menu, "command", label = "Cluster",
         command = function() ClusterPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
-    tkadd(analysis_menu, "command", label = "Correlation", 
+    tkadd(analysis_menu, "command", label = "Correlation", state = "disabled", 
         command = function() CorrelationPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "Correlation Between Two Groups", 
         command = function() CorBetweenGroupsPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
-    tkadd(analysis_menu, "command", label = "Correspondence Analysis", 
+    tkadd(analysis_menu, "command", label = "AFC", state = "disabled", 
         command = function() CaPage(X = env$tm, parent = window, notebook = notebook, envir = env))
 
     tkadd(analysis_menu, "command", label = "HJ-Biplot", 
@@ -1004,5 +1004,7 @@ TextMiningGUI <- function() {
     if(require(readxl)) tkentryconfigure(file_menu, 1, state = "normal")
     if(require(jsonlite)) tkentryconfigure(file_menu, 3, state = "normal")
     if(require(topicmodels)) tkentryconfigure(analysis_menu, 13, state = "normal")
+    if(require(corrr)) tkentryconfigure(analysis_menu, 7, state = "normal")
+    if(require(ca)) tkentryconfigure(analysis_menu, 9, state = "normal")
     if(require(igraph) && require(ggraph)) tkentryconfigure(analysis_menu, 4, state = "normal")
 }

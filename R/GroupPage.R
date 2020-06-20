@@ -20,7 +20,7 @@ GroupPage <- function(X, parent, notebook, envir) {
                 geom_line(aes(color = GROUP)) +
                 geom_point(aes(color = GROUP)) +
                 labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t() +
-                scale_color_manual(values = tmPalette(graph$palette, ncol(X$data)))
+                scale_color_manual(values = tmPalette(graph$palette, X$len))
         }else {
             plot <- X$freq %>% ggplot(aes(weight = freq, x = GROUP)) + geom_bar(fill = graph$color) + 
                 labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + 

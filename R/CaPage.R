@@ -81,7 +81,7 @@ CaPage <- function(X, parent, notebook, envir) {
 
     name <- as.character(runif(1))
     save <- list()
-    save$name <- "Correspondence Analysis"
+    save$name <- "AFC"
 
     colnames(ca$colcontrib) <- unlist(lapply(1:ncol(ca$colcontrib), function(x) paste0("Con", x)))
     colnames(ca$rowcontrib) <- unlist(lapply(1:ncol(ca$rowcontrib), function(x) paste0("Con", x)))
@@ -90,7 +90,7 @@ CaPage <- function(X, parent, notebook, envir) {
 
     class(save) <- "save"
 
-    PageGUI("CA - Biplot", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", title = "CA - Biplot", limit = 100, vector_color = "red", point_color = "blue",
+    PageGUI("AFC", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", title = "AFC", limit = 100, vector_color = "red", point_color = "blue",
         vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ", dim = "all",
         parent = parent, notebook = notebook, to = nrow(X$data))
 }

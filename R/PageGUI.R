@@ -25,7 +25,6 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     }
                    
     themes <- c("theme_white","theme_dark2","theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
-    #palettes <- c("Set1", "Set2", "Set3", "Pastel1", "Pastel2", "Paired", "Dark2", "Accent")
     palettes <- rownames(brewer.pal.info)
 
     env = environment()
@@ -509,7 +508,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     if(graph$vcolor != "") tkconfigure(vcolor, background = graph$vcolor)
     if(graph$pcolor != "") tkconfigure(pcolor, background = graph$pcolor)
 
-    if(graph$distance != "") tcl(distance_box, "config", "-state", "normal")
+    if(distances != "") tcl(distance_box, "config", "-state", "normal")
     if(graph$cluster > 0) tcl(cluster_box, "config", "-state", "normal")
     if(graph$clustert != "" && require(ape)) tcl(clustert_box, "config", "-state", "normal")
 }

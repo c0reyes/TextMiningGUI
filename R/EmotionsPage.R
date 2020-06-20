@@ -4,7 +4,7 @@ EmotionsPage <- function(X, parent, notebook, envir) {
 
         plot <- ggplot(data = emotions, aes(x = emotion, y = count, group = GROUP, color = GROUP)) +
             geom_polygon(fill = NA, size = 1) +
-            scale_color_manual(values = tmPalette(graph$palette, ncol(X$data))) +
+            scale_color_manual(values = tmPalette(graph$palette, X$len)) +
             coord_polar() + 
             labs(title = graph$title, x = "", y = "")
 
@@ -63,7 +63,7 @@ EmotionsPage <- function(X, parent, notebook, envir) {
         sentiments <- gather(sentiments, "sentiment", "count", -group)
 
         if(ncol(X$data) > 1)
-            emotions[,-1] <- Convert(emotions[,-1])   
+            emotions[,-1] <- Convert(emotions[,-1])
         emotions <- gather(emotions, "GROUP", "count", -emotion)
 
         assign("emotions", emotions, envir = e)

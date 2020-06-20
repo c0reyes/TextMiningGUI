@@ -27,16 +27,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
                             stripWhitespace(x)
                         }
 
-                        if(require(parallel)) {
-                            cores <- if(detectCores() - 1 > 0)  detectCores() - 1 else 1
-                            cl <- makeCluster(cores)
-                            clusterExport(cl = cl, c("stemCompletion", "stripWhitespace"))
-                            d <- parLapply(cl, d, stemCompletion2, dCopy)
-                            stopCluster(cl)
-                        }else{
-                            d <- lapply(d, stemCompletion2, dictionary = dCopy)
-                        }
-
+                        d <- lapply(d, stemCompletion2, dictionary = dCopy)
                         d <- Corpus(VectorSource(d))
                     })
                 console(cmds = "time", envir = environment())
@@ -96,7 +87,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     if(normalize == "chara-value") 
         tm$data <- Convert(TM) 
     else if(normalize == "media")
-        tm$data <- TM / row_sums(TM)
+        tm$data <- TM / row_means(TM)
     else 
         tm$data <- TM
     
@@ -106,6 +97,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
 
     tm$dtm <- as.DocumentTermMatrix(tdm_global, weighting = weightTf)
     tm$df <- DF %>% select(-TEXT) %>% add_column(txt) %>% rename(TEXT = txt)
+    tm$len <- if(class(tm$df$GROUP) == "factor") nlevels(tm$df$GROUP) else tm$df$GROUP %>% unique() %>% length()
 
     class(tm) <- "DataTM"
 

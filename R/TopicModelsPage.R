@@ -19,7 +19,7 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
             topics <- data.frame(date = as.IDate(X$df[X$dtm$dimnames$Docs,]$TIME), topic)
             plot <- qplot(date, ..count.., data = topics, geom = "density", fill = term[topic], position = "stack") +
                         labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t() +
-                        theme(legend.title = element_blank()) +
+                        theme(legend.title = element_blank(), legend.position = "bottom") +
                         scale_fill_manual(values = tmPalette(graph$palette, graph$limit))
         }else {
             topics <- tidy(lda, matrix = "beta")
