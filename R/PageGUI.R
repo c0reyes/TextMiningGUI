@@ -461,16 +461,14 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
 
     # Save
     tkbind(page$save, "<ButtonRelease-1>", function() {
-            graph$alpha <<- 0.1
+            graph$alpha <- 0.1
             Save(X = Plot(graph), name = name, type = type)
-            graph$alpha <<- 1
         })
 
     # Zoom
     tkbind(page$zoom, "<ButtonRelease-1>", function() {
-            graph$alpha <<- 0.1
+            graph$alpha <- 0.1
             Plot(graph)
-            graph$alpha <<- 1
         })
  
     tkbind(content, "<Configure>", function() {
