@@ -1,44 +1,44 @@
 #' @export
-print.DataTM <- function(obj) {
+print.DataTM <- function(x, ...) {
     cat("\n### Language ###\n\n")
-    print(obj$lang)
+    print(x$lang)
     
     cat("\n### Normalize ###\n\n")
-    print(obj$normalize)
+    print(x$normalize)
     
     cat("\n### Steam ###\n\n")
-    print(obj$steam)
+    print(x$steam)
 
     cat("\n### Completion ###\n\n")
-    print(obj$steamcomp)
+    print(x$steamcomp)
     
     cat("\n### Sparse ###\n\n")
-    print(obj$sparse)
+    print(x$sparse)
     
     cat("\n### Summary ###\n\n")
-    print(summary(obj$freq[1:2]))
+    print(summary(x$freq[1:2]))
 
     cat("\n### Words by groups ###\n\n")
-    t <- obj$freq %>% group_by(GROUP) %>% summarise(total = sum(freq)) %>% arrange(desc(total))
+    t <- x$freq %>% group_by(GROUP) %>% summarise(total = sum(freq)) %>% arrange(desc(total))
     print(t)
     
     cat("\n### Distinct words by groups ###\n\n")
-    print(obj$dist)
+    print(x$dist)
     
     cat("\n### Lexical table - head() ###\n\n")
-    print(head(obj$data))
+    print(head(x$data))
 
     cat("\n### str() ###\n\n")
-    print(str(obj$freq))
+    print(str(x$freq))
 
-    if(!is.null(obj$bigrams)) {
+    if(!is.null(x$bigrams)) {
         cat("\n### Bigrams ###\n\n")
-        print(head(obj$bigrams))
+        print(head(x$bigrams))
     }
 
     cat("\n### DTM ###\n\n")
-    print(inspect(obj$dtm))
+    print(inspect(x$dtm))
 
     cat("\n### DF ###\n\n")
-    print(head(obj$df))
+    print(head(x$df))
 }
