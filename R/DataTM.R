@@ -85,7 +85,7 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     tm$ngrams <- ngrams
     
     if(normalize == "chara-value") 
-        tm$data <- Convert(TM) 
+        tm$data <- charavalue(TM) 
     else if(normalize == "media")
         tm$data <- TM / row_means(TM)
     else 

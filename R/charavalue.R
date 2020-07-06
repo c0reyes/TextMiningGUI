@@ -1,4 +1,4 @@
-Convert <- function(DF) {
+charavalue <- function(DF) {
     colMax <- function(data) sapply(data, max, na.rm = TRUE)
     
     calc <- function(x, maxj) {
