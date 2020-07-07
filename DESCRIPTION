@@ -1,11 +1,11 @@
 Package: TextMiningGUI
 Version: 0.1
-Date: 2020-04-12
-Title: Text Mining GUI interface
-Author: Conrado Reyes, with...
+Date: 2020-07-02
+Title: Text Mining GUI Interface
+Author: Conrado Reyes, Purificacion Galindo Villardon
 Maintainer: Conrado Reyes <coreyes@gmail.com>
-Depends: R(>= 3.6.3), tcltk, tkrplot, dplyr, tidyr, tidytext, tibble, tm, SnowballC, slam, syuzhet, ggplot2, ggwordcloud, RColorBrewer
-Suggests: readxl, jsonlite, parallel, ggrepel, ggpubr, igraph, ggraph, ape, topicmodels, ca, corrr
-Description: GUI for text analysis.
+Depends: R(>= 3.6), tcltk, tkrplot, dplyr, tidyr, tidytext, tibble, tm, SnowballC, slam, syuzhet, ggplot2, ggwordcloud, RColorBrewer
+Suggests: readxl, jsonlite, parallel, ggrepel, ggpubr, igraph, ggraph, ape, topicmodels, ca, corrr, data.table, knitr, rmarkdown
+Description: Text Mining GUI with HJ-Biplot and another methods.
 License: GPL (>= 2)
 LazyData: true

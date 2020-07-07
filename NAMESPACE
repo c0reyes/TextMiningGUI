@@ -1,4 +1,8 @@
 export(TextMiningGUI)
 
+importFrom("grDevices", "colorRampPalette", "dev.off", "recordPlot")
+importFrom("stats", "cutree", "dist", "filter", "hclust", "kmeans", "rect.hclust", "runif", "terms")
+importFrom("utils", "capture.output", "head", "read.table", "str")
+
 S3method(print, DataTM)
 S3method(as.data.frame, HJBiplot)
