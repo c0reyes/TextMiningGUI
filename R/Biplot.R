@@ -1,9 +1,5 @@
 HJBiplot <- function(X, ...) Biplot(X, name = "HJBiplot", A = TRUE, B = TRUE, scale = 2)
 
-JKBiplot <- function(X, ...) Biplot(X, name = "JKBiplot", A = TRUE, B = FALSE, scale = 1)
-
-GHBiplot <- function(X, ...) Biplot(X, name = "GHBiplot", A = FALSE, B = TRUE, scale = 1)
-
 Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale = 2) {
   if(is.data.frame(X)) 
     X <- as.matrix(X)
