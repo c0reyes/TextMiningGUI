@@ -1,6 +1,4 @@
-HJBiplot <- function(X, ...) Biplot(X, name = "HJBiplot", A = TRUE, B = TRUE, scale = 2)
-
-Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale = 2) {
+HJBiplot <- function(X, dimension = 3, name = "HJBiplot", A = TRUE, B = TRUE, scale = 2) {
   if(is.data.frame(X)) 
     X <- as.matrix(X)
   
@@ -25,15 +23,8 @@ Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale 
   biplot$inertia <- round((EV/sum(EV)) * 100, digits = 3)
   biplot$cuminertia <- cumsum(biplot$inertia)
   
-  if(A)
-    biplot$RowCoordinates <- SD$u * rep(SD$d[1:dimension], rep.int(nrow(SD$u), dimension))
-  else
-    biplot$RowCoordinates <- SD$u
-  
-  if(B)
-    biplot$ColCoordinates <- SD$v * rep(SD$d[1:dimension], rep.int(nrow(SD$v), dimension))
-  else
-    biplot$ColCoordinates <- SD$v
+  biplot$RowCoordinates <- SD$u * rep(SD$d[1:dimension], rep.int(nrow(SD$u), dimension))
+  biplot$ColCoordinates <- SD$v * rep(SD$d[1:dimension], rep.int(nrow(SD$v), dimension))
 
   sf <- apply((X^2), 1, sum)
   biplot$RowContributions <- matrix(0, nrow(X), dimension)
@@ -43,11 +34,8 @@ Biplot <- function(X, dimension = 3, name = "Biplot", A = TRUE, B = TRUE, scale 
   sc <- apply((X^2), 2, sum)
   biplot$ColContributions <- round(((diag(1/sc)) %*% biplot$ColCoordinates^2) * 100, digits = 2)
 
-  if(A)
-    biplot$RowCoordinates <- biplot$RowCoordinates * scale
-
-  if(B)
-    biplot$ColCoordinates <- biplot$ColCoordinates / scale
+  biplot$RowCoordinates <- biplot$RowCoordinates * scale
+  biplot$ColCoordinates <- biplot$ColCoordinates / scale
 
   rownames(biplot$RowCoordinates) <- RowNames
   colnames(biplot$RowCoordinates) <- DimNames
