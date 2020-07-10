@@ -1,4 +1,4 @@
-as.data.frame.HJBiplot <- function (x, row.lab = "Rows", col.lab = "Columns") {
+as.data.frame.HJBiplot <- function (x, row.names, optional, row.lab = "Rows", col.lab = "Columns", ...) {
   df <- data.frame(
     Label = c(rownames(x$ColCoordinates), rownames(x$RowCoordinates)),
     Dim1 = c(x$ColCoordinates[,1], x$RowCoordinates[,1]),
