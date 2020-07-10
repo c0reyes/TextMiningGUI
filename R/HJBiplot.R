@@ -1,4 +1,4 @@
-HJBiplot <- function(X, dimension = 3, name = "HJBiplot", A = TRUE, B = TRUE, scale = 2) {
+HJBiplot <- function(X, dimension = 3, scale = 2) {
   if(is.data.frame(X)) 
     X <- as.matrix(X)
   
@@ -49,7 +49,7 @@ HJBiplot <- function(X, dimension = 3, name = "HJBiplot", A = TRUE, B = TRUE, sc
   rownames(biplot$ColContributions) <- VarNames
   colnames(biplot$ColContributions) <- DimNames
   
-  class(biplot) <- name
+  class(biplot) <- "HJBiplot"
   
   return(biplot)
 }
