@@ -11,7 +11,8 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
             lda <<- LDA(X$dtm, k = graph$limit)
             limit <<- graph$limit
         }
-        term <- terms(lda, 6)
+
+        term <- topicmodels::terms(lda, 6)
         term <- apply(term, MARGIN = 2, paste, collapse = ", ")
 
         if(graph$time == TRUE && require(data.table)) {

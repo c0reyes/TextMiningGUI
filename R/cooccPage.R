@@ -5,7 +5,7 @@ cooccPage <- function(X, parent, notebook, envir) {
             return(NULL)
         }
         
-        w <- w %>% filter(n > graph$limit) %>% graph_from_data_frame(directed = FALSE)
+        w <- w %>% dplyr::filter(n > graph$limit) %>% graph_from_data_frame(directed = FALSE)
 
         V(w)$size <- degree(w)
         V(w)$clu <- as.character(membership(cluster_louvain(w)))

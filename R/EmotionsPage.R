@@ -62,8 +62,6 @@ EmotionsPage <- function(X, parent, notebook, envir) {
         sentiments <- cbind(group = rownames(sentiments), sentiments)
         sentiments <- gather(sentiments, "sentiment", "count", -group)
 
-        if(ncol(X$data) > 1)
-            emotions[,-1] <- charavalue(emotions[,-1])
         emotions <- gather(emotions, "GROUP", "count", -emotion)
 
         assign("emotions", emotions, envir = e)

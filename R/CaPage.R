@@ -61,6 +61,10 @@ CaPage <- function(X, parent, notebook, envir) {
         plot(plot)
     }
 
+    if(X$normalize != "none") {
+        tkmessageBox(title = "Warning", message = "Warning:", icon = "warning", detail = "It is recommended not to use normalize for AFC.", type = "ok")
+    }
+
     ca <- tryCatch({ 
             ca(X$data, nd = 3)
         }, error = function(cond) {

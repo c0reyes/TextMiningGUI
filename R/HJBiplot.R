@@ -1,4 +1,4 @@
-HJBiplot <- function(X, dimension = 3, scale = 2) {
+HJBiplot <- function(X, name = "HJBiplot", dimension = 3, scale = 2) {
   if(is.data.frame(X)) 
     X <- as.matrix(X)
   
