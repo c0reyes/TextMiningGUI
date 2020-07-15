@@ -58,7 +58,7 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
         if(graph$distance != "") {
             r <- biplot$ColCoordinates[graph$distance,]
             slope <- r[2] / r[1]
-            distance <- Distance(biplot$RowCoordinates[1:(graph$limit+ncol(X$data)),], slope = slope)
+            distance <- Distance(biplot$RowCoordinates[1:graph$limit,], slope = slope)
 
             console(cmds = "slope", envir = environment())
             console(cmds = "distance", envir = environment())
