@@ -65,7 +65,7 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
 
             plot <- plot + geom_abline(intercept = 0, slope = slope, linetype = "dashed", color = graph$vcolor, alpha = vector_alpha) +
                      geom_segment(data = distance, aes(x = Dim1, y = Dim2, xend = xend, yend = yend), 
-                                  inherit.aes = FALSE, linetype = "dotted")
+                                  inherit.aes = FALSE, linetype = "dotted") + coord_fixed()
         }
 
         plot <- plot +
@@ -78,7 +78,7 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
             color <- c(graph$vcolor, brewer.pal(n = graph$cluster, name = graph$palette))
         
         plot <- plot + scale_color_manual(values = color) 
-        plot <- plot + t() + theme(legend.position = "none")
+        plot <- plot + t() + theme(legend.position = "none") 
 
         save$plot <<- plot
         assign(name, save, envir = toprint)
