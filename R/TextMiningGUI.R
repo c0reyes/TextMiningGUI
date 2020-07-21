@@ -25,7 +25,7 @@ TextMiningGUI <- function() {
 
         text1 <- ttklabel(frame, text = "Version: 0.1")
         tkconfigure(text1, background = "white")
-        text2 <- ttklabel(frame, text = "License: GPL")
+        text2 <- ttklabel(frame, text = "License: GPL (>= 2)")
         tkconfigure(text2, background = "white")
         tkpack(text1, text2)
 
