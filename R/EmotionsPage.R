@@ -1,4 +1,6 @@
 EmotionsPage <- function(X, parent, notebook, envir) {
+    GROUP <- TEXT <- GROUP <- emotions <- emotion <- sentiments <- sentiment <- group <- NULL
+    
     Plot <- function(graph) {
         t <- match.fun(graph$theme)
 

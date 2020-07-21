@@ -1,4 +1,6 @@
 WordCloudPage <- function(X, parent, notebook, envir) {
+    word <- freq <- NULL
+    
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
             plot(save$plot)

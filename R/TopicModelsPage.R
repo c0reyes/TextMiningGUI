@@ -1,4 +1,6 @@
 TopicModelsPage <- function(X, parent, notebook, envir) {
+    ..count.. <- NULL
+
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
             plot(save$plot)
@@ -8,16 +10,16 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
         t <- match.fun(graph$theme)
 
         if(limit != graph$limit) {
-            lda <<- LDA(X$dtm, k = graph$limit)
+            lda <<- topicmodels::LDA(X$dtm, k = graph$limit)
             limit <<- graph$limit
         }
 
         term <- topicmodels::terms(lda, 6)
         term <- apply(term, MARGIN = 2, paste, collapse = ", ")
 
-        if(graph$time == TRUE && require(data.table)) {
-            topic <- topics(lda, 1)
-            topics <- data.frame(date = as.IDate(X$df[X$dtm$dimnames$Docs,]$TIME), topic)
+        if(graph$time == TRUE && is.installed("data.table")) {
+            topic <- topicmodels::topics(lda, 1)
+            topics <- data.frame(date = data.table::as.IDate(X$df[X$dtm$dimnames$Docs,]$TIME), topic)
             plot <- qplot(date, ..count.., data = topics, geom = "density", fill = term[topic], position = "stack") +
                         labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t() +
                         theme(legend.title = element_blank(), legend.position = "bottom") +
@@ -70,7 +72,7 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
 
     time <- if("TIME" %in% colnames(X$df)) " " else ""
     limit <- 4
-    lda <- LDA(X$dtm, k = limit)
+    lda <- topicmodels::LDA(X$dtm, k = limit)
 
     PageGUI("Topic Models", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = limit, parent = parent, notebook = notebook, 
         to = 10, from = 2, resolution = 1, time = time, theme = "theme_gray", title = "Topic Models", palette = "Dark2", subtitle = " ", caption = " ")

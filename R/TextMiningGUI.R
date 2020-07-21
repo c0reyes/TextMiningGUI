@@ -1,4 +1,5 @@
 toprint <- new.env()
+x <- NULL
 
 TextMiningGUI <- function() {
     if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
@@ -400,8 +401,8 @@ TextMiningGUI <- function() {
                     }else{
                         tkentryconfigure(analysis_menu, 8, state = "normal")
                         tkentryconfigure(analysis_menu, 10, state = "normal")
-                        if(require(corrr)) tkentryconfigure(analysis_menu, 7, state = "normal")
-                        if(require(ca)) tkentryconfigure(analysis_menu, 9, state = "normal")
+                        if(is.installed("corrr")) tkentryconfigure(analysis_menu, 7, state = "normal")
+                        if(is.installed("ca")) tkentryconfigure(analysis_menu, 9, state = "normal")
                     }
 
                     if(bigrams) tkentryconfigure(analysis_menu, 4, state = "normal")
@@ -639,7 +640,7 @@ TextMiningGUI <- function() {
     # Read Excel
     ReadExcel <- function(file_name) {      
         rm(list = ls(envir = env), envir = env)                                                                                                                                                                                                                        
-        assign("DATA", read_excel(file_name), envir = env)                                                                                                                                                                                       
+        assign("DATA", readxl::read_excel(file_name), envir = env)                                                                                                                                                                                       
         dataFrameTable(env$DATA)
         disableMenu()
     }
@@ -647,7 +648,7 @@ TextMiningGUI <- function() {
     # Read Json
     ReadJson <- function(file_name) {
         rm(list = ls(envir = env), envir = env)
-        assign("DATA", fromJSON(file_name), envir = env)                                                                                                                                                                                    
+        assign("DATA", jsonlite::fromJSON(file_name), envir = env)                                                                                                                                                                                    
         dataFrameTable(env$DATA)
         disableMenu()
     }
@@ -748,8 +749,8 @@ TextMiningGUI <- function() {
         }else{
             tkentryconfigure(analysis_menu, 8, state = "normal")
             tkentryconfigure(analysis_menu, 10, state = "normal")
-            if(require(corrr)) tkentryconfigure(analysis_menu, 7, state = "normal")
-            if(require(ca)) tkentryconfigure(analysis_menu, 9, state = "normal")
+            if(is.installed("corrr")) tkentryconfigure(analysis_menu, 7, state = "normal")
+            if(is.installed("ca")) tkentryconfigure(analysis_menu, 9, state = "normal")
         }
 
         group <<- tclVar("")
@@ -1001,10 +1002,10 @@ TextMiningGUI <- function() {
     img <- ttklabel(tb$tableFrame, image = "imageID", compound = "image", anchor = "center")
     tkpack(img)
 
-    if(require(readxl)) tkentryconfigure(file_menu, 1, state = "normal")
-    if(require(jsonlite)) tkentryconfigure(file_menu, 3, state = "normal")
-    if(require(topicmodels)) tkentryconfigure(analysis_menu, 13, state = "normal")
-    if(require(corrr)) tkentryconfigure(analysis_menu, 7, state = "normal")
-    if(require(ca)) tkentryconfigure(analysis_menu, 9, state = "normal")
-    if(require(igraph) && require(ggraph)) tkentryconfigure(analysis_menu, 4, state = "normal")
+    if(is.installed("readxl")) tkentryconfigure(file_menu, 1, state = "normal")
+    if(is.installed("jsonlite")) tkentryconfigure(file_menu, 3, state = "normal")
+    if(is.installed("topicmodels")) tkentryconfigure(analysis_menu, 13, state = "normal")
+    if(is.installed("corrr")) tkentryconfigure(analysis_menu, 7, state = "normal")
+    if(is.installed("ca")) tkentryconfigure(analysis_menu, 9, state = "normal")
+    if(is.installed("igraph") && is.installed("ggraph")) tkentryconfigure(analysis_menu, 4, state = "normal")
 }

@@ -1,4 +1,6 @@
 CommonPage <- function(X, parent, notebook, envir) {
+    word <- freq <- NULL
+    
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
             plot(save$plot)
@@ -11,8 +13,8 @@ CommonPage <- function(X, parent, notebook, envir) {
         
         w <- X$data[1:graph$limit,,drop = FALSE]
         
-        if(require(ggpubr)) 
-            plot <- ggballoonplot(w, fill = "value") +
+        if(is.installed("ggpubr")) 
+            plot <- ggpubr::ggballoonplot(w, fill = "value") +
                 scale_fill_gradientn(colors = colors) +
                 theme_minimal() +
                 guides(size = FALSE) + 

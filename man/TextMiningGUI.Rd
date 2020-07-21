@@ -40,3 +40,9 @@ Analysis Menu:
 \item Topic Models
 }
 }
+\examples{
+\dontrun{
+library(TextMiningGUI)
+TextMiningGUI()
+}
+}

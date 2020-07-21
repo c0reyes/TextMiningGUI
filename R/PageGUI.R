@@ -2,6 +2,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
                     xlab = "", ylab = "", flip = "", palette = "", subtitle = "", caption = "", clustert = "", text_size = 0, dim = "",
                     background = "", text_color = "", vector_color = "", point_color = "", repel = "", limit = 0, vector_text = "", point_text = "",
                     vector_size = 0, point_size = 0, parent, notebook, to = 1, from = 10, resolution = 10, distances = "", cluster = 0) {
+    hscale <- vscale <- NULL
     
     resize <- function(parent, env) {
         geometry <- unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(parent)),"\\+"))[1],"x"))
@@ -508,5 +509,5 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
 
     if(distances != "") tcl(distance_box, "config", "-state", "normal")
     if(graph$cluster > 0) tcl(cluster_box, "config", "-state", "normal")
-    if(graph$clustert != "" && require(ape)) tcl(clustert_box, "config", "-state", "normal")
+    if(graph$clustert != "" && is.installed("ape")) tcl(clustert_box, "config", "-state", "normal")
 }

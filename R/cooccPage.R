@@ -1,22 +1,24 @@
 cooccPage <- function(X, parent, notebook, envir) {
+    size <- bigram <- word1 <- word2 <- NULL
+    
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
             plot(save$plot)
             return(NULL)
         }
         
-        w <- w %>% dplyr::filter(n > graph$limit) %>% graph_from_data_frame(directed = FALSE)
+        w <- w %>% dplyr::filter(n > graph$limit) %>% igraph::graph_from_data_frame(directed = FALSE)
 
-        V(w)$size <- degree(w)
-        V(w)$clu <- as.character(membership(cluster_louvain(w)))
+        igraph::V(w)$size <- igraph::degree(w)
+        igraph::V(w)$clu <- as.character(igraph::membership(igraph::cluster_louvain(w)))
 
         set.seed(0)
-        plot <- ggraph(graph = w, layout = 'fr') + # nicely
-            geom_edge_link0(aes(edge_width = n), colour = graph$vcolor, alpha = (if(graph$alpha == 1) 1 else 0.50))  +
-            geom_node_point(aes(fill = as.numeric(V(w)$clu), size = size), stroke = 0, shape = 21)+
-            geom_node_text(aes(label = name), color = graph$tcolor, size = graph$tsize, repel = FALSE) +
+        plot <- ggraph::ggraph(graph = w, layout = 'fr') + # nicely
+            ggraph::geom_edge_link0(aes(edge_width = n), colour = graph$vcolor, alpha = (if(graph$alpha == 1) 1 else 0.50))  +
+            ggraph::geom_node_point(aes(fill = as.numeric(igraph::V(w)$clu), size = size), stroke = 0, shape = 21)+
+            ggraph::geom_node_text(aes(label = name), color = graph$tcolor, size = graph$tsize, repel = FALSE) +
             scale_fill_distiller(palette = graph$palette)+
-            scale_edge_width(range = c(0.2,3))+
+            ggraph::scale_edge_width(range = c(0.2,3))+
             scale_size(range = c(1,6))+
             theme(legend.position = "none") +
             theme(

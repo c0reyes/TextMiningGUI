@@ -1,5 +1,7 @@
 CaPage <- function(X, parent, notebook, envir) {
     Plot <- function(graph) {
+        Dim1 <- Dim2 <- Variable <- Label <- NULL
+
         if(!is.null(graph$reload)) { 
             plot(save$plot)
             return(NULL)
@@ -34,7 +36,7 @@ CaPage <- function(X, parent, notebook, envir) {
                                   col = Variable, shape = Variable,
                                   label = Label), size = graph$psize)
 
-        g_text <- if(graph$repel == TRUE && require(ggrepel)) geom_text_repel else geom_text
+        g_text <- if(graph$repel == TRUE && is.installed("ggrepel")) ggrepel::geom_text_repel else geom_text
 
         if(graph$vtext == TRUE) 
             plot <- plot + g_text(data = w[which(w$Variable == "Columns"),],
@@ -66,7 +68,7 @@ CaPage <- function(X, parent, notebook, envir) {
     }
 
     ca <- tryCatch({ 
-            ca(X$data, nd = 3)
+            ca::ca(X$data, nd = 3)
         }, error = function(cond) {
             tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
         })

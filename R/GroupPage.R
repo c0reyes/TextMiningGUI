@@ -1,4 +1,6 @@
 GroupPage <- function(X, parent, notebook, envir) {
+    GROUP <- TIME <- COUNT <- freq <- ..count.. <- NULL
+    
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
             plot(save$plot)

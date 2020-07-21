@@ -1,4 +1,6 @@
 DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value", ngrams = FALSE, steamcomp = FALSE, stopwords = TRUE, otherstopwords = "") {
+    GROUP <- TEXT <- ID <- freq <- word <- NULL
+    
     tm_group <- function(X) {
         X$TEXT <- iconv(X$TEXT, to = "ASCII//TRANSLIT")
         corpus <- Corpus(VectorSource(X$TEXT))

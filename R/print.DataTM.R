@@ -1,5 +1,7 @@
 #' @export
 print.DataTM <- function(x, ...) {
+    GROUP <- freq <- total <- NULL
+    
     cat("\n### Language ###\n\n")
     print(x$lang)
     

@@ -1,7 +1,12 @@
-console <- function(start = FALSE, cmds = "", envir = .BaseNamespaceEnv) {
+console <- function(start = FALSE, cmds = "", envir = .BaseNamespaceEnv) { 
+    windowc <- txt <- NULL   
+
+    if(exists("windowc", envir = .BaseNamespaceEnv)) windowc <- get("windowc", envir = .BaseNamespaceEnv)
+    if(exists("txt", envir = .BaseNamespaceEnv)) txt <- get("txt", envir = .BaseNamespaceEnv)
+
     if(start == TRUE) {
         if(!exists("windowc", envir = .BaseNamespaceEnv) || is.null(windowc)) {
-            assign("windowc", tktoplevel(), envir = .BaseNamespaceEnv)
+            windowc <- tktoplevel()
             tkwm.minsize(windowc, "600", "200")
             tkwm.title(windowc, "Console")
             tkwm.protocol(windowc, "WM_DELETE_WINDOW", function() {
@@ -13,7 +18,7 @@ console <- function(start = FALSE, cmds = "", envir = .BaseNamespaceEnv) {
             frame_2 <- ttkframe(windowc)
             tkpack(frame, expand = TRUE, fill = "both")
             tkpack(frame_2, side = "right")
-            assign("txt", tktext(frame, width = 80, height = 24, wrap = "none", font = "courier"), envir = .BaseNamespaceEnv)
+            txt <- tktext(frame, width = 80, height = 24, wrap = "none", font = "courier")
             addScrollbars(frame, txt)
             tktag.configure(txt, "commandTag", foreground = "blue", font = "courier 12 italic")
             tktag.configure(txt, "outputTag", font = "courier 12")
@@ -26,10 +31,13 @@ console <- function(start = FALSE, cmds = "", envir = .BaseNamespaceEnv) {
                     assign("txt", NULL, envir = .BaseNamespaceEnv)
                 })
             tkpack(button_frame, fill = "x", padx = 5, pady = 5)             
-            tkpack(close_button, side = "right", padx = 0)             
+            tkpack(close_button, side = "right", padx = 0)  
+
+            assign("windowc", windowc, envir = .BaseNamespaceEnv)   
+            assign("txt", txt, envir = .BaseNamespaceEnv)        
         }
     }else{
-        if(exists("txt", envir = .BaseNamespaceEnv) && !is.null(txt)) {
+        if(!is.null(txt)) {
             tkinsert(txt, "end", "\n")
             tkinsert(txt, "end", "\n")
             cmd_chunks <- try(parse(text = cmds), silent = TRUE)

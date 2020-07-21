@@ -1,8 +1,9 @@
 Export <- function(X) {
+    GROUP <- freq <- total <- NULL
     file <- "output.Rmd"
 
-    if(!require(knitr)) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require knitr library.", type = "ok")
-    if(!require(rmarkdown)) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require rmarkdown library.", type = "ok")
+    if(!is.installed("knitr")) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require knitr library.", type = "ok")
+    if(!is.installed("rmarkdown")) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require rmarkdown library.", type = "ok")
 
     cat("---\ntitle: TextMiningGUI\n---\n\n", file = file)
     time <- format(Sys.time(), "%a %b %d %X %Y")
@@ -24,20 +25,20 @@ Export <- function(X) {
     cat(X$sparse, file = file, append = TRUE)
 
     cat("\n\n# Summary\n\n", file = file, append = TRUE)
-    table <- kable(summary(X$freq[1:2]), format = "markdown")
+    table <- knitr::kable(summary(X$freq[1:2]), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
     cat("\n# Words by groups\n\n", file = file, append = TRUE)
     t <- X$freq %>% group_by(GROUP) %>% summarise(total = sum(freq)) %>% arrange(desc(total))
-    table <- kable(t, format = "markdown")
+    table <- knitr::kable(t, format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
     cat("\n\n# Distinct words by groups\n\n", file = file, append = TRUE)
-    table <- kable(X$dist, format = "markdown")
+    table <- knitr::kable(X$dist, format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
     cat("\n\n# Lexical table\n\n", file = file, append = TRUE)
-    table <- kable(head(X$data), format = "markdown")
+    table <- knitr::kable(head(X$data), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
     cat("\n\n# str()\n\n", file = file, append = TRUE)
@@ -46,7 +47,7 @@ Export <- function(X) {
 
     if(!is.null(X$bigrams)) {
         cat("\n\n# Bigrams\n\n", file = file, append = TRUE)
-        table <- kable(head(X$bigrams), format = "markdown")
+        table <- knitr::kable(head(X$bigrams), format = "markdown")
         cat(table, sep="\n", file = file, append = TRUE)
     }
 
@@ -55,7 +56,7 @@ Export <- function(X) {
     cat(paste("> ", i, "\n\n"), file = file, append = TRUE)
 
     cat("\n\n# DF\n\n", file = file, append = TRUE)
-    table <- kable(head(X$df), format = "markdown")
+    table <- knitr::kable(head(X$df), format = "markdown")
     cat(table, sep = "\n", file = file, append = TRUE)
 
     cat(paste0("\n\n# Analysis\n\n"), file = file, append = TRUE)
@@ -69,12 +70,12 @@ Export <- function(X) {
         if(!is.null(getElement(i, "table"))) {
             if(!is.null(getElement(i, "more"))) {
                 for(tt in i$table) {
-                    table <- kable(tt, format = "markdown")
+                    table <- knitr::kable(tt, format = "markdown")
                     cat(table, sep = "\n", file = file, append = TRUE)
                     cat("\n\n", file = file, append = TRUE)
                 }
             }else{
-                table <- kable(i$table, format = "markdown")
+                table <- knitr::kable(i$table, format = "markdown")
                 cat(table, sep = "\n", file = file, append = TRUE)
             }
         }
@@ -86,7 +87,7 @@ Export <- function(X) {
         }
     }
 
-    render("output.Rmd", output_format = "pdf_document", params = list(params))
+    rmarkdown::render("output.Rmd", output_format = "pdf_document", params = list(params))
     file.remove(file)
     tkmessageBox(title = "Export", message = "Export:", detail = "output.pdf was created.", type = "ok") 
 }

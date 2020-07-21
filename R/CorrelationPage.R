@@ -5,7 +5,7 @@ CorrelationPage <- function(X, parent, notebook, envir) {
             return(NULL)
         }
         
-        plot <- cor %>% network_plot(min_cor = graph$limit, repel = TRUE) 
+        plot <- cor %>% corrr::network_plot(min_cor = graph$limit, repel = TRUE) 
         plot <- plot + theme_white() + theme(axis.title.x = element_blank(), axis.text.x = element_blank(),
                                            axis.title.y = element_blank(), axis.text.y = element_blank())
 
@@ -20,7 +20,7 @@ CorrelationPage <- function(X, parent, notebook, envir) {
     }
 
     cor <- tryCatch({
-            X$data %>% correlate() 
+            X$data %>% corrr::correlate() 
         }, error = function(cond) {
             tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "Some error occurred verify your data.", type = "ok")
         })
@@ -30,7 +30,7 @@ CorrelationPage <- function(X, parent, notebook, envir) {
     name <- as.character(runif(1))
     save <- list()
     save$name <- "Correlation"
-    save$table <- X$data %>% correlate()
+    save$table <- X$data %>% corrr::correlate()
     class(save) <- "save"
 
     PageGUI("Correlation", Plot, id = as.character(match.call()[[1]]), envir = envir, parent = parent, notebook = notebook, from = 0.1, to = 0.9, resolution = 0.1, limit = 0.5)

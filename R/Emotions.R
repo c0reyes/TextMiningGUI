@@ -1,14 +1,14 @@
 Emotions <- function(X, language) {
     X <- as.vector(X)
 
-    if(require(parallel)) {
-        cores <- max(1, detectCores() - 1)
-        cl <- makeCluster(cores)
-        clusterExport(cl = cl, c("get_sentiment", "get_sent_values", "get_nrc_sentiment", "get_nrc_values", "parLapply"))
-        emotion.df <- get_nrc_sentiment(char_v = X, language = language, cl = cl)
-        stopCluster(cl)
+    if(is.installed("parallel")) {
+        cores <- max(1, parallel::detectCores() - 1)
+        cl <- parallel::makeCluster(cores)
+        parallel::clusterExport(cl = cl, c("get_sentiment", "get_sent_values", "get_nrc_sentiment", "get_nrc_values"))
+        emotion.df <- syuzhet::get_nrc_sentiment(char_v = X, language = language, cl = cl)
+        parallel::stopCluster(cl)
     }else{
-        emotion.df <- get_nrc_sentiment(char_v = X, language = language)
+        emotion.df <- syuzhet::get_nrc_sentiment(char_v = X, language = language)
     }
 
     emotion.df <- data.frame(t(emotion.df))

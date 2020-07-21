@@ -12,7 +12,7 @@ ClusterPage <- function(X, parent, notebook, envir) {
             else
                 clus = rep(1, graph$limit)
 
-            plot(as.phylo(plot), main = graph$title, type = graph$clustert, tip.color = colors[clus], cex = 0.8)
+            plot(ape::as.phylo(plot), main = graph$title, type = graph$clustert, tip.color = colors[clus], cex = 0.8)
         } else {
             plot(plot, sub = "", xlab = "", main = graph$title)
             if(graph$cluster > 1)

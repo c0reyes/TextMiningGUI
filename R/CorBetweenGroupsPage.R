@@ -1,4 +1,5 @@
 CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
+    .data <- NULL
     vars <- colnames(X$data)
 
     group1 <- tclVar("")
