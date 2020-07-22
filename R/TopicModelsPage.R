@@ -10,7 +10,7 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
         t <- match.fun(graph$theme)
 
         if(limit != graph$limit) {
-            lda <<- topicmodels::LDA(X$dtm, k = graph$limit)
+            lda <<- topicmodels::LDA(X$dtm, k = graph$limit, control = list(seed = 1234))
             limit <<- graph$limit
         }
 
@@ -72,7 +72,7 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
 
     time <- if("TIME" %in% colnames(X$df)) " " else ""
     limit <- 4
-    lda <- topicmodels::LDA(X$dtm, k = limit)
+    lda <- topicmodels::LDA(X$dtm, k = limit, control = list(seed = 1234))
 
     PageGUI("Topic Models", Plot, id = as.character(match.call()[[1]]), envir = envir, limit = limit, parent = parent, notebook = notebook, 
         to = 10, from = 2, resolution = 1, time = time, theme = "theme_gray", title = "Topic Models", palette = "Dark2", subtitle = " ", caption = " ")
