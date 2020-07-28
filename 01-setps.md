@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Uso
-permalink: /steps/
+permalink: /TextMiningGUI/steps/
 ---
 
     library(TextMiningGUI)

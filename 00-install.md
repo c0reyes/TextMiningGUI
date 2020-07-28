@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Instalación
-permalink: /install/
+permalink: /TextMiningGUI/install/
 ---
 
 Para la instalación podemos utilizar el repositorio en GitHub donde están los códigos en

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Acerca de
-permalink: /about/
+permalink: /TextMiningGUI/about/
 ---
 
 Este programa es el resultado del Trabajo fin de Máster un Software para el Análisis de Datos Textuales, realizado en el contexto del Departamento de Estadística de la [Universidad de Salamanca](https://usal.es/) en el periodo 2019-2020. 
