@@ -13,7 +13,7 @@ Para utilizar el programa y efectuar los análisis, se realizan los siguientes p
 - Minería de textos, en otras palabras crear corpus y tablas léxicas. Menú Datos.
 - Realizar los análisis, menú Análisis.
 
-<center><img src="/assets/img/gui.png" width="75%"></center>
+<center><img src="assets/img/gui.png" width="75%"></center>
 
 # Archivos
 
