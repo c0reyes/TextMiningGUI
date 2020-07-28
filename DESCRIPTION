@@ -4,6 +4,7 @@ Date: 2020-07-02
 Title: Text Mining GUI Interface
 Author: Conrado Reyes, Purificacion Galindo Villardon
 Maintainer: Conrado Reyes <coreyes@gmail.com>
+URL: https://c0reyes.github.io/TextMiningGUI/
 Depends: R(>= 3.6), syuzhet
 Imports: tcltk, tkrplot, dplyr, tidyr, tidytext, tibble, tm, slam, ggplot2, ggwordcloud, RColorBrewer
 Suggests: SnowballC, readxl, jsonlite, parallel, ggrepel, ggpubr, igraph, ggraph, ape, topicmodels, ca, corrr, data.table, knitr, rmarkdown

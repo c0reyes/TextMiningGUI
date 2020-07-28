@@ -3,6 +3,8 @@
 GUI for Text Mining created in R and tcltk.  
 The core of the analysis are the Biplots technique and the caracteritation value.
 
+https://c0reyes.github.io/TextMiningGUI/
+
 ## Prerequisites
 
 ```
