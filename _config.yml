@@ -1,0 +1,15 @@
+title: TextMiningGUI
+description: >-
+  GUI for Text Mining created in R and tcltk.  
+  The core of the analysis are the Biplots technique and the caracteritation value.
+baseurl: ""
+url: "" 
+github_username:  c0reyes
+
+theme: minima
+
+defaults:
+  - scope:
+      path: "assets/img"
+    values:
+      image: true

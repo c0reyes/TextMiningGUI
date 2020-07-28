@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Instalación | TextMiningGUI</title>
+<meta name="generator" content="Jekyll v3.8.7" />
+<meta property="og:title" content="Instalación" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="GUI for Text Mining created in R and tcltk. The core of the analysis are the Biplots technique and the caracteritation value." />
+<meta property="og:description" content="GUI for Text Mining created in R and tcltk. The core of the analysis are the Biplots technique and the caracteritation value." />
+<link rel="canonical" href="http://localhost:4000/install/" />
+<meta property="og:url" content="http://localhost:4000/install/" />
+<meta property="og:site_name" content="TextMiningGUI" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/install/","headline":"Instalación","description":"GUI for Text Mining created in R and tcltk. The core of the analysis are the Biplots technique and the caracteritation value.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="TextMiningGUI" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">TextMiningGUI</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/install/">Instalación</a><a class="page-link" href="/steps/">Uso</a><a class="page-link" href="/about/">Acerca de</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title">Instalación</h1>
+  </header>
+
+  <div class="post-content">
+    <p>Para la instalación podemos utilizar el repositorio en GitHub donde están los códigos en
+desarrollo. Esto requiere de disponer previamente el paquete “devtools” y las dependencias
+principales del programa.</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s2">"tcltk"</span><span class="p">,</span><span class="w"> </span><span class="s2">"tkrplot"</span><span class="p">,</span><span class="w"> </span><span class="s2">"dplyr"</span><span class="p">,</span><span class="w"> </span><span class="s2">"tidyr"</span><span class="p">,</span><span class="w"> </span><span class="s2">"tidytext"</span><span class="p">,</span><span class="w"> </span><span class="s2">"tibble"</span><span class="p">,</span><span class="w"> </span><span class="s2">"tm"</span><span class="p">,</span><span class="w"> </span><span class="s2">"SnowballC"</span><span class="p">,</span><span class="w"> </span><span class="s2">"slam"</span><span class="p">,</span><span class="w"> </span><span class="s2">"syuzhet"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ggplot2"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ggwordcloud"</span><span class="p">,</span><span class="w"> </span><span class="s2">"RcolorBrewer"</span><span class="p">))</span><span class="w">
+
+</span><span class="n">install.packages</span><span class="p">(</span><span class="s2">"devtools"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">devtools</span><span class="o">::</span><span class="n">install_github</span><span class="p">(</span><span class="s2">"c0reyes/TextMiningGUI"</span><span class="p">)</span></code></pre></figure>
+
+<p>Instaladas las dependencias y el paquete de TextMiningGUI, se procede a cargar la librería y ejecutar el programa:</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">library</span><span class="p">(</span><span class="n">TextMiningGUI</span><span class="p">)</span><span class="w">
+
+</span><span class="n">TextMiningGUI</span><span class="p">()</span></code></pre></figure>
+
+<p>Otros paquetes adicionales que pueden ser instalados son:</p>
+
+<figure class="highlight"><pre><code class="language-r" data-lang="r"><span class="n">install.packages</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s2">"readxl"</span><span class="p">,</span><span class="w"> </span><span class="s2">"jsonlite"</span><span class="p">,</span><span class="w"> </span><span class="s2">"parallel"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ggrepel"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ggpubr"</span><span class="p">,</span><span class="w"> </span><span class="s2">"igraph"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ggraph"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ape"</span><span class="p">,</span><span class="w"> </span><span class="s2">"topicmodels"</span><span class="p">,</span><span class="w"> </span><span class="s2">"ca"</span><span class="p">,</span><span class="w"> </span><span class="s2">"corrr"</span><span class="p">))</span></code></pre></figure>
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">TextMiningGUI</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">TextMiningGUI</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/c0reyes"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">c0reyes</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>GUI for Text Mining created in R and tcltk.   The core of the analysis are the Biplots technique and the caracteritation value.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
