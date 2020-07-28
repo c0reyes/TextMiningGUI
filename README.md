@@ -1,6 +1,7 @@
 # TextMiningGUI
 
-It's a GUI create in R with tcltk. With this is posible the analysis text, convert documents to corpus and lexical table. The base core  of the analysis its the HJ-Biplot and the caracteritation value.
+GUI for Text Mining created in R and tcltk.  
+The core of the analysis are the Biplots technique and the caracteritation value.
 
 ## Prerequisites
 
