@@ -13,5 +13,3 @@ Tutora: Mª Purificación Galindo
 Código fuente en GitHub: [TextMiningGUI](https://github.com/c0reyes/TextMiningGUI)
 
 <center><a href="https://github.com/c0reyes/TextMiningGUI"><img border="0" src="/TextMiningGUI/assets/img/TextMiningGUI.png"></a></center>
-<br/>&nbsp;<br/>
-<center><a href="https://usal.es/"><img border="0" src="/TextMiningGUI/assets/img/usal.png"></a></center>

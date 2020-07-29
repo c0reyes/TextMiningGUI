@@ -1,7 +1,6 @@
 title: TextMiningGUI
 description: >-
-  GUI for Text Mining created in R and tcltk.  
-  The core of the analysis are the Biplots technique and the caracteritation value.
+  TextMiningGUI is a graphic interface for text analysis, implement a few methods such as HJ-Biplot, AFC, Co-occurrence, Clustering, Topic Models, Correlations and Sentiments.
 baseurl: "/TextMiningGUI/"
 url: "" 
 github_username:  c0reyes
