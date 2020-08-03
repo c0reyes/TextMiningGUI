@@ -10,6 +10,7 @@ TextMiningGUI(seed = 0)
 }
 \description{
  Graphic interface for text analysis, implement a few methods such as biplots, correspondece analysis, co-occurrence, clustering, topic models, correlations and sentiments.
+
 File Menu:
 \itemize{
 \item Can import files: csv, excel, json or RData. 
