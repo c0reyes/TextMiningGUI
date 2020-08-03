@@ -41,8 +41,6 @@ Analysis Menu:
 }
 }
 \examples{
-\dontrun{
 library(TextMiningGUI)
-TextMiningGUI()
-}
+if(TextMiningGUI()){}
 }
