@@ -1,6 +1,6 @@
 Package: TextMiningGUI
 Version: 0.1
-Date: 2020-07-02
+Date: 2020-08-03
 Title: Text Mining GUI Interface
 Authors@R: c(person("Conrado", "Reyes", email = "coreyes@gmail.com", role = c("aut", "cre")),
              person("Purificacion", "Galindo", role = c("tch")))
