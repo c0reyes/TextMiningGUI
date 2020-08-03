@@ -1,5 +1,5 @@
 DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value", ngrams = FALSE, steamcomp = FALSE, stopwords = TRUE, otherstopwords = "") {
-    GROUP <- TEXT <- ID <- freq <- word <- NULL
+    GROUP <- TEXT <- ID <- freq <- word <- txt <- NULL
     env <- new.env()
 
     env$txt <- data.frame()

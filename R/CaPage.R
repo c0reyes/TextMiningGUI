@@ -3,7 +3,7 @@ CaPage <- function(X, parent, notebook, envir) {
         Dim1 <- Dim2 <- Variable <- Label <- NULL
 
         if(!is.null(graph$reload)) { 
-            plot(save$plot)
+            plot(env$save$plot)
             return(NULL)
         }
         
@@ -57,8 +57,8 @@ CaPage <- function(X, parent, notebook, envir) {
         plot <- plot + scale_color_manual(values = color) 
         plot <- plot + t() + theme(legend.position = "none")
 
-        save$plot <- plot
-        assign(name, save, envir = toprint)
+        env$save$plot <- plot
+        assign(name, env$save, envir = toprint)
 
         plot(plot)
     }
@@ -86,15 +86,16 @@ CaPage <- function(X, parent, notebook, envir) {
     console(cmds = "ca", envir = environment())
 
     name <- as.character(runif(1))
-    save <- list()
-    save$name <- "AFC"
+    env = environment()
+    env$save <- list()
+    env$save$name <- "AFC"
 
     colnames(ca$colcontrib) <- unlist(lapply(1:ncol(ca$colcontrib), function(x) paste0("Con", x)))
     colnames(ca$rowcontrib) <- unlist(lapply(1:ncol(ca$rowcontrib), function(x) paste0("Con", x)))
-    save$table <- list(cbind(ca$colcoord, ca$colcontrib), cbind(ca$rowcoord, ca$rowcontrib))
-    save$more <- TRUE
+    env$save$table <- list(cbind(ca$colcoord, ca$colcontrib), cbind(ca$rowcoord, ca$rowcontrib))
+    env$save$more <- TRUE
 
-    class(save) <- "save"
+    class(env$save) <- "save"
 
     PageGUI("AFC", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", title = "AFC", limit = 100, vector_color = "red", point_color = "blue",
         vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ", dim = "all",

@@ -3,7 +3,7 @@ GroupPage <- function(X, parent, notebook, envir) {
     
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
-            plot(save$plot)
+            plot(env$save$plot)
             return(NULL)
         }
         
@@ -36,16 +36,17 @@ GroupPage <- function(X, parent, notebook, envir) {
                 plot <- plot + coord_flip()
         }
 
-        save$plot <- plot
-        assign(name, save, envir = toprint)
+        env$save$plot <- plot
+        assign(name, env$save, envir = toprint)
         
         plot(plot)
     }
 
     name <- as.character(runif(1))
-    save <- list()
-    save$name <- "Word Group"
-    class(save) <- "save"
+    env = environment()
+    env$save <- list()
+    env$save$name <- "Word Group"
+    class(env$save) <- "save"
 
     time <- if("TIME" %in% colnames(X$df)) " " else ""
 

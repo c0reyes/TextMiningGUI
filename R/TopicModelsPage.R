@@ -4,7 +4,7 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
 
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
-            plot(save$plot)
+            plot(env$save$plot)
             return(NULL)
         }
 
@@ -53,8 +53,8 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
             save$table <- top_terms
         }
             
-        save$plot <- plot
-        assign(name, save, envir = toprint)
+        env$save$plot <- plot
+        assign(name, env$save, envir = toprint)
         
         plot(plot)
     }
@@ -67,9 +67,10 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
     X$dtm <- X$dtm[rowTotals > 0, ]
 
     name <- as.character(runif(1))
-    save <- list()
-    save$name <- "Topic Models"
-    class(save) <- "save"
+    env = environment()
+    env$save <- list()
+    env$save$name <- "Topic Models"
+    class(env$save) <- "save"
 
     time <- if("TIME" %in% colnames(X$df)) " " else ""
     limit <- 4

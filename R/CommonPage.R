@@ -37,9 +37,10 @@ CommonPage <- function(X, parent, notebook, envir) {
     }
 
     name <- as.character(runif(1))
-    save <- list()
-    save$name <- "Most common words"
-    class(save) <- "save"
+    env = environment()
+    env$save <- list()
+    env$save$name <- "Most common words"
+    class(env$save) <- "save"
 
     PageGUI("Most commond words", Plot, id = as.character(match.call()[[1]]), envir = envir, 
         color = "lightblue", theme = "theme_gray", title = "Most common words", subtitle = " ", caption = " ",

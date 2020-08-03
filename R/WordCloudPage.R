@@ -3,7 +3,7 @@ WordCloudPage <- function(X, parent, notebook, envir) {
     
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
-            plot(save$plot)
+            plot(env$save$plot)
             return(NULL)
         }
 
@@ -22,16 +22,17 @@ WordCloudPage <- function(X, parent, notebook, envir) {
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank())
 
-        save$plot <- plot
-        assign(name, save, envir = toprint)
+        env$save$plot <- plot
+        assign(name, env$save, envir = toprint)
 
         plot(plot)
     }
 
     name <- as.character(runif(1))
-    save <- list()
-    save$name <- "Word Cloud"
-    class(save) <- "save"
+    env = environment()
+    env$save <- list()
+    env$save$name <- "Word Cloud"
+    class(env$save) <- "save"
 
     PageGUI("Word Cloud", Plot, id = as.character(match.call()[[1]]), envir = envir, palette = "Dark2", background = "#ffffff", limit = 100,
         parent = parent, notebook = notebook, to = nrow(X$data))

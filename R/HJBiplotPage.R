@@ -3,7 +3,7 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
     
     Plot <- function(graph) {
         if(!is.null(graph$reload)) { 
-            plot(save$plot)
+            plot(env$save$plot)
             return(NULL)
         }
         
@@ -82,8 +82,8 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
         plot <- plot + scale_color_manual(values = color) 
         plot <- plot + t() + theme(legend.position = "none") 
 
-        save$plot <- plot
-        assign(name, save, envir = toprint)
+        env$save$plot <- plot
+        assign(name, env$save, envir = toprint)
 
         plot(plot)
     }
@@ -102,12 +102,13 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
     console(cmds = "head(plotdf)", envir = environment())
 
     name <- as.character(runif(1))
-    save <- list()
-    save$name <- "HJ-Biplot"
-    save$table <- plotdf
-    class(save) <- "save"
+    env = environment()
+    env$save <- list()
+    env$save$name <- "HJ-Biplot"
+    env$save$table <- plotdf
+    class(env$save) <- "save"
 
-    assign(name, save, envir = toprint)
+    assign(name, env$save, envir = toprint)
 
     PageGUI("HJ-Biplot", Plot, id = as.character(match.call()[[1]]), envir = envir, theme = "theme_white", limit = 100, vector_color = "#f8766d", point_color = "#00bfc4", 
         title = "HJ-Biplot", vector_text = " ", point_text = " ", vector_size = 1, point_size = 2, repel = " ", dim = "all",

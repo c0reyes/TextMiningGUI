@@ -50,7 +50,7 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
             if(g1 != "" && g2 != "") {
                 Plot <- function(graph) {
                     if(!is.null(graph$reload)) { 
-                        plot(save$plot)
+                        plot(env$save$plot)
                         return(NULL)
                     }
 
@@ -65,14 +65,16 @@ CorBetweenGroupsPage <- function(X, parent, notebook, envir) {
                                       axis.text.y = element_blank())
 
                     name <- as.character(runif(1))
-                    save <- list()
-                    save$name <- "Correlation Between Two Groups"
-                    save$plot <- plot
-                    class(save) <- "save"
-                    assign(name, save, envir = toprint)
+                    env$save <- list()
+                    env$save$name <- "Correlation Between Two Groups"
+                    env$save$plot <- plot
+                    class(env$save) <- "save"
+                    assign(name, env$save, envir = toprint)
 
                     plot(plot)
                 }
+
+                env = environment()
 
                 PageGUI("Correlation between groups", Plot, id = "CorBetweenGroupsPage", limit = 100, envir = envir, parent = parent, notebook = notebook, to = nrow(X$data))
                 tkdestroy(window)
