@@ -2,8 +2,8 @@ Export <- function(X) {
     GROUP <- freq <- total <- NULL
     file <- "output.Rmd"
 
-    if(!is.installed("knitr")) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require knitr library.", type = "ok")
-    if(!is.installed("rmarkdown")) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require rmarkdown library.", type = "ok")
+    if(!requireNamespace("knitr", quietly = TRUE)) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require knitr library.", type = "ok")
+    if(!requireNamespace("rmarkdown", quietly = TRUE)) tkmessageBox(title = "Error", message = "Error:", icon = "error", detail = "require rmarkdown library.", type = "ok")
 
     cat("---\ntitle: TextMiningGUI\n---\n\n", file = file)
     time <- format(Sys.time(), "%a %b %d %X %Y")

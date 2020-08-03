@@ -509,5 +509,5 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
 
     if(distances != "") tcl(distance_box, "config", "-state", "normal")
     if(graph$cluster > 0) tcl(cluster_box, "config", "-state", "normal")
-    if(graph$clustert != "" && is.installed("ape")) tcl(clustert_box, "config", "-state", "normal")
+    if(graph$clustert != "" && requireNamespace("ape", quietly = TRUE)) tcl(clustert_box, "config", "-state", "normal")
 }

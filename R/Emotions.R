@@ -1,7 +1,7 @@
 Emotions <- function(X, language) {
     X <- as.vector(X)
 
-    if(is.installed("parallel")) {
+    if(requireNamespace("parallel", quietly = TRUE)) {
         cores <- max(1, parallel::detectCores() - 1)
         cl <- parallel::makeCluster(cores)
         parallel::clusterExport(cl = cl, c("get_sentiment", "get_sent_values", "get_nrc_sentiment", "get_nrc_values"))

@@ -17,7 +17,7 @@ TopicModelsPage <- function(X, parent, notebook, envir) {
         term <- topicmodels::terms(lda, 6)
         term <- apply(term, MARGIN = 2, paste, collapse = ", ")
 
-        if(graph$time == TRUE && is.installed("data.table")) {
+        if(graph$time == TRUE && requireNamespace("data.table", quietly = TRUE)) {
             topic <- topicmodels::topics(lda, 1)
             topics <- data.frame(date = data.table::as.IDate(X$df[X$dtm$dimnames$Docs,]$TIME), topic)
             plot <- qplot(date, ..count.., data = topics, geom = "density", fill = term[topic], position = "stack") +

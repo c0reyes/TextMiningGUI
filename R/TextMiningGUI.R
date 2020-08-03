@@ -401,8 +401,8 @@ TextMiningGUI <- function() {
                     }else{
                         tkentryconfigure(analysis_menu, 8, state = "normal")
                         tkentryconfigure(analysis_menu, 10, state = "normal")
-                        if(is.installed("corrr")) tkentryconfigure(analysis_menu, 7, state = "normal")
-                        if(is.installed("ca")) tkentryconfigure(analysis_menu, 9, state = "normal")
+                        if(requireNamespace("corrr", quietly = TRUE)) tkentryconfigure(analysis_menu, 7, state = "normal")
+                        if(requireNamespace("ca", quietly = TRUE)) tkentryconfigure(analysis_menu, 9, state = "normal")
                     }
 
                     if(bigrams) tkentryconfigure(analysis_menu, 4, state = "normal")
@@ -749,8 +749,8 @@ TextMiningGUI <- function() {
         }else{
             tkentryconfigure(analysis_menu, 8, state = "normal")
             tkentryconfigure(analysis_menu, 10, state = "normal")
-            if(is.installed("corrr")) tkentryconfigure(analysis_menu, 7, state = "normal")
-            if(is.installed("ca")) tkentryconfigure(analysis_menu, 9, state = "normal")
+            if(requireNamespace("corrr", quietly = TRUE)) tkentryconfigure(analysis_menu, 7, state = "normal")
+            if(requireNamespace("ca", quietly = TRUE)) tkentryconfigure(analysis_menu, 9, state = "normal")
         }
 
         group <<- tclVar("")
@@ -1002,10 +1002,10 @@ TextMiningGUI <- function() {
     img <- ttklabel(tb$tableFrame, image = "imageID", compound = "image", anchor = "center")
     tkpack(img)
 
-    if(is.installed("readxl")) tkentryconfigure(file_menu, 1, state = "normal")
-    if(is.installed("jsonlite")) tkentryconfigure(file_menu, 3, state = "normal")
-    if(is.installed("topicmodels")) tkentryconfigure(analysis_menu, 13, state = "normal")
-    if(is.installed("corrr")) tkentryconfigure(analysis_menu, 7, state = "normal")
-    if(is.installed("ca")) tkentryconfigure(analysis_menu, 9, state = "normal")
-    if(is.installed("igraph") && is.installed("ggraph")) tkentryconfigure(analysis_menu, 4, state = "normal")
+    if(requireNamespace("readxl", quietly = TRUE)) tkentryconfigure(file_menu, 1, state = "normal")
+    if(requireNamespace("jsonlite", quietly = TRUE)) tkentryconfigure(file_menu, 3, state = "normal")
+    if(requireNamespace("topicmodels", quietly = TRUE)) tkentryconfigure(analysis_menu, 13, state = "normal")
+    if(requireNamespace("corrr", quietly = TRUE)) tkentryconfigure(analysis_menu, 7, state = "normal")
+    if(requireNamespace("ca", quietly = TRUE)) tkentryconfigure(analysis_menu, 9, state = "normal")
+    if(requireNamespace("igraph", quietly = TRUE) && requireNamespace("ggraph", quietly = TRUE)) tkentryconfigure(analysis_menu, 4, state = "normal")
 }

@@ -13,7 +13,7 @@ CommonPage <- function(X, parent, notebook, envir) {
         
         w <- X$data[1:graph$limit,,drop = FALSE]
         
-        if(is.installed("ggpubr")) 
+        if(requireNamespace("ggpubr", quietly = TRUE)) 
             plot <- ggpubr::ggballoonplot(w, fill = "value") +
                 scale_fill_gradientn(colors = colors) +
                 theme_minimal() +

@@ -45,7 +45,7 @@ HJBiplotPage <- function(X, parent, notebook, envir) {
                                   col = (if(graph$cluster < 2) Variable else kcluster), shape = Variable,
                                   label = Label), size = graph$psize)
 
-        g_text <- if(graph$repel == TRUE && is.installed("ggrepel")) ggrepel::geom_text_repel else geom_text
+        g_text <- if(graph$repel == TRUE && requireNamespace("ggrepel", quietly = TRUE)) ggrepel::geom_text_repel else geom_text
 
         if(graph$vtext == TRUE) 
             plot <- plot + g_text(data = w[which(w$Variable == "Columns"),],
