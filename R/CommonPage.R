@@ -30,7 +30,7 @@ CommonPage <- function(X, parent, notebook, envir) {
                 labs(title = graph$title, subtitle = graph$subtitle, caption = graph$caption) + t()
         }
             
-        save$plot <<- plot
+        save$plot <- plot
         assign(name, save, envir = toprint)
         
         plot(plot)

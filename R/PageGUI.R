@@ -32,34 +32,34 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     resize(parent, env)
     assign("g", unlist(strsplit(unlist(strsplit(tclvalue(tkwm.geometry(parent)),"\\+"))[1],"x")), envir = env)
 
-    graph <- list()
-    graph$color <- color
-    graph$theme <- theme
-    graph$title <- title
-    graph$xlab <- xlab
-    graph$ylab <- ylab
-    graph$flip <- flip
-    graph$palette <- palette
-    graph$subtitle <- subtitle
-    graph$caption <- caption
-    graph$background <- background
-    graph$tcolor <- text_color
-    graph$vcolor <- vector_color
-    graph$pcolor <- point_color
-    graph$repel <- repel
-    graph$limit <- limit
-    graph$alpha <- 1
-    graph$vtext <- vector_text
-    graph$ptext <- point_text
-    graph$vsize <- vector_size
-    graph$psize <- point_size
-    graph$tsize <- text_size
-    graph$cluster <- cluster
-    graph$distance <- ""
-    graph$clustert <- clustert
-    graph$dim <- dim
-    graph$time <- time
-    class(graph) <- "graph"
+    env$graph <- list()
+    env$graph$color <- color
+    env$graph$theme <- theme
+    env$graph$title <- title
+    env$graph$xlab <- xlab
+    env$graph$ylab <- ylab
+    env$graph$flip <- flip
+    env$graph$palette <- palette
+    env$graph$subtitle <- subtitle
+    env$graph$caption <- caption
+    env$graph$background <- background
+    env$graph$tcolor <- text_color
+    env$graph$vcolor <- vector_color
+    env$graph$pcolor <- point_color
+    env$graph$repel <- repel
+    env$graph$limit <- limit
+    env$graph$alpha <- 1
+    env$graph$vtext <- vector_text
+    env$graph$ptext <- point_text
+    env$graph$vsize <- vector_size
+    env$graph$psize <- point_size
+    env$graph$tsize <- text_size
+    env$graph$cluster <- cluster
+    env$graph$distance <- ""
+    env$graph$clustert <- clustert
+    env$graph$dim <- dim
+    env$graph$time <- time
+    class(env$graph) <- "graph"
 
     try(if(typeof(get(id, envir = envir)) != "closure") graph <- get(id, envir = envir), silent = TRUE)
     graph$dim <- if(is.null(graph$dim)) dim else graph$dim
@@ -226,7 +226,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     flip <- tclVar(graph$flip)
     ft <- tclVar("Flip graph")
     check_button <- ttkcheckbutton(sidebar, variable = flip, textvariable = ft, state = "disabled", command = function() {
-            graph$flip <<- if( tclvalue(flip) == "1" ) TRUE else FALSE
+            env$graph$flip <- if( tclvalue(flip) == "1" ) TRUE else FALSE
             replot()
         })
     tkgrid(check_button, row = 27, column = 1, sticky = "nw", padx = 2)
@@ -234,7 +234,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     time <- tclVar(graph$time)
     tm <- tclVar("Time series")
     time_button <- ttkcheckbutton(sidebar, variable = time, textvariable = tm, state = "disabled", command = function() {
-            graph$time <<- if( tclvalue(time) == "1" ) TRUE else FALSE
+            env$graph$time <- if( tclvalue(time) == "1" ) TRUE else FALSE
             replot()
         })
     tkgrid(time_button, row = 28, column = 1, sticky = "nw", padx = 2)
@@ -242,7 +242,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     repel <- tclVar(graph$repel)
     rt <- tclVar("Repel point text")
     repel_button <- ttkcheckbutton(sidebar, variable = repel, textvariable = rt, state = "disabled", command = function() {
-            graph$repel <<- if( tclvalue(repel) == "1" ) TRUE else FALSE
+            env$graph$repel <- if( tclvalue(repel) == "1" ) TRUE else FALSE
             replot()
         })
     tkgrid(repel_button, row = 29, column = 1, sticky = "nw", padx = 2)
@@ -250,7 +250,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     vtext <- tclVar(graph$vtext)
     tt <- tclVar("Show vector text")
     text_button <- ttkcheckbutton(sidebar, variable = vtext, textvariable = tt, state = "disabled", command = function() {
-            graph$vtext <<- if( tclvalue(vtext) == "1" ) TRUE else FALSE
+            env$graph$vtext <- if( tclvalue(vtext) == "1" ) TRUE else FALSE
             replot()
         })
     tkgrid(text_button, row = 30, column = 1, sticky = "nw", padx = 2)
@@ -258,7 +258,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     ptext <- tclVar(graph$ptext)
     vt <- tclVar("Show point text")
     vector_button <- ttkcheckbutton(sidebar, variable = ptext, textvariable = vt, state = "disabled", command = function() {
-            graph$ptext <<- if( tclvalue(ptext) == "1" ) TRUE else FALSE
+            env$graph$ptext <- if( tclvalue(ptext) == "1" ) TRUE else FALSE
             replot()
         })
     tkgrid(vector_button, row = 31, column = 1, sticky = "nw", padx = 2)
@@ -317,7 +317,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     tkbind(color, "<Button-1>", function(W) {
             if(graph$color != "") {
                 color <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                graph$color <<- tclvalue(color)
+                env$graph$color <- tclvalue(color)
                 if(nchar(tclvalue(color))) {
                     tkconfigure(W, background = tclvalue(color)) 
                     replot()
@@ -328,7 +328,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     tkbind(bcolor, "<Button-1>", function(W) {
             if(graph$background != "") {
                 bcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                graph$background <<- tclvalue(bcolor)
+                env$graph$background <- tclvalue(bcolor)
                 if(nchar(tclvalue(bcolor))) {
                     tkconfigure(W, background = tclvalue(bcolor)) 
                     replot()
@@ -339,7 +339,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     tkbind(tcolor, "<Button-1>", function(W) {
             if(graph$tcolor != "") {
                 tcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                graph$tcolor <<- tclvalue(tcolor)
+                env$graph$tcolor <- tclvalue(tcolor)
                 if(nchar(tclvalue(tcolor))) {
                     tkconfigure(W, background = tclvalue(tcolor)) 
                     replot()
@@ -350,7 +350,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     tkbind(vcolor, "<Button-1>", function(W) {
             if(graph$vcolor != "") {
                 vcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                graph$vcolor <<- tclvalue(vcolor)
+                env$graph$vcolor <- tclvalue(vcolor)
                 if(nchar(tclvalue(vcolor))) {
                     tkconfigure(W, background = tclvalue(vcolor)) 
                     replot()
@@ -361,7 +361,7 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
     tkbind(pcolor, "<Button-1>", function(W) {
             if(graph$pcolor != "") {
                 pcolor <- tcl("tk_chooseColor", parent = W, title = "Set box color")
-                graph$pcolor <<- tclvalue(pcolor)
+                env$graph$pcolor <- tclvalue(pcolor)
                 if(nchar(tclvalue(pcolor))) {
                     tkconfigure(W, background = tclvalue(pcolor)) 
                     replot()
@@ -370,82 +370,82 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
         })
 
     tkbind(theme_box, "<<ComboboxSelected>>", function() {
-            graph$theme <<- tclvalue(themex)
+            env$graph$theme <- tclvalue(themex)
             replot()
         })
 
     tkbind(palette_box, "<<ComboboxSelected>>", function() {
-            graph$palette <<- tclvalue(palette)
+            env$graph$palette <- tclvalue(palette)
             replot()
         })
 
     tkbind(distance_box, "<<ComboboxSelected>>", function() {
-            graph$distance <<- tclvalue(distance)
+            env$graph$distance <- tclvalue(distance)
             replot()
         })
 
     tkbind(radio_box, "<<ComboboxSelected>>", function() {
-            graph$dim <<- tclvalue(dim)
+            env$graph$dim <- tclvalue(dim)
             replot()
         })
 
     if(as.numeric(graph$cluster) > 0)
         tkbind(cluster_box, "<ButtonRelease-1>", function() {
-                graph$cluster <<- as.numeric(tclvalue(cluster))
+                env$graph$cluster <- as.numeric(tclvalue(cluster))
                 replot()
             })
 
     tkbind(clustert_box, "<<ComboboxSelected>>", function() {
-            graph$clustert <<- tclvalue(cluster_type)
+            env$graph$clustert <- tclvalue(cluster_type)
             replot()
         })
 
     tkbind(entry1, "<Return>", function() {
-            graph$title <<- tclvalue(title) 
+            env$graph$title <- tclvalue(title) 
             replot()
         })
 
     tkbind(entry2, "<Return>", function() {
-            graph$xlab <<- tclvalue(xlab)
+            env$graph$xlab <- tclvalue(xlab)
             replot()
         })
 
     tkbind(entry3, "<Return>", function() {
-            graph$ylab <<- tclvalue(ylab)
+            env$graph$ylab <- tclvalue(ylab)
             replot()
         })
 
     tkbind(subentry, "<Return>", function() {
-            graph$subtitle <<- tclvalue(subtitle)
+            env$graph$subtitle <- tclvalue(subtitle)
             replot()
         })
 
     tkbind(capentry, "<Return>", function() {
-            graph$caption <<- tclvalue(caption)
+            env$graph$caption <- tclvalue(caption)
             replot()
         })
 
     if(as.numeric(graph$limit) > 0)
         tkbind(limitbar, "<ButtonRelease-1>", function() {
-                graph$limit <<- as.numeric(tclvalue(limit))
+                env$graph$limit <- as.numeric(tclvalue(limit))
                 replot()
             })
 
     if(as.numeric(graph$vsize) > 0)
         tkbind(vectorsize, "<ButtonRelease-1>", function() {
-                graph$vsize <<- as.numeric(tclvalue(vector_size))
+                env$graph$vsize <- as.numeric(tclvalue(vector_size))
                 replot()
             })
 
     if(as.numeric(graph$psize) > 0)
         tkbind(pointsize, "<ButtonRelease-1>", function() {
-                graph$psize <<- as.numeric(tclvalue(point_size))
+                env$graph$psize <- as.numeric(tclvalue(point_size))
                 replot()
             })
 
     if(as.numeric(graph$tsize) > 0)
         tkbind(textsize, "<ButtonRelease-1>", function() {
-                graph$tsize <<- as.numeric(tclvalue(text_size))
+                env$graph$tsize <- as.numeric(tclvalue(text_size))
                 replot()
             })
 

@@ -57,7 +57,7 @@ CaPage <- function(X, parent, notebook, envir) {
         plot <- plot + scale_color_manual(values = color) 
         plot <- plot + t() + theme(legend.position = "none")
 
-        save$plot <<- plot
+        save$plot <- plot
         assign(name, save, envir = toprint)
 
         plot(plot)

@@ -12,7 +12,6 @@ cooccPage <- function(X, parent, notebook, envir) {
         igraph::V(w)$size <- igraph::degree(w)
         igraph::V(w)$clu <- as.character(igraph::membership(igraph::cluster_louvain(w)))
 
-        set.seed(0)
         plot <- ggraph::ggraph(graph = w, layout = 'fr') + # nicely
             ggraph::geom_edge_link0(aes(edge_width = n), colour = graph$vcolor, alpha = (if(graph$alpha == 1) 1 else 0.50))  +
             ggraph::geom_node_point(aes(fill = as.numeric(igraph::V(w)$clu), size = size), stroke = 0, shape = 21)+
@@ -30,7 +29,7 @@ cooccPage <- function(X, parent, notebook, envir) {
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank())
 
-        save$plot <<- plot
+        save$plot <- plot
         assign(name, save, envir = toprint)
 
         plot(plot)

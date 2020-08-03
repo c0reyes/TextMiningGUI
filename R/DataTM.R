@@ -1,5 +1,9 @@
 DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-value", ngrams = FALSE, steamcomp = FALSE, stopwords = TRUE, otherstopwords = "") {
     GROUP <- TEXT <- ID <- freq <- word <- NULL
+    env <- new.env()
+
+    env$txt <- data.frame()
+    env$tdm_global <- c()
     
     tm_group <- function(X) {
         X$TEXT <- iconv(X$TEXT, to = "ASCII//TRANSLIT")
@@ -40,15 +44,15 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
 
         tdm <- TermDocumentMatrix(d, control = list(weighting = (if(normalize == "tf-idf") weightTfIdf else weightTf)))
 
-        txt <<- rbind(txt, data.frame(txt = sapply(d, as.character), stringsAsFactors = FALSE))
+        env$txt <- rbind(env$txt, data.frame(txt = sapply(d, as.character), stringsAsFactors = FALSE))
 
         t <- TermDocumentMatrix(d)
         t$dimnames$Docs <- X$ID
-        tdm_global <<- if(!is.null(tdm_global)) c(tdm_global, t) else t
+        env$tdm_global <- if(!is.null(env$tdm_global)) c(env$tdm_global, t) else t
 
         if(sparse < 1) {
             tdm <- removeSparseTerms(tdm, sparse)
-            tdm_global <<- removeSparseTerms(tdm_global, sparse)
+            env$tdm_global <- removeSparseTerms(env$tdm_global, sparse)
         }
         
         console(cmds = "inspect(tdm)", envir = environment())
@@ -60,12 +64,9 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     }
 
     bigrams <- function() {
-        bigrams <- txt %>% unnest_tokens(input = txt, output = "bigram", token = "ngrams", n = 2, drop = TRUE)
+        bigrams <- env$txt %>% unnest_tokens(input = txt, output = "bigram", token = "ngrams", n = 2, drop = TRUE)
         return(bigrams)
     }
-
-    txt <- data.frame()
-    tdm_global <- c()
 
     otherstopwords <- if(otherstopwords != "") unlist(strsplit(otherstopwords, ",")) else ""
 
@@ -97,8 +98,8 @@ DataTM <- function(DF, language, steam = TRUE, sparse = 1, normalize = "chara-va
     tm$freq <- df %>% select(GROUP, word, freq)
     tm$dist <- df %>% group_by(GROUP) %>% summarise(sum = n()) 
 
-    tm$dtm <- as.DocumentTermMatrix(tdm_global, weighting = weightTf)
-    tm$df <- DF %>% select(-TEXT) %>% add_column(txt) %>% rename(TEXT = txt)
+    tm$dtm <- as.DocumentTermMatrix(env$tdm_global, weighting = weightTf)
+    tm$df <- DF %>% select(-TEXT) %>% add_column(env$txt) %>% rename(TEXT = txt)
     tm$len <- if(class(tm$df$GROUP) == "factor") nlevels(tm$df$GROUP) else tm$df$GROUP %>% unique() %>% length()
 
     class(tm) <- "DataTM"

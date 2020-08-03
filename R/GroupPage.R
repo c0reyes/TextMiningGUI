@@ -36,7 +36,7 @@ GroupPage <- function(X, parent, notebook, envir) {
                 plot <- plot + coord_flip()
         }
 
-        save$plot <<- plot
+        save$plot <- plot
         assign(name, save, envir = toprint)
         
         plot(plot)

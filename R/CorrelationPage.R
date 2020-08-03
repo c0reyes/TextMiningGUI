@@ -13,7 +13,7 @@ CorrelationPage <- function(X, parent, notebook, envir) {
             plot <- plot + scale_alpha_continuous(range = c(1,1))
         }
 
-        save$plot <<- plot
+        save$plot <- plot
         assign(name, save, envir = toprint)
         
         plot(plot)

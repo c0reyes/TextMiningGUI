@@ -6,8 +6,7 @@ WordCloudPage <- function(X, parent, notebook, envir) {
             plot(save$plot)
             return(NULL)
         }
-        
-        set.seed(0)
+
         w <- X$freq[1:graph$limit,]
         plot <- w %>% ggplot(aes(label = word, size = freq, color = freq)) +
             geom_text_wordcloud(aes(angle = 45 * sample(-2:2, nrow(w),
@@ -23,7 +22,7 @@ WordCloudPage <- function(X, parent, notebook, envir) {
                 panel.grid.major = element_blank(),
                 panel.grid.minor = element_blank())
 
-        save$plot <<- plot
+        save$plot <- plot
         assign(name, save, envir = toprint)
 
         plot(plot)

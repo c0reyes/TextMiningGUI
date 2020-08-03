@@ -19,7 +19,7 @@ ClusterPage <- function(X, parent, notebook, envir) {
                 rect.hclust(plot, k = graph$cluster, border = "red")
         }
 
-        save$plot <<- recordPlot()
+        save$plot <- recordPlot()
         assign(name, save, envir = toprint)
     }
 

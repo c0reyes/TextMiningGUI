@@ -1,7 +1,10 @@
 toprint <- new.env()
 x <- NULL
 
-TextMiningGUI <- function() {
+#' Graphic interface for text analysis
+#'
+#' @param seed The seed of internal function.
+TextMiningGUI <- function(seed = 0) {
     if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
         assign("x", 1, envir = .BaseNamespaceEnv)
     
@@ -69,13 +72,13 @@ TextMiningGUI <- function() {
         if(!exists("freq_", envir = env)) assign("freq_", env$tm$freq, envir = env)
 
         V <- colnames(env$data_)
-        X <- colnames(env$tm$data)
+        env$X <- colnames(env$tm$data)
 
         for(i in seq_along(V))
             tkinsert(treeview1, "", "end", values = as.tclObj(V[i]))
     
-        for(i in seq_along(X))
-            tkinsert(treeview2, "", "end", values = as.tclObj(X[i]))
+        for(i in seq_along(env$X))
+            tkinsert(treeview2, "", "end", values = as.tclObj(env$X[i]))
 
         button_frame <- ttkframe(frame)
         cancel_button <- ttkbutton(button_frame, text = "cancel",
@@ -84,9 +87,9 @@ TextMiningGUI <- function() {
                                    })
         ok_button <- ttkbutton(button_frame, text = "ok",
                                command = function() {
-                                    if(length(X) >= 3) {
-                                        env$tm$data <- env$data_[,X]
-                                        env$tm$freq <- env$freq_[env$freq_$GROUP %in% X,]
+                                    if(length(env$X) >= 3) {
+                                        env$tm$data <- env$data_[,env$X]
+                                        env$tm$freq <- env$freq_[env$freq_$GROUP %in% env$X,]
                                         dataFrameTable(env$tm$data)
                                         tkdestroy(window) 
                                     }
@@ -99,15 +102,15 @@ TextMiningGUI <- function() {
         tkbind(treeview1, "<Button-1>", function(W, x, y) {
             id <- as.character(tcl(W, "identify", "row", x, y))
             value <- as.character(tcl(W, "item", id, "-values"))
-            if(value %in% X) return(NULL)
-            X <<- c(X, value)
+            if(value %in% env$X) return(NULL)
+            env$X <- c(env$X, value)
             tkinsert(treeview2, "", "end", values = as.tclObj(c(value)))
         })  
     
         tkbind(treeview2, "<Button-1>", function(W, x, y) {
             id <- as.character(tcl(W, "identify", "row", x, y))
             value <- as.character(tcl(W, "item", id, "-values"))
-            X <<- X[X != value]
+            env$X <- env$X[env$X != value]
             tcl(W, "delete", id)
         }) 
     }
@@ -222,21 +225,33 @@ TextMiningGUI <- function() {
     }
 
     # Transformation
-    group <- tclVar("")
-    text <- tclVar("")
-    time <- tclVar("")
-    lang <- tclVar("")
-    steam <- tclVar(FALSE)
-    steamcomp <- tclVar(FALSE)
-    stopwords <- tclVar(TRUE)
-    otherstopwords <- tclVar("")
-    normalize <- tclVar("chara-value")
-    sparse <- tclVar(init = 0.998)
-    bigrams <- tclVar(FALSE)
+    env$group <- ""
+    env$text <- ""
+    env$time <- ""
+    env$lang <- ""
+    env$steam <- FALSE
+    env$steamcomp <- FALSE
+    env$stopwords <- TRUE
+    env$otherstopwords <- ""
+    env$normalize <- "chara-value"
+    env$sparse <- 0.998
+    env$bigrams <- FALSE
 
-    Transform <- function() {  
+    Transform <- function() { 
         languages <- c("danish","dutch","english","finnish","french","german","hungarian","italian","norwegian","portuguese","russian","spanish","swedish")         
         names <- colnames(env$DATA)      
+
+        group <- tclVar(env$group) 
+        text <- tclVar(env$text)
+        lang <- tclVar(env$lang)
+        time <- tclVar(env$time)
+        sparse <- tclVar(init = env$sparse) 
+        steam <- tclVar(env$steam)
+        steamcomp <- tclVar(env$steamcomp)
+        stopwords <- tclVar(env$stopwords)
+        otherstopwords <- tclVar(paste(env$otherstopwords, collapse = ","))
+        normalize <- tclVar(env$normalize) 
+        bigrams <- tclVar(env$bigrams)
 
         window <- tktoplevel(width = 420, height = 350)
         tkwm.minsize(window, "420", "350")
@@ -298,7 +313,7 @@ TextMiningGUI <- function() {
                 file_name <- tkgetOpenFile(filetypes = "{{Text files} {.txt}}")
                 if(file.exists(file_name <- as.character(file_name))) {
                     words <- iconv(paste(unlist(scan(file_name, what = list(name = character()))), collapse = ","), to = "ASCII//TRANSLIT")
-                    otherstopwords <<- tclVar(words)
+                    otherstopwords <- tclVar(words)
                     tcl(otherstopwords_entry, "configure", "-textvariable", otherstopwords)
                 }
             })
@@ -347,37 +362,38 @@ TextMiningGUI <- function() {
             })
         ok_button <- ttkbutton(button_frame, text = "ok",
             command = function() { 
-                group <- tclvalue(group)
-                text <- tclvalue(text)
-                lang <- tclvalue(lang)
-                time <- tclvalue(time)
-                sparse <- as.numeric(tclvalue(sparse))
-                steam <- if( tclvalue(steam) == "1" ) TRUE else FALSE
-                steamcomp <- if( tclvalue(steamcomp) == "1" ) TRUE else FALSE
-                stopwords <- if( tclvalue(stopwords) == "1" ) TRUE else FALSE
-                otherstopwords <- tclvalue(otherstopwords)
-                normalize <- tclvalue(normalize)
-                bigrams <- if( tclvalue(bigrams) == "1" ) TRUE else FALSE
+                env$group <- tclvalue(group)
+                env$text <- tclvalue(text)
+                env$lang <- tclvalue(lang)
+                env$time <- tclvalue(time)
+                env$sparse <- as.numeric(tclvalue(sparse))
+                env$steam <- if( tclvalue(steam) == "1" ) TRUE else FALSE
+                env$steamcomp <- if( tclvalue(steamcomp) == "1" ) TRUE else FALSE
+                env$stopwords <- if( tclvalue(stopwords) == "1" ) TRUE else FALSE
+                env$otherstopwords <- tclvalue(otherstopwords)
+                env$normalize <- tclvalue(normalize)
+                env$bigrams <- if( tclvalue(bigrams) == "1" ) TRUE else FALSE
 
-                if(text != "" && lang != "") {
-                    if(time == "")
-                        TMP <- env$DATA %>% select(text)
+                if(env$text != "" && env$lang != "") {
+                    if(env$time == "")
+                        TMP <- env$DATA %>% select(env$text)
                     else {
-                        if(class(env$DATA[[time]]) == "Date")
-                            TMP <- env$DATA %>% select(time, text)
+                        if(class(env$DATA[[env$time]]) == "Date")
+                            TMP <- env$DATA %>% select(env$time, env$text)
                         else
-                            time <- ""
+                            env$time <- ""
                     }
 
-                    if(group == "") {
+                    if(env$group == "") {
                         TMP$GROUP <- "dummy"
                         normalize <- if(normalize == "tf-idf") "tf-idf" else "none"
                     } else
-                        TMP$GROUP <- env$DATA[[group]]
+                        TMP$GROUP <- env$DATA[[env$group]]
 
-                    colnames(TMP) <- if(time == "") c("TEXT", "GROUP") else c("TIME", "TEXT", "GROUP")
+                    colnames(TMP) <- if(env$time == "") c("TEXT", "GROUP") else c("TIME", "TEXT", "GROUP")
 
-                    assign("tm", DataTM(TMP, language = lang, steam = steam, sparse = sparse, normalize = normalize, ngrams = bigrams, steamcomp = steamcomp, stopwords = stopwords, otherstopwords = otherstopwords), envir = env)
+                    assign("tm", DataTM(TMP, language = env$lang, steam = env$steam, sparse = env$sparse, normalize = env$normalize, ngrams = env$bigrams, steamcomp = env$steamcomp, stopwords = env$stopwords, otherstopwords = env$otherstopwords), envir = env)
+                    env$tm$seed <- seed
                     dataFrameTable(env$tm$data)
                     tkdestroy(window) 
                     
@@ -405,7 +421,7 @@ TextMiningGUI <- function() {
                         if(requireNamespace("ca", quietly = TRUE)) tkentryconfigure(analysis_menu, 9, state = "normal")
                     }
 
-                    if(bigrams) tkentryconfigure(analysis_menu, 4, state = "normal")
+                    if(env$bigrams) tkentryconfigure(analysis_menu, 4, state = "normal")
                     else tkentryconfigure(analysis_menu, 4, state = "disabled")
                 }
             })
@@ -753,17 +769,17 @@ TextMiningGUI <- function() {
             if(requireNamespace("ca", quietly = TRUE)) tkentryconfigure(analysis_menu, 9, state = "normal")
         }
 
-        group <<- tclVar("")
-        text <<- tclVar("")
-        time <<- tclVar("")
-        steamcomp <<- tclVar(env$tm$steamcomp)
-        stopwords <<- tclVar(env$tm$stopwords)
-        otherstopwords <<- tclVar(paste(env$tm$otherstopwords, collapse = ","))
-        lang <<- tclVar(env$tm$lang)
-        steam <<- tclVar(env$tm$steam)
-        normalize <<- tclVar(env$tm$normalize)
-        sparse <<- tclVar(env$tm$sparse)
-        bigrams <<- tclVar(env$tm$ngrams)
+        env$group <- ""
+        env$text <- ""
+        env$time <- ""
+        env$steamcomp <- env$tm$steamcomp
+        env$stopwords <- env$tm$stopwords
+        env$otherstopwords <- env$tm$otherstopwords
+        env$lang <- env$tm$lang
+        env$steam <- env$tm$steam
+        env$normalize <- env$tm$normalize
+        env$sparse <- env$tm$sparse
+        env$bigrams <- env$tm$ngrams
     }
 
     disableMenu <- function() {
@@ -776,17 +792,17 @@ TextMiningGUI <- function() {
         tkentryconfigure(file_menu, 8, state = "disabled")
         tkentryconfigure(file_menu, 11, state = "disabled")
 
-        group <<- tclVar("")
-        text <<- tclVar("")
-        lang <<- tclVar("")
-        time <<- tclVar("")
-        steam <<- tclVar(FALSE)
-        steamcomp <<- tclVar(FALSE)
-        stopwords <<- tclVar(TRUE)
-        otherstopwords <<- tclVar("")
-        normalize <<- tclVar("chara-value")
-        sparse <<- tclVar(init = 0.99)
-        bigrams <<- tclVar(FALSE)
+        env$group <- ""
+        env$text <- ""
+        env$lang <- ""
+        env$time <- ""
+        env$steam <- FALSE
+        env$steamcomp <- FALSE
+        env$stopwords <- TRUE
+        env$otherstopwords <- ""
+        env$normalize <- "chara-value"
+        env$sparse <- 0.998
+        env$bigrams <- FALSE
 
         rm(list = ls(envir = toprint), envir = toprint)
     }
