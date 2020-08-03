@@ -1,6 +1,6 @@
 title: TextMiningGUI
 description: >-
-  TextMiningGUI is a graphic interface for text analysis, implement a few methods such as HJ-Biplot, AFC, Co-occurrence, Clustering, Topic Models, Correlations and Sentiments.
+  Graphic interface for text analysis, implement a few methods such as biplots, correspondece analysis, co-occurrence, clustering, topic models, correlations and sentiments.
 baseurl: "/TextMiningGUI/"
 url: "" 
 github_username:  c0reyes
