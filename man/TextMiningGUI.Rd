@@ -9,7 +9,7 @@ TextMiningGUI(seed = 0)
 \item{seed}{the seed of internal function.}
 }
 \description{
- Graphic interface for text analysis, implement a few methods such as biplots, correspondece analysis, co-occurrence, clustering, topic models, correlations and sentiments.
+Graphic interface for text analysis, implement a few methods such as biplots, correspondence analysis, co-occurrence, clustering, topic models, correlations and sentiments.
 
 File Menu:
 \itemize{
