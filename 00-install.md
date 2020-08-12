@@ -9,7 +9,7 @@ desarrollo o desde el repositorio CRAN de R. Para instalar desde GitHub requiere
 
 Sino dispone de R, con esta guia puede hacer la instalación:
 
-<https://knowledgesociety.usal.es/sites/default/files/Guia_instalacion_R.pdf>
+https://knowledgesociety.usal.es/sites/default/files/Guia_instalacion_R.pdf
 
 Requisitos
 
