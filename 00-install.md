@@ -5,8 +5,11 @@ permalink: /TextMiningGUI/install/
 ---
 
 Para la instalación podemos utilizar el repositorio en GitHub donde están los códigos en
-desarrollo. Esto requiere de disponer previamente el paquete “devtools” y las dependencias
-principales del programa.
+desarrollo o desde el repositorio CRAN de R. Para instalar desde GitHub requiere disponer previamente del paquete “devtools” y las dependencias principales del programa.
+
+Sino dispone de R, con esta guia puede hacer la instalación:
+
+https://knowledgesociety.usal.es/sites/default/files/Guia_instalacion_R.pdf
 
 Requisitos
 
@@ -20,6 +23,12 @@ Paquetes adicionales
 install.packages(c("readxl", "jsonlite", "parallel", "ggrepel", "ggpubr", "igraph", "ggraph", "ape", "topicmodels", "ca", "corrr"))
 {% endhighlight %}
 
+Instalación desde CRAN
+
+{% highlight r %}
+install.packages("TextMiningGUI")
+{% endhighlight %}
+
 Instalación desde GitHub
 
 {% highlight r %}
@@ -28,7 +37,7 @@ install.packages("devtools")
 devtools::install_github("c0reyes/TextMiningGUI")
 {% endhighlight %}
 
-Instaladas las dependencias y el paquete de TextMiningGUI, se procede a cargar la librería y ejecutar el programa:
+Instaladas las dependencias y el paquete TextMiningGUI, se procede a cargar la librería y ejecutar el programa:
 
 {% highlight r %}
 library(TextMiningGUI)
