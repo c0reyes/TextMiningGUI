@@ -18,6 +18,14 @@ install.packages(c("readxl", "jsonlite", "parallel", "ggrepel", "ggpubr", "igrap
 
 ## Install
 
+**CRAN**
+
+```
+install.packages("TextMiningGUI")
+```
+
+**GitHub**
+
 ```
 install.packages("devtools")
 
