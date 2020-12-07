@@ -14,13 +14,13 @@ Sino dispone de R, con esta guia puede hacer la instalación:
 Requisitos
 
 {% highlight r %}
-install.packages(c("tcltk", "tkrplot", "dplyr", "tidyr", "tidytext", "tibble", "tm", "SnowballC", "slam", "syuzhet", "ggplot2", "ggwordcloud", "RcolorBrewer"))
+install.packages(c("tcltk", "dplyr", "tidyr", "tidytext", "tibble", "tm", "SnowballC", "slam", "syuzhet", "ggplot2", "ggwordcloud", "RcolorBrewer"))
 {% endhighlight %}
 
 Paquetes adicionales
 
 {% highlight r %}
-install.packages(c("readxl", "jsonlite", "parallel", "ggrepel", "ggpubr", "igraph", "ggraph", "ape", "topicmodels", "ca", "corrr"))
+install.packages(c("tkrplot", "readxl", "jsonlite", "parallel", "ggrepel", "ggpubr", "igraph", "ggraph", "ape", "topicmodels", "ca", "corrr"))
 {% endhighlight %}
 
 Instalación desde CRAN
