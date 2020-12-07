@@ -1024,6 +1024,6 @@ TextMiningGUI <- function(seed = 0) {
     if(requireNamespace("corrr", quietly = TRUE)) tkentryconfigure(analysis_menu, 7, state = "normal")
     if(requireNamespace("ca", quietly = TRUE)) tkentryconfigure(analysis_menu, 9, state = "normal")
     if(requireNamespace("igraph", quietly = TRUE) && requireNamespace("ggraph", quietly = TRUE)) tkentryconfigure(analysis_menu, 4, state = "normal")
-
+    
     TRUE
 }

@@ -20,9 +20,14 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
 
     replot <- function() {
         if(id != "") assign(id, graph, envir = envir)
-        tkrreplot(eplot, fun = function() {
+        if(requireNamespace("tkrplot", quietly = TRUE)) {
+            tkrplot::tkrreplot(eplot, fun = function() {
+                Plot(graph)
+            }, hscale = hscale, vscale = vscale)
+        }else{
+            dev.new()
             Plot(graph)
-        }, hscale = hscale, vscale = vscale)
+        }
     }
                    
     themes <- c("theme_white","theme_dark2","theme_gray", "theme_bw", "theme_linedraw", "theme_light", "theme_dark", "theme_minimal", "theme_classic", "theme_void")
@@ -450,10 +455,18 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
             })
 
     # Graph
-    eplot <- tkrplot(frame, fun = function() {
-            Plot(graph)
-        }, hscale = hscale, vscale = vscale)
-    tkpack(eplot)
+    eplot <- ""
+    if(requireNamespace("tkrplot", quietly = TRUE)) {
+        eplot <- tkrplot::tkrplot(frame, fun = function() {
+                Plot(graph)
+            }, hscale = hscale, vscale = vscale)
+        tkpack(eplot)
+    }else{
+        img <- ttklabel(frame, image = "imageID", compound = "image", anchor = "center")
+        tkpack(img)
+        dev.new()
+        Plot(graph)
+    }
 
     if(id != "") assign(id, graph, envir = envir)
 
@@ -474,9 +487,9 @@ PageGUI <- function(name, Plot, id = "", color = "", theme = "", title = "", typ
  
     tkbind(content, "<Configure>", function() {
             geometry <- resize(parent, env)
-            if(paste0(geometry, collapse = "") != paste0(get("g", envir = env), collapse = "")) {
+            if(paste0(geometry, collapse = "") != paste0(get("g", envir = env), collapse = "") && requireNamespace("tkrplot", quietly = TRUE)) {
                 assign("g", geometry, envir = env)
-                tkrreplot(eplot, fun = function() {
+                tkrplot::tkrreplot(eplot, fun = function() {
                     graph$reload <- TRUE
                     Plot(graph)
                 }, hscale = hscale, vscale = vscale)
