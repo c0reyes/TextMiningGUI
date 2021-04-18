@@ -1,18 +1,19 @@
-console <- function(start = FALSE, cmds = "", envir = .BaseNamespaceEnv) { 
+console <- function(start = FALSE, cmds = "", envir = parent.frame()) { 
     windowc <- txt <- NULL   
-
-    if(exists("windowc", envir = .BaseNamespaceEnv)) windowc <- get("windowc", envir = .BaseNamespaceEnv)
-    if(exists("txt", envir = .BaseNamespaceEnv)) txt <- get("txt", envir = .BaseNamespaceEnv)
+    consoleEnv <- globalenv()
+    
+    if(exists("windowc", envir = consoleEnv)) windowc <- get("windowc", envir = consoleEnv)
+    if(exists("txt", envir = consoleEnv)) txt <- get("txt", envir = consoleEnv)
 
     if(start == TRUE) {
-        if(!exists("windowc", envir = .BaseNamespaceEnv) || is.null(windowc)) {
+        if(!exists("windowc", envir = consoleEnv) || is.null(windowc)) {
             windowc <- tktoplevel()
             tkwm.minsize(windowc, "600", "200")
             tkwm.title(windowc, "Console")
             tkwm.protocol(windowc, "WM_DELETE_WINDOW", function() {
                     tkdestroy(windowc)
-                    assign("windowc", NULL, envir = .BaseNamespaceEnv)
-                    assign("txt", NULL, envir = .BaseNamespaceEnv)
+                    assign("windowc", NULL, envir = consoleEnv)
+                    assign("txt", NULL, envir = consoleEnv)
                 })
             frame <- ttkframe(windowc, padding = c(3,3,12,12))
             frame_2 <- ttkframe(windowc)
@@ -27,14 +28,14 @@ console <- function(start = FALSE, cmds = "", envir = .BaseNamespaceEnv) {
             close_button <- ttkbutton(button_frame, text = "close",
                 command = function() { 
                     tkdestroy(windowc) 
-                    assign("windowc", NULL, envir = .BaseNamespaceEnv)
-                    assign("txt", NULL, envir = .BaseNamespaceEnv)
+                    assign("windowc", NULL, envir = consoleEnv)
+                    assign("txt", NULL, envir = consoleEnv)
                 })
             tkpack(button_frame, fill = "x", padx = 5, pady = 5)             
             tkpack(close_button, side = "right", padx = 0)  
 
-            assign("windowc", windowc, envir = .BaseNamespaceEnv)   
-            assign("txt", txt, envir = .BaseNamespaceEnv)        
+            assign("windowc", windowc, envir = consoleEnv)   
+            assign("txt", txt, envir = consoleEnv)        
         }
     }else{
         if(!is.null(txt)) {

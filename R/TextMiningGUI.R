@@ -1,13 +1,16 @@
 toprint <- new.env()
-x <- NULL
 
 #' Graphic interface for text analysis
 #'
 #' @param seed The seed of internal function.
-TextMiningGUI <- function(seed = 0) {
-    if(exists("x", envir = .BaseNamespaceEnv) && !is.null(x)) stop("You have one session running...") 
-        assign("x", 1, envir = .BaseNamespaceEnv)
+TextMiningGUI <- function(seed = 0) {    
+    TextMiningGUIEnv <- globalenv()
+
+    if(exists("x", envir = TextMiningGUIEnv) && !is.null(get("x", envir = TextMiningGUIEnv)))
+        stop("You have one session running...")  
     
+    assign("x", 1, envir = TextMiningGUIEnv)
+
     env <- new.env()
     tb <- new.env()
 
@@ -26,7 +29,7 @@ TextMiningGUI <- function(seed = 0) {
         tkconfigure(img1, background = "white")
         tkpack(img1)
 
-        text1 <- ttklabel(frame, text = "Version: 0.1")
+        text1 <- ttklabel(frame, text = "Version: 0.3")
         tkconfigure(text1, background = "white")
         text2 <- ttklabel(frame, text = "License: GPL (>= 2)")
         tkconfigure(text2, background = "white")
@@ -820,7 +823,7 @@ TextMiningGUI <- function(seed = 0) {
     tkwm.maxsize(window, tclvalue(tkwinfo("screenwidth",".")), tclvalue(tkwinfo("screenheight",".")))
     tkwm.title(window, "TextMiningGUI")
     tkwm.protocol(window, "WM_DELETE_WINDOW", function() {
-            assign("x", NULL, envir = .BaseNamespaceEnv)
+            assign("x", NULL, envir = TextMiningGUIEnv)
             tkdestroy(window)
         })
 
@@ -927,7 +930,7 @@ TextMiningGUI <- function(seed = 0) {
 
     tkadd(file_menu, "command", label = "Quit",
         command = function() {
-            assign("x", NULL, envir = .BaseNamespaceEnv)
+            assign("x", NULL, envir = TextMiningGUIEnv)
             tkdestroy(window)
         })
 
